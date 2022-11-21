@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-async function initDatabase() {
+async function initDatabase(database) {
     await database.exec(`CREATE TABLE IF NOT EXISTS auth(
         'email' VARCHAR(255) UNIQUE,
         'username' VARCHAR(255),
@@ -67,7 +67,7 @@ module.exports = {
 
     register: async (database, req, salt) => {
 
-        await initDatabase()
+        await initDatabase(database)
 
         return (async () => {
             // validating input
@@ -236,7 +236,7 @@ module.exports = {
 
     login: async (database, req, salt) => {
 
-        await initDatabase()
+        await initDatabase(database)
 
         return (async () => {
             // validating input
@@ -387,7 +387,7 @@ module.exports = {
     },
 
     makeTempKey: async (database, req) => {
-        await initDatabase()
+        await initDatabase(database)
 
         // TODO create tempkey functionality for password resets
 
