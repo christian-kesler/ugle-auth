@@ -385,11 +385,4 @@ module.exports = {
         req.session.destroy()
 
     },
-
-    makeTempKey: async (database, req) => {
-        await initDatabase(database)
-
-        // TODO create tempkey functionality for password resets
-
-    }
 }

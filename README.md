@@ -8,23 +8,27 @@ An authentication package by Uglesoft
 
 ## Dependencies
 
+You will probably be able to use this package with older or newer versions than these, but I know these work for sure.  
+
     "dependencies": {
-        "express": "^4.18.2",
-        "express-session": "^1.17.3",
-        "sqlite": "^4.1.2",
-        "sqlite3": "^5.1.2",
+        "express": "4.18.2",
+        "express-session": "1.17.3",
+        "sqlite": "4.1.2",
+        "sqlite3": "5.1.2",
     }
 
 ## Usage
 
-ugle-auth will handle the session variables for you, but first, you need to configure your express app to utilize express-session.  
+ugle-auth will handle the session variables for you, but first, you need to configure your express app and utilize express-session.  
 
 ### Function inputs
 
 IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
 
     ugle_auth.register(sqlite_db, express_req, hashing_salt);
+
     ugle_auth.login(sqlite_db, express_req, hashing_salt);
+
     ugle_auth.logout(express_req);
 
 ### express & express-session configuration
@@ -35,9 +39,13 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 
     (async () => {
         const app = await express()
-        const database = await new sqlite3.Database(__dirname + '/your-database.db', sqlite3.OPEN_READWRITE, (err) => {
-            if (err) console.log(err.message)
-        })
+        const database = await new sqlite3.Database(
+            __dirname + '/your-database.db',
+            sqlite3.OPEN_READWRITE,
+            (err) => {
+                if (err) console.log(err.message)
+            }
+        )
 
         app.use(
             session({
@@ -62,7 +70,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 Note - the following examples assume your express app is using a view engine such as EJS
 
     // register
-    app.post('/auth/register', async function (req, res) {
+    app.post('/auth/register', async (req, res) => {
 
         (async () => {
             var result = await ugle_auth.register(database, req)
@@ -82,7 +90,7 @@ Note - the following examples assume your express app is using a view engine suc
 ### Login to an existing account - example routing
 
     // login
-    app.post('/auth/login', function (req, res) {
+    app.post('/auth/login', (req, res) => {
 
         (async () => {
             var result = await ugle_auth.login(database, req)
@@ -102,7 +110,7 @@ Note - the following examples assume your express app is using a view engine suc
 ### Logout of an existing session - example routing
 
     // logout
-    app.post('/auth/logout', function (req, res) {
+    app.post('/auth/logout', (req, res) => {
         (async () => {
             await ugle_auth.logout(req)
 
@@ -115,15 +123,15 @@ Note - the following examples assume your express app is using a view engine suc
 
 ### Variable instantiation and deletion
 
-I've made an effort to delete any and all variables used within this package before returning a response.
+I've made an effort to delete any and all variables used within this package before returning a response, and intend to refactor towards removing as many variables as possible.  
 
 ### Password Hashing
 
-The hashing algorithm used is below:
+The hashing algorithm used is below, and relies on the built-in crypto package for NodeJS:
 
     crypto.pbkdf2Sync(input, salt, 1000000, 255, `sha512`).toString(`hex`)
 
-As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 1 million times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
+As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 1,000,000 times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
 
 ### Login Attempts
 

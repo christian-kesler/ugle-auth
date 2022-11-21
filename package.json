@@ -1,19 +1,19 @@
 {
   "name": "ugle-auth",
-  "version": "1.0.0",
-  "description": "An authentication system for NodeJS web apps using SQLite",
+  "version": "1.0.1",
+  "description": "An authentication system for NodeJS web apps using sqlite, express, and express-session",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/christian-kesler/authjs.git"
+    "url": "git+https://github.com/christian-kesler/ugle-auth.git"
   },
   "author": "Uglesoft LLC (Christian Kesler)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/christian-kesler/authjs/issues"
+    "url": "https://github.com/christian-kesler/ugle-auth/issues"
   },
-  "homepage": "https://github.com/christian-kesler/authjs#readme"
+  "homepage": "https://github.com/christian-kesler/ugle-auth#readme"
 }
