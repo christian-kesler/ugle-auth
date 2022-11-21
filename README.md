@@ -62,10 +62,6 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 Note - the following examples assume your express app is using a view engine such as EJS
 
     // register
-    app.get('/auth/register', function (req, res) {
-        res.render('content/auth/register');
-    });
-
     app.post('/auth/register', async function (req, res) {
 
         (async () => {
@@ -74,6 +70,7 @@ Note - the following examples assume your express app is using a view engine suc
             if (result.valid) {
                 res.redirect('/auth/login?redirect=registration-successful')
             } else {
+                console.log(result.message)
                 res.render('content/auth/register', {
                     msg_warning: result.message,
                 });
@@ -85,25 +82,6 @@ Note - the following examples assume your express app is using a view engine suc
 ### Login to an existing account - example routing
 
     // login
-    app.get('/auth/login', function (req, res) {
-        msg_success = undefined
-        msg_info = undefined
-
-        if (req.query.redirect == 'registration-successful') {
-            msg_success = "New account created, login below"
-        } else if (req.query.redirect == 'invalid-session') {
-            msg_info = "Please login below."
-        } else if (req.query.redirect == 'logout') {
-            msg_success = "You have successfully logged out"
-        }
-        res.render('content/auth/login', {
-            msg_success: msg_success,
-            msg_info: msg_info,
-        });
-        delete msg_success
-        delete msg_info
-    });
-
     app.post('/auth/login', function (req, res) {
 
         (async () => {
@@ -112,6 +90,7 @@ Note - the following examples assume your express app is using a view engine suc
             if (result.valid) {
                 res.redirect('/account/home')
             } else {
+                console.log(result.message)
                 res.render('content/auth/login', {
                     msg_warning: result.message,
                 });
@@ -123,12 +102,6 @@ Note - the following examples assume your express app is using a view engine suc
 ### Logout of an existing session - example routing
 
     // logout
-    app.get('/auth/logout', (req, res) => {
-        res.render('content/auth/logout', {
-            msg_warning: "Are you sure you want to logout?"
-        });
-    });
-
     app.post('/auth/logout', function (req, res) {
         (async () => {
             await ugle_auth.logout(req)

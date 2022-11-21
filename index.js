@@ -5,7 +5,7 @@ async function initDatabase(database) {
         'email' VARCHAR(255) UNIQUE,
         'username' VARCHAR(255),
         'hash' VARCHAR(255),
-        'tempKey' VARCHAR(255)
+        'tempKey' VARCHAR(255),
         'salt' VARCHAR(255),
         'reset_key' VARCHAR(255),
         'nickname' VARCHAR(255),
