@@ -1,20 +1,26 @@
 const crypto = require('crypto');
+const { resolve } = require('path');
 
 async function initDatabase(database) {
-    await database.exec(`CREATE TABLE IF NOT EXISTS auth(
+    await database.exec(
+        `CREATE TABLE IF NOT EXISTS auth(
         'email' VARCHAR(255) UNIQUE,
         'username' VARCHAR(255),
         'hash' VARCHAR(255),
-        'tempKey' VARCHAR(255),
-        'salt' VARCHAR(255),
-        'reset_key' VARCHAR(255),
+        'tempkey' VARCHAR(255),
+        'tempkey_datetime' DATE,
+
+        'admin' INTEGER,
+        'manager_tags' TEXT,
+        'user_tags' TEXT,
         'nickname' VARCHAR(255),
         'pfp' VARCHAR(255),
         'theme' VARCHAR(255),
         'created_at' DATETIME,
         'updated_at' DATETIME,
         'deleted_at' DATETIME
-        );`);
+        );`
+    );
 }
 
 function isValidEmail(field) {
@@ -383,6 +389,91 @@ module.exports = {
     logout: async (req) => {
 
         req.session.destroy()
+
+    },
+
+    set_tempkey: async (database, email, salt) => {
+
+        await initDatabase(database)
+
+        return (async () => {
+            // validating input
+            console.log('validating input')
+
+            return new Promise((resolve) => {
+                if (!isTooLong(email) && !isTooShort(email) && !containsQuotes(email) && isValidEmail(email)) {
+
+                } else {
+                    resolve({
+                        'return': true,
+                        'valid': false,
+                        'code': 'email-is-invalid',
+                        'message': 'That email does not pass input validation'
+                    })
+                }
+            })
+        })().then((data) => {
+            if (data.return == true) {
+                return data
+            } else {
+                // inserting tempkey
+                console.log('inserting tempkey')
+
+                return new Promise(async (resolve) => {
+                    var hash = await hash(Math.random() * 1000000, salt)
+
+                    database.all(
+                        `UPDATE auth
+                        SET tempkey = '${hash}'
+                        WHERE email = '${email}';`,
+                        [],
+                        (err, rows) => {
+                            if (err) { console.log(err.message); return err }
+                            if (rows != undefined && rows.length == 1) {
+                                // console.log(rows[0])
+                                if (email == rows[0].email) {
+                                    resolve({
+                                        'return': true,
+                                        'valid': true,
+                                        'code': 'tempkey-set-successfully',
+                                        'message': 'Those credentials did not match any existing records'
+                                    })
+                                } else {
+                                    delete rows
+                                    resolve({
+                                        'return': true,
+                                        'valid': false,
+                                        'code': 'credentials-not-present',
+                                        'message': 'Those credentials did not match any existing records'
+                                    })
+                                }
+                            } else {
+                                delete rows
+                                resolve({
+                                    'return': true,
+                                    'valid': false,
+                                    'code': 'credentials-not-present',
+                                    'message': 'Those credentials did not match any existing records'
+                                })
+                            }
+                        }
+                    )
+                })
+
+            }
+        }).then((data) => {
+            if (data.return == true) {
+                return data
+            } else {
+                // sending email
+                console.log('sending email')
+
+                return new Promise(async (resolve) => {
+
+
+                })
+            }
+        })
 
     },
 }
