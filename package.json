@@ -1,6 +1,6 @@
 {
   "name": "ugle-auth",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An authentication system for NodeJS web apps using sqlite, express, and express-session",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/christian-kesler/ugle-auth/issues"
   },
-  "homepage": "https://github.com/christian-kesler/ugle-auth#readme"
+  "homepage": "https://github.com/christian-kesler/ugle-auth#readme",
+  "dependencies": {
+    "sqlite3": "^5.1.2"
+  }
 }

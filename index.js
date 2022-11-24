@@ -1,5 +1,6 @@
 const crypto = require('crypto');
-const { resolve } = require('path');
+const fs = require('fs');
+const sqlite3 = require('sqlite3')
 
 async function initDatabase(database) {
     await database.exec(
@@ -70,6 +71,26 @@ function hash(input, salt) {
 }
 
 module.exports = {
+
+    init: async function (path) {
+        try {
+            if (!fs.existsSync(path)) {
+                fs.writeFileSync(path, '', () => {
+                    console.log('new database file created. . . ')
+                })
+            }
+
+            const database = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
+                if (err) console.log(err.message)
+            })
+
+            return database
+        } catch (err) {
+            console.log(err.message);
+
+            return null
+        }
+    },
 
     register: async (database, req, salt) => {
 
@@ -371,87 +392,87 @@ module.exports = {
 
     },
 
-    set_tempkey: async (database, email, salt) => {
+    // set_tempkey: async (database, email, salt) => {
 
-        await initDatabase(database)
+    //     await initDatabase(database)
 
-        return (async () => {
-            // validating input
-            console.log('validating input')
+    //     return (async () => {
+    //         // validating input
+    //         console.log('validating input')
 
-            return new Promise((resolve) => {
-                if (!isTooLong(email) && !isTooShort(email) && !containsQuotes(email) && isValidEmail(email)) {
+    //         return new Promise((resolve) => {
+    //             if (!isTooLong(email) && !isTooShort(email) && !containsQuotes(email) && isValidEmail(email)) {
 
-                } else {
-                    resolve({
-                        'return': true,
-                        'valid': false,
-                        'code': 'email-is-invalid',
-                        'message': 'That email does not pass input validation'
-                    })
-                }
-            })
-        })().then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // inserting tempkey
-                console.log('inserting tempkey')
+    //             } else {
+    //                 resolve({
+    //                     'return': true,
+    //                     'valid': false,
+    //                     'code': 'email-is-invalid',
+    //                     'message': 'That email does not pass input validation'
+    //                 })
+    //             }
+    //         })
+    //     })().then((data) => {
+    //         if (data.return == true) {
+    //             return data
+    //         } else {
+    //             // inserting tempkey
+    //             console.log('inserting tempkey')
 
-                return new Promise(async (resolve) => {
-                    var hash = await hash(Math.random() * 1000000, salt)
+    //             return new Promise(async (resolve) => {
+    //                 var hash = await hash(Math.random() * 1000000, salt)
 
-                    database.all(
-                        `UPDATE auth
-                        SET tempkey = '${hash}'
-                        WHERE email = '${email}';`,
-                        [],
-                        (err, rows) => {
-                            if (err) { console.log(err.message); return err }
-                            if (rows != undefined && rows.length == 1) {
-                                if (email == rows[0].email) {
-                                    resolve({
-                                        'return': true,
-                                        'valid': true,
-                                        'code': 'tempkey-set-successfully',
-                                        'message': 'Those credentials did not match any existing records'
-                                    })
-                                } else {
-                                    delete rows
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'credentials-not-present',
-                                        'message': 'Those credentials did not match any existing records'
-                                    })
-                                }
-                            } else {
-                                delete rows
-                                resolve({
-                                    'return': true,
-                                    'valid': false,
-                                    'code': 'credentials-not-present',
-                                    'message': 'Those credentials did not match any existing records'
-                                })
-                            }
-                        }
-                    )
-                })
+    //                 database.all(
+    //                     `UPDATE auth
+    //                     SET tempkey = '${hash}'
+    //                     WHERE email = '${email}';`,
+    //                     [],
+    //                     (err, rows) => {
+    //                         if (err) { console.log(err.message); return err }
+    //                         if (rows != undefined && rows.length == 1) {
+    //                             if (email == rows[0].email) {
+    //                                 resolve({
+    //                                     'return': true,
+    //                                     'valid': true,
+    //                                     'code': 'tempkey-set-successfully',
+    //                                     'message': 'Those credentials did not match any existing records'
+    //                                 })
+    //                             } else {
+    //                                 delete rows
+    //                                 resolve({
+    //                                     'return': true,
+    //                                     'valid': false,
+    //                                     'code': 'credentials-not-present',
+    //                                     'message': 'Those credentials did not match any existing records'
+    //                                 })
+    //                             }
+    //                         } else {
+    //                             delete rows
+    //                             resolve({
+    //                                 'return': true,
+    //                                 'valid': false,
+    //                                 'code': 'credentials-not-present',
+    //                                 'message': 'Those credentials did not match any existing records'
+    //                             })
+    //                         }
+    //                     }
+    //                 )
+    //             })
 
-            }
-        }).then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // sending email
-                console.log('sending email')
+    //         }
+    //     }).then((data) => {
+    //         if (data.return == true) {
+    //             return data
+    //         } else {
+    //             // sending email
+    //             console.log('sending email')
 
-                return new Promise(async (resolve) => {
+    //             return new Promise(async (resolve) => {
 
 
-                })
-            }
-        })
+    //             })
+    //         }
+    //     })
 
-    },
+    // },
 }
