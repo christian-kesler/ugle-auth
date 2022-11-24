@@ -67,13 +67,13 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 
 ### Register a new account - example routing
 
-Note - the following examples assume your express app is using a view engine such as EJS
+Note - the following examples assume your express app is using a view engine such as EJS, and an environment variable solution such as 'dotenv'
 
     // register
     app.post('/auth/register', async (req, res) => {
 
         (async () => {
-            var result = await ugle_auth.register(database, req)
+            var result = await ugle_auth.register(database, req, process.env.SALT)
 
             if (result.valid) {
                 res.redirect('/auth/login?redirect=registration-successful')
@@ -93,7 +93,7 @@ Note - the following examples assume your express app is using a view engine suc
     app.post('/auth/login', (req, res) => {
 
         (async () => {
-            var result = await ugle_auth.login(database, req)
+            var result = await ugle_auth.login(database, req, process.env.SALT)
 
             if (result.valid) {
                 res.redirect('/account/home')
