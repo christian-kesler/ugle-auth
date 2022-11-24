@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const fs = require('fs');
-const sqlite3 = require('sqlite3')
+const sqlite3 = require(__dirname + '/../sqlite3')
 
 async function initDatabase(database) {
     await database.exec(
