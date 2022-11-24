@@ -80,7 +80,6 @@ module.exports = {
             console.log('validating input')
 
             return new Promise(async (resolve) => {
-                console.log('1')
 
                 data = {
                     email: req.body.email1,
@@ -88,19 +87,12 @@ module.exports = {
                     password: req.body.password1,
                 }
 
-                console.log('2')
                 if (!containsQuotes(data.email) && !containsQuotes(data.username) && !containsQuotes(data.password)) {
-                    console.log('3')
                     if (isValidEmail(data.email)) {
-                        console.log('4')
                         if (!isTooLong(data.username)) {
-                            console.log('5')
                             if (!isTooShort(data.username)) {
-                                console.log('6')
                                 if (!isTooLong(data.password)) {
-                                    console.log('7')
                                     if (!isTooShort(data.password)) {
-                                        console.log('8')
                                         resolve(data)
                                     } else {
                                         delete data
@@ -168,7 +160,6 @@ module.exports = {
                         if (err) { console.log(err.message) }
                         if (rows != undefined && rows.length > 0) {
                             for (let z = 0; z < rows.length; z++) {
-                                console.log(rows[z])
                                 if (data.email == rows[z].email) {
                                     z = rows.length
 
@@ -320,19 +311,7 @@ module.exports = {
                         if (err) { console.log(err.message); return err }
                         if (rows != undefined && rows.length > 0) {
                             for (let z = 0; z < rows.length; z++) {
-                                // console.log(rows[z])
-                                console.log('================================')
-                                console.log(data.hash)
-                                console.log(rows[z].hash)
-                                console.log('================================')
-
                                 if (data.hash == rows[z].hash) {
-
-                                    console.log('================================')
-                                    console.log(data.hash)
-                                    console.log(rows[z].hash)
-                                    console.log('================================')
-
                                     delete data
                                     resolve(rows[z])
                                 } else {
@@ -430,7 +409,6 @@ module.exports = {
                         (err, rows) => {
                             if (err) { console.log(err.message); return err }
                             if (rows != undefined && rows.length == 1) {
-                                // console.log(rows[0])
                                 if (email == rows[0].email) {
                                     resolve({
                                         'return': true,
