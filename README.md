@@ -95,7 +95,7 @@ Note - the following examples assume your express app is using a view engine suc
         (async () => {
             var result = await ugle_auth.login(database, req, process.env.SALT)
 
-            if (result.valid) {
+            if (result.valid && req.session.loggedin == true) {
                 res.redirect('/account/home')
             } else {
                 console.log(result.message)
