@@ -1,0 +1,18 @@
+<%- include('./layout/auth_begin' ) %>
+
+
+<h1 class="h3 mb-3 font-weight-normal" style="margin-top: 16px;">Auth - Login</h1>
+
+<%- include('./layout/messages') %>
+
+<input name="identifier" type="identifier" id="identifier" class="form-control" placeholder="Email or Username" required="" autofocus="">
+<input name="password" type="password" id="password" class="form-control" placeholder="Password" required="">
+
+<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+Don't have an account? <a href="/auth/register">Sign up here</a>
+<hr>
+<a href="/auth/lookup">Forgot password?</a>
+
+
+<%- include('./layout/auth_end' ) %>

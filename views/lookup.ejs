@@ -1,0 +1,15 @@
+<%- include('./layout/auth_begin' ) %>
+
+
+<h1 class="h3 mb-3 font-weight-normal">Auth - Lookup</h1>
+
+<%- include('./layout/messages') %>
+
+<input type="email" id="inputEmail" class="form-control" placeholder="Email Address" required="" autofocus="">
+
+<button class="btn btn-lg btn-primary btn-block" type="submit">Send Reset Email</button>
+
+Don't have an account? <a href="/auth/register">Sign up here</a>
+
+
+<%- include('./layout/auth_end' ) %>

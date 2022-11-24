@@ -1,0 +1,45 @@
+<%- include('./layout/auth_begin' ) %>
+
+
+<script>
+    function checkForm(form) {
+        password1 = form.password1.value;
+        password2 = form.password2.value;
+
+        email1 = form.email1.value
+        email2 = form.email2.value
+
+        if (email1 != email2) {
+            alert("\nEmail addresses did not match: Please try again...")
+            return false;
+        } else {
+            if (password1 != password2) {
+                alert("\nPassword did not match: Please try again...")
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+</script>
+
+
+<h1 class="h3 mb-3 font-weight-normal">Auth - Register</h1>
+
+<%- include('./layout/messages') %>
+
+<input type="email" name="email1" id="email1" class="form-control" placeholder="Email address" required="" autofocus="">
+<input type="email" name="email2" id="email2" class="form-control" placeholder="Confirm Email" required="" style="margin-bottom: 8px">
+
+<input type="username" name="username" id="username" class="form-control" placeholder="Username" required="" style="margin-bottom: 8px">
+
+<input type="password" name="password1" id="password1" class="form-control" placeholder="New Password" required="">
+<input type="password" name="password2" id="password2" class="form-control" placeholder="Confirm Password" required="">
+
+<button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
+
+Already have an account? <a href="/auth/login">Login here</a>
+
+
+<%- include('./layout/auth_end' ) %>
