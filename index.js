@@ -2,38 +2,53 @@
 ================================================================
 ugle-auth
 ----------------
-function parameters
+callback parameters
+    callback(err)
+        createUser
+        updateUser
+        deleteUser
 
+    callback(err, data)
+        readUser
+----------------
+function parameters
     dtb - variable representing sqlite database connection
     args - object containing varying information necessary for each function
         create_fields - string containing the database fields to write to
+            (email, hash, created_at, created_by)
         create_params - the values to be written into the database
+            email
+            password
 
         read_fields - string containing the database fields to retrieve
-        read_param - variable containing the value to search for
+            id
+            email
+            created_at
+            created_by
+        read_key - variable containing the field to index
+            id
+            email
+            created_at
+            created_by
+        read_value - variable containing the value to search for
+            
+        update_fields - string containing the database fields to modify
+            (email, hash)
+        update_params - the values to be written into the database
+            email
+            hash
+        update_key - variable containing the field to index
+            (id, email)
+        update_value - variable containing the value to search for
 
-        update_fields - 
-        update_param - variable containing the value to search for
+        delete_key - variable containing the field to index
+            (id, email)
+        delete_value - variable containing the value to search for
 
-        delete_param - variable containing the value to search for
-
-        retrieve_fields - 
-        search_fields - string containing the database fields to search
-        search_param - variable containing the value to search for
-        update_param
-        update_param
-        email - 
-        password - 
     callback - executed upon completion of the package function
         err - FALSE if successful, object if function failed
             message - descriptive string of what went wrong, taken from sqlite when possible
         data - object containing sqlite data if successful, NULL if function failed
-
-
-callback(err, data)
-    err will either be FALSE or contain a descriptive message at err.message
-    data will either be NULL or contain the var retrieved from sqlite
-
 ================================================================
 */
 
@@ -55,52 +70,38 @@ const sqlite3 = require(__dirname + '/../sqlite3')
 /*
     Private Functions - BEGIN
 */
-async function initDatabase(database) {
-    await database.exec(
+async function tryCreateTable(dtb) {
+    await dtb.exec(
         `CREATE TABLE IF NOT EXISTS auth(
+        'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+
         'email' VARCHAR(255) UNIQUE,
-        'username' VARCHAR(255),
         'hash' VARCHAR(255),
         'tempkey' VARCHAR(255),
         'tempkey_datetime' DATE,
 
-        'admin' INTEGER,
-        'manager_tags' TEXT,
-        'user_tags' TEXT,
-        'nickname' VARCHAR(255),
-        'pfp' VARCHAR(255),
-        'theme' VARCHAR(255),
         'created_at' DATETIME,
-        'updated_at' DATETIME,
-        'deleted_at' DATETIME
+        'created_by' DATETIME,
+        'deleted_at' DATETIME,
+        'deleted_by' DATETIME
         );`
     );
 }
 
-function isValidEmail(field) {
-    if (field.includes('@') && field.includes('.') && field.length >= 5) {
+function validEmail(input) {
+    if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
         return true
     } else {
         return false
     }
 }
-
-function isTooShort(field) {
-    if (field.length >= 8) {
-        return false
-    } else {
+function validPassword(input) {
+    if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
         return true
+    } else {
+        return false
     }
 }
-
-function isTooLong(field) {
-    if (field.length <= 32) {
-        return false
-    } else {
-        return true
-    }
-}
-
 function containsQuotes(field) {
     if (
         field.includes("'") ||
@@ -132,22 +133,56 @@ function hash(input, salt) {
 */
 module.exports = {
     /*
-        functionName: (dtb, args, callback) => { } - BEGIN
+        functionName: async (dtb, args, callback) => { } - BEGIN
     */
     /*
             CRUD user functions - BEGIN
     */
-    createUser: (dtb, args, callback) => {
-        // TODO
+    createUser: async (dtb, args, callback) => {
+        // TODO: testing
+        await tryCreateTable(dtb)
+
+        if (!validEmail(args.create_params.email)) {
+            callback(
+                {
+                    message: "invalid email"
+                }
+            )
+        } else {
+            if (!validPassword(args.create_params.password)) {
+                callback(
+                    {
+                        message: "invalid password"
+                    }
+                )
+            } else {
+                await dtb.exec(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`, [
+                    args.create_params.email,
+                    hash(args.create_params.password)
+                ], (err) => {
+                    if (err) {
+                        callback(
+                            {
+                                message: err.message
+                            }
+                        )
+                    } else {
+                        callback(
+                            false
+                        )
+                    }
+                })
+            }
+        }
     },
-    readUser: (dtb, args, callback) => {
-        // TODO
+    readUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
-    updateUser: (dtb, args, callback) => {
-        // TODO
+    updateUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
-    deleteUser: (dtb, args, callback) => {
-        // TODO
+    deleteUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
     /*
             CRUD user functions - END
@@ -156,33 +191,31 @@ module.exports = {
     /*
             Authentication user functions - BEGIN
     */
-    registerUser: (dtb, args, callback) => {
-        // TODO
+    registerUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
-    loginUser: (dtb, args, callback) => {
-        // TODO
+    loginUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
-    logoutUser: (dtb, args, callback) => {
-
-
-        // TODO
+    logoutUser: async (dtb, args, callback) => {
+        // TODO: programming
     },
     /*
             Authentication user functions - END
     */
     /*
-        functionName: (dtb, args, callback) => { } - END
+        functionName: async (dtb, args, callback) => { } - END
     */
 
 
     /*
-        functionName: (dtb, callback) => { } - BEGIN
+        functionName: async (dtb, callback) => { } - BEGIN
     */
-    allUsers: (dtb, callback) => {
-        // TODO
+    allUsers: async (dtb, callback) => {
+        // TODO: programming
     },
     /*
-        functionName: (dtb, callback) => { }- END
+        functionName: async (dtb, callback) => { }- END
     */
 }
 /*
