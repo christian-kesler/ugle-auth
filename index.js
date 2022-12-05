@@ -51,7 +51,6 @@ function parameters
 
 
 
-
 /*
     Import Statements - BEGIN
 */
@@ -140,43 +139,33 @@ module.exports = {
 
         try {
             if (!validEmail(args.create_params.email)) {
-                callback(
-                    {
-                        message: "invalid email"
-                    }
-                )
+                callback({
+                    message: "invalid email"
+                })
             } else {
                 if (!validPassword(args.create_params.password)) {
-                    callback(
-                        {
-                            message: "invalid password"
-                        }
-                    )
+                    callback({
+                        message: "invalid password"
+                    })
                 } else {
                     await dtb.exec(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`, [
                         args.create_params.email,
                         hash(args.create_params.password)
                     ], (err) => {
                         if (err) {
-                            callback(
-                                {
-                                    message: err.message
-                                }
-                            )
+                            callback({
+                                message: err.message
+                            })
                         } else {
-                            callback(
-                                false
-                            )
+                            callback(null)
                         }
                     })
                 }
             }
         } catch (err) {
-            callback(
-                {
-                    message: err.message
-                }
-            )
+            callback({
+                message: err.message
+            })
         }
     },
     readUser: async (dtb, args, callback) => {
@@ -186,26 +175,17 @@ module.exports = {
         try {
             await dtb.all(`SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ${args.read_value};`, [], (err, rows) => {
                 if (err) {
-                    callback(
-                        {
-                            message: err.message
-                        },
-                        null
-                    )
+                    callback({
+                        message: err.message
+                    })
                 } else {
-                    callback(
-                        false
-                    ),
-                        rows
+                    callback(null, rows)
                 }
             })
         } catch (err) {
-            callback(
-                {
-                    message: err.message
-                },
-                null
-            )
+            callback({
+                message: err.message
+            })
         }
     },
     updateUser: async (dtb, args, callback) => {
@@ -223,27 +203,41 @@ module.exports = {
                 args.update_value
             ], (err) => {
                 if (err) {
-                    callback(
-                        {
-                            message: err.message
-                        }
-                    )
+                    callback({
+                        message: err.message
+                    })
                 } else {
-                    callback(
-                        false
-                    )
+                    callback(null)
                 }
             })
         } catch (err) {
-            callback(
-                {
-                    message: err.message
-                }
-            )
+            callback({
+                message: err.message
+            })
         }
     },
     deleteUser: async (dtb, args, callback) => {
-        // TODO: programming
+        // TODO: testing
+        await tryCreateTable(dtb)
+
+        try {
+            await dtb.exec(`DELETE FROM auth WHERE ? = ?;`, [
+                args.delete_key,
+                args.delete_value,
+            ], (err) => {
+                if (err) {
+                    callback({
+                        message: err.message
+                    })
+                } else {
+                    callback(null)
+                }
+            })
+        } catch (err) {
+            callback({
+                message: err.message
+            })
+        }
     },
     /*
             CRUD user functions - END
@@ -252,14 +246,63 @@ module.exports = {
     /*
             Authentication user functions - BEGIN
     */
-    registerUser: async (dtb, args, callback) => {
-        // TODO: programming
-    },
+    // registerUser: async (dtb, args, callback) => {
+    // TODO: programming
+    // },
     loginUser: async (dtb, args, callback) => {
-        // TODO: programming
+        // TODO: testing
+        await tryCreateTable(dtb)
+
+        try {
+            if (!validEmail(args.login_params.email)) {
+                callback({
+                    message: "invalid email"
+                })
+            } else {
+                if (!validPassword(args.login_params.password)) {
+                    callback({
+                        message: "invalid password"
+                    })
+                } else {
+                    await dtb.all(`SELECT * FROM auth WHERE ? = ?;`, [
+                        'email',
+                        args.login_params.email
+                    ], (err) => {
+                        if (err) {
+                            callback({
+                                message: err.message
+                            })
+                        } else {
+                            if (hash(args.login_params.email) != rows[0].hash) {
+                                callback({
+                                    message: 'credentials failed'
+                                })
+                            } else {
+                                args.session.email = rows[0].email
+                                args.session.id = rows[0].id
+
+                                callback(null)
+                            }
+                        }
+                    })
+                }
+            }
+        } catch (err) {
+            callback({
+                message: err.message
+            })
+        }
     },
     logoutUser: async (dtb, args, callback) => {
         // TODO: programming
+
+        try {
+            args.session.destroy()
+        } catch (err) {
+            callback({
+                message: err.message
+            })
+        }
     },
     /*
             Authentication user functions - END
@@ -273,7 +316,25 @@ module.exports = {
         functionName: async (dtb, callback) => { } - BEGIN
     */
     allUsers: async (dtb, callback) => {
-        // TODO: programming
+        // TODO: testing
+        await tryCreateTable(dtb)
+
+        try {
+            await dtb.all(`SELECT * FROM auth;`, [], (err, rows) => {
+                if (err) {
+                    callback({
+                        message: err.message
+                    })
+                } else {
+                    callback(null, rows)
+                }
+            })
+        } catch (err) {
+            callback({
+                message: err.message
+            })
+        }
+
     },
     /*
         functionName: async (dtb, callback) => { }- END
