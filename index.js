@@ -116,7 +116,7 @@ function containsQuotes(field) {
 }
 
 function hash(input, salt) {
-    return crypto.pbkdf2Sync(input, salt, 1000000, 255, `sha512`).toString(`hex`)
+    return crypto.pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
 }
 /*
     Private Functions - END
@@ -150,7 +150,7 @@ module.exports = {
                 } else {
                     await dtb.exec(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`, [
                         args.create_params.email,
-                        hash(args.create_params.password)
+                        hash(args.create_params.password, args.create_params.salt)
                     ], (err) => {
                         if (err) {
                             callback({
@@ -194,7 +194,7 @@ module.exports = {
 
         try {
             if (args.update_params.hash == true) {
-                args.update_params.data = hash(args.update_params.data)
+                args.update_params.data = hash(args.update_params.data, args.update_params.salt)
             }
             await dtb.exec(`UPDATE auth SET ? = ? WHERE ? = ?;`, [
                 args.update_field,
@@ -246,9 +246,6 @@ module.exports = {
     /*
             Authentication user functions - BEGIN
     */
-    // registerUser: async (dtb, args, callback) => {
-    // TODO: programming
-    // },
     loginUser: async (dtb, args, callback) => {
         // TODO: testing
         await tryCreateTable(dtb)
@@ -273,7 +270,7 @@ module.exports = {
                                 message: err.message
                             })
                         } else {
-                            if (hash(args.login_params.email) != rows[0].hash) {
+                            if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
                                 callback({
                                     message: 'credentials failed'
                                 })
