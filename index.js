@@ -19,6 +19,7 @@ function parameters
         create_params - the values to be written into the database
             email - variable
             password - variable
+            salt - variable
 
         read_fields - string containing the database fields to retrieve
             "id, email, created_at, created_by"
@@ -56,7 +57,9 @@ function parameters
 */
 const crypto = require('crypto');
 const fs = require('fs');
-const sqlite3 = require(__dirname + '/../sqlite3')
+// const sqlite3 = require(__dirname + '/../sqlite3')
+const sqlite3 = require('sqlite3')
+
 /*
     Import Statements - END
 */
@@ -148,18 +151,21 @@ module.exports = {
                         message: "invalid password"
                     })
                 } else {
-                    await dtb.exec(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`, [
-                        args.create_params.email,
-                        hash(args.create_params.password, args.create_params.salt)
-                    ], (err) => {
-                        if (err) {
-                            callback({
-                                message: err.message
-                            })
-                        } else {
-                            callback(null)
-                        }
-                    })
+                    await dtb.exec(
+                        `INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`,
+                        [
+                            args.create_params.email,
+                            hash(args.create_params.password, args.create_params.salt)
+                        ],
+                        (err) => {
+                            if (err) {
+                                callback({
+                                    message: err.message
+                                })
+                            } else {
+                                callback(null)
+                            }
+                        })
                 }
             }
         } catch (err) {
