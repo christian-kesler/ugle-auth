@@ -1,17 +1,24 @@
 const ugle_auth = require('./index.js');
 
 const sqlite3 = require('sqlite3').verbose();
-const dtb = new sqlite3.Database(':memory:');
+// const dtb = new sqlite3.Database(':memory:');
 
 (async () => {
+    // TODO: convert to promise with .then to ensure dtb is loaded prior to other functions
+    return new Promise((resolve) => {
 
-    // const dtb = await new sqlite3.Database('./test.db', sqlite3.OPEN_READWRITE, (err) => {
-    //     if (err) {
-    //         console.log(err.message)
-    //     } else {
-    //         console.log('sqlite connection secured')
-    //     }
-    // });
+        const dtb = new sqlite3.Database('./test.db', sqlite3.OPEN_READWRITE, (err) => {
+            if (err) {
+                console.log(err.message)
+                resolve(null)
+            } else {
+                console.log('sqlite connection secured')
+                dtb.exec('DROP TABLE IF EXISTS auth;')
+                resolve(dtb)
+            }
+        });
+    })
+})().then(async (dtb) => {
 
     createUser_args = [
         {
@@ -19,7 +26,29 @@ const dtb = new sqlite3.Database(':memory:');
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
+            }
+        },
+        {
+            "create_fields": "email, hash, created_at, created_by",
+            "create_params": {
+                "email": "a@gmail",
+                "password": "examplePassword",
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
+            }
+        },
+        {
+            "create_fields": "email, hash, created_at, created_by",
+            "create_params": {
+                "email": "christian.j.kesler@gmail.com",
+                "password": "hi",
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
@@ -27,31 +56,29 @@ const dtb = new sqlite3.Database(':memory:');
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
-            "create_fields": "email, created_at, created_by",
+            "create_fields": "email, hash, created_at, created_by, deleted_by",
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
-            "create_fields": "email, hash, created_by",
+            "create_fields": "email, hash, created_at, hello",
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
-            }
-        },
-        {
-            "create_fields": "email, hash, created_at",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
@@ -59,27 +86,56 @@ const dtb = new sqlite3.Database(':memory:');
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
             "create_fields": "email, hash, created_at, created_by",
             "create_params": {
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
             "create_fields": "email, hash, created_at, created_by",
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
         {
             "create_fields": "email, hash, created_at, created_by",
             "create_params": {
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
+            }
+        },
+        {
+            "create_fields": "email, hash, created_at, created_by",
+            "create_params": {
+                "salt": "exampleSalt",
+                "created_by": "Me",
+            }
+        },
+        {
+            "create_fields": "email, hash, created_at, created_by",
+            "create_params": {
+                "created_at": "Today :)",
+                "created_by": "Me",
+            }
+        },
+        {
+            "create_fields": "email, hash, created_at, created_by",
+            "create_params": {
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
             }
         },
         {
@@ -89,7 +145,9 @@ const dtb = new sqlite3.Database(':memory:');
             "create_params": {
                 "email": "christian.j.kesler@gmail.com",
                 "password": "examplePassword",
-                "salt": "exampleSalt"
+                "salt": "exampleSalt",
+                "created_at": "Today :)",
+                "created_by": "Me",
             }
         },
     ]
@@ -103,6 +161,79 @@ const dtb = new sqlite3.Database(':memory:');
         })
     }
 
+
+    readUser_args = [
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "id",
+            "read_value": "1",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "id",
+            "read_value": "hero",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "email",
+            "read_value": "christian.j.kesler@gmail.com",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "email",
+            "read_value": "Antarctica",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "created_at",
+            "read_value": "Today :)",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "created_at",
+            "read_value": "Yesterday",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "created_by",
+            "read_value": "Me",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "created_by",
+            "read_value": "You",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_value": "You",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+            "read_key": "created_by",
+        },
+        {
+            "read_key": "created_by",
+            "read_value": "You",
+        },
+        {
+            "read_value": "You",
+        },
+        {
+            "read_fields": "id, email, created_at, created_by",
+        },
+        {
+            "read_key": "created_by",
+        },
+    ]
+    for (i = 0; i < readUser_args.length; i++) {
+        await ugle_auth.readUser(dtb, readUser_args[i], (err, data) => {
+            if (err) {
+                console.log(`FAIL | readUser[${i}] | ${err.message}`)
+            } else {
+                console.log(`PASS | readUser[${i}] | ${JSON.stringify(data)}`)
+            }
+        })
+    }
     // ugle_auth.readUser(dtb, args, (err) => {
     //     if (err) {
     //         console.log('[X] readUser(nominal) failed: ' + err.message)
@@ -147,8 +278,8 @@ const dtb = new sqlite3.Database(':memory:');
         if (err) {
             console.log('[X] allUsers(nominal) failed: ' + err.message)
         } else {
-            console.log('[X] allUsers(nominal) passed | ' + data)
+            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data))
         }
     })
 
-})()
+})

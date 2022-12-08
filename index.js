@@ -69,8 +69,9 @@ const sqlite3 = require('sqlite3')
     Private Functions - BEGIN
 */
 async function tryCreateTable(dtb) {
-    await dtb.exec(
-        `CREATE TABLE IF NOT EXISTS auth(
+    try {
+        await dtb.exec(
+            `CREATE TABLE IF NOT EXISTS auth(
         'id' INTEGER PRIMARY KEY AUTOINCREMENT,
 
         'email' VARCHAR(255) UNIQUE,
@@ -83,43 +84,66 @@ async function tryCreateTable(dtb) {
         'deleted_at' DATETIME,
         'deleted_by' DATETIME
         );`
-    );
+        );
+    } catch (err) {
+        console.log(err.message)
+    }
 }
 
 function validEmail(input) {
-    if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
-        return true
-    } else {
+    try {
+        if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
+            return true
+        } else {
+            return false
+        }
+    } catch (err) {
+        // console.log(err.message)
         return false
     }
 }
 function validPassword(input) {
-    if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
-        return true
-    } else {
+    try {
+        if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
+            return true
+        } else {
+            return false
+        }
+    } catch (err) {
+        // console.log(err.message)
         return false
     }
 }
 function containsQuotes(field) {
-    if (
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`") ||
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`") ||
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`")
-    ) {
-        return true
-    } else {
+    try {
+        if (
+            field.includes("'") ||
+            field.includes('"') ||
+            field.includes("`") ||
+            field.includes("'") ||
+            field.includes('"') ||
+            field.includes("`") ||
+            field.includes("'") ||
+            field.includes('"') ||
+            field.includes("`")
+        ) {
+            return true
+        } else {
+            return false
+        }
+    } catch (err) {
+        // console.log(err.message)
         return false
     }
 }
 
 function hash(input, salt) {
-    return crypto.pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
+    try {
+        return crypto.pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
+    } catch (err) {
+        console.log(err.message)
+        return null
+    }
 }
 /*
     Private Functions - END
@@ -136,63 +160,97 @@ module.exports = {
     /*
             CRUD user functions - BEGIN
     */
-    createUser: async (dtb, args, callback) => {
-        // TODO: testing
-        await tryCreateTable(dtb)
+    createUser: (dtb, args, callback) => {
+        // Testing Completed
+        return new Promise(async (resolve) => {
+            try {
 
-        try {
-            if (!validEmail(args.create_params.email)) {
-                callback({
-                    message: "invalid email"
-                })
-            } else {
-                if (!validPassword(args.create_params.password)) {
+                await tryCreateTable(dtb)
+
+                if (!validEmail(args.create_params.email)) {
                     callback({
-                        message: "invalid password"
+                        message: "invalid email"
                     })
+                    resolve()
+
                 } else {
-                    await dtb.exec(
-                        `INSERT INTO auth(${args.create_fields}) VALUES(?, ?);`,
-                        [
-                            args.create_params.email,
-                            hash(args.create_params.password, args.create_params.salt)
-                        ],
-                        (err) => {
+                    if (!validPassword(args.create_params.password)) {
+                        callback({
+                            message: "invalid password"
+                        })
+                        resolve()
+
+                    } else {
+
+                        dtb.run(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?, ?, ?);`, [args.create_params.email, hash(args.create_params.password, args.create_params.salt), args.create_params.created_at, args.create_params.created_by], (err) => {
                             if (err) {
+
                                 callback({
                                     message: err.message
                                 })
+                                resolve()
+
                             } else {
+
                                 callback(null)
+                                resolve()
+
                             }
                         })
+                    }
                 }
+            } catch (err) {
+                callback({
+                    message: "CATCH ERROR " + err.message
+                })
+                resolve()
+
             }
-        } catch (err) {
-            callback({
-                message: err.message
-            })
-        }
+        })
     },
     readUser: async (dtb, args, callback) => {
         // TODO: testing
-        await tryCreateTable(dtb)
+        return new Promise(async (resolve) => {
+            try {
 
-        try {
-            await dtb.all(`SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ${args.read_value};`, [], (err, rows) => {
-                if (err) {
-                    callback({
-                        message: err.message
-                    })
-                } else {
-                    callback(null, rows)
-                }
-            })
-        } catch (err) {
-            callback({
-                message: err.message
-            })
-        }
+                await tryCreateTable(dtb)
+
+                await dtb.all(
+                    `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = '${args.read_value}';`,
+                    [],
+                    (err, rows) => {
+                        if (err) {
+
+                            callback({
+                                message: err.message
+                            })
+                            resolve()
+
+                        } else if (rows.length == 0) {
+
+                            callback({
+                                message: "entry not found"
+                            })
+                            resolve()
+
+                        } else {
+                            // console.log(typeof rows + " | " + rows.length)
+
+                            callback(null, rows)
+                            resolve()
+
+                        }
+                    }
+                )
+            } catch (err) {
+
+                callback({
+                    message: "CATCH ERROR " + err.message
+                })
+                resolve()
+
+            }
+        })
     },
     updateUser: async (dtb, args, callback) => {
         // TODO: testing

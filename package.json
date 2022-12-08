@@ -4,7 +4,7 @@
   "description": "An authentication system for NodeJS web apps using sqlite, express, and express-session",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/christian-kesler/ugle-auth#readme",
   "dependencies": {
+    "sqlite": "^4.1.2",
     "sqlite3": "^5.1.2"
   }
 }
