@@ -234,13 +234,35 @@ const sqlite3 = require('sqlite3').verbose();
             }
         });
     }
-    // ugle_auth.readUser(dtb, args, (err) => {
-    //     if (err) {
-    //         console.log('[X] readUser(nominal) failed: ' + err.message)
-    //     } else {
-    //         console.log('[X] readUser(nominal) passed')
-    //     }
-    // })
+
+    var updateUser_args = [
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'plaintext_hash'
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'new@email.com'
+        },
+    ];
+    for (let i = 0; i < updateUser_args.length; i++) {
+        await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
+            if (err) {
+                console.log(`FAIL | updateUser[${i}] | ${err.message}`);
+            } else {
+                console.log(`PASS | updateUser[${i}] | ${changes.message}`);
+            }
+        });
+    }
 
     // ugle_auth.updateUser(dtb, args, (err) => {
     //     if (err) {

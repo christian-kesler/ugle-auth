@@ -5,11 +5,14 @@ ugle-auth
 callback parameters
     callback(err)
         createUser
-        updateUser
         deleteUser
 
     callback(err, data)
         readUser
+
+    callback(err, data)
+        updateUser
+
 ----------------
 function parameters
     dtb - variable representing sqlite database connection
@@ -28,11 +31,11 @@ function parameters
         read_value - variable containing the value to search for
             ${varies}
 
-        update_fields - string containing the database fields to modify
-            "email, hash"
+        update_field - string containing the database fields to modify
+            ("email", "hash")
         update_params - the values to be written into the database
             data - variable containing the actual content
-            hash - boolean defining whether the data should be hashed before storing (PASSWORDS WILL NOT WORK UNLESS HASHED)
+            salt - string to salt the data with.  If undefined, plaintext is stored (PASSWORDS WILL NOT WORK UNLESS HASHED)
         update_key - variable containing the field to index
             (id || email)
         update_value - variable containing the value to search for
@@ -247,8 +250,8 @@ module.exports = {
                 tryCreateTable(dtb);
 
                 dtb.all(
-                    `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = '${args.read_value}';`,
-                    [],
+                    `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
+                    [args.read_value],
                     (err, rows) => {
                         if (err) {
 
@@ -265,7 +268,6 @@ module.exports = {
                             resolve();
 
                         } else {
-                            // console.log(typeof rows + " | " + rows.length)
 
                             callback(null, rows);
                             resolve();
@@ -288,27 +290,55 @@ module.exports = {
         await tryCreateTable(dtb);
 
         try {
-            if (args.update_params.hash == true) {
-                args.update_params.data = hash(args.update_params.data, args.update_params.salt);
-            }
-            await dtb.exec('UPDATE auth SET ? = ? WHERE ? = ?;', [
-                args.update_field,
-                args.update_params.data,
-                args.update_key,
-                args.update_value
-            ], (err) => {
-                if (err) {
+            if (args.update_params.salt != undefined) {
+                try {
+                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
+                } catch (err) {
+
                     callback({
                         message: err.message
                     });
+
+                }
+            }
+
+            await dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
+                if (err) {
+
+                    callback({
+                        message: err.message,
+                    });
+
+                } else if (this.changes == 0) {
+
+                    callback(
+                        {
+                            message: `Row(s) affected: ${this.changes}`
+                        },
+                        {
+                            count: this.changes,
+                            message: `Row(s) affected: ${this.changes}`
+                        }
+                    );
+
                 } else {
-                    callback(null);
+
+                    callback(
+                        null,
+                        {
+                            count: this.changes,
+                            message: `Row(s) affected: ${this.changes}`
+                        }
+                    );
+
                 }
             });
         } catch (err) {
+
             callback({
                 message: err.message
             });
+
         }
     },
     deleteUser: async (dtb, args, callback) => {
