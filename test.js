@@ -9,230 +9,230 @@ const sqlite3 = require('sqlite3').verbose();
 
         const dtb = new sqlite3.Database('./test.db', sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
-                console.log(err.message)
-                resolve(null)
+                console.log(err.message);
+                resolve(null);
             } else {
-                console.log('sqlite connection secured')
-                dtb.exec('DROP TABLE IF EXISTS auth;')
-                resolve(dtb)
+                console.log('sqlite connection secured');
+                dtb.exec('DROP TABLE IF EXISTS auth;');
+                resolve(dtb);
             }
         });
-    })
+    });
 })().then(async (dtb) => {
 
-    createUser_args = [
+    var createUser_args = [
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "email": "a@gmail",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'email': 'a@gmail',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "hi",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'hi',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "hash, created_at, created_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'hash, created_at, created_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by, deleted_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by, deleted_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, hello",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, hello',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, , , created_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, , , created_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "salt": "exampleSalt",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'salt': 'exampleSalt',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
-            "create_params": {
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
             }
         },
         {
-            "create_fields": "email, hash, created_at, created_by",
+            'create_fields': 'email, hash, created_at, created_by',
         },
         {
-            "create_params": {
-                "email": "christian.j.kesler@gmail.com",
-                "password": "examplePassword",
-                "salt": "exampleSalt",
-                "created_at": "Today :)",
-                "created_by": "Me",
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'examplePassword',
+                'salt': 'exampleSalt',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
             }
         },
-    ]
-    for (i = 0; i < createUser_args.length; i++) {
+    ];
+    for (let i = 0; i < createUser_args.length; i++) {
         await ugle_auth.createUser(dtb, createUser_args[i], (err) => {
             if (err) {
-                console.log(`FAIL | createUser[${i}] | ${err.message}`)
+                console.log(`FAIL | createUser[${i}] | ${err.message}`);
             } else {
-                console.log(`PASS | createUser[${i}]`)
+                console.log(`PASS | createUser[${i}]`);
             }
-        })
+        });
     }
 
 
-    readUser_args = [
+    var readUser_args = [
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "id",
-            "read_value": "1",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'id',
+            'read_value': '1',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "id",
-            "read_value": "hero",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'id',
+            'read_value': 'hero',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "email",
-            "read_value": "christian.j.kesler@gmail.com",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'email',
+            'read_value': 'christian.j.kesler@gmail.com',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "email",
-            "read_value": "Antarctica",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'email',
+            'read_value': 'Antarctica',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "created_at",
-            "read_value": "Today :)",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'created_at',
+            'read_value': 'Today :)',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "created_at",
-            "read_value": "Yesterday",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'created_at',
+            'read_value': 'Yesterday',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "created_by",
-            "read_value": "Me",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'created_by',
+            'read_value': 'Me',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "created_by",
-            "read_value": "You",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'created_by',
+            'read_value': 'You',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_value": "You",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_value': 'You',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
-            "read_key": "created_by",
+            'read_fields': 'id, email, created_at, created_by',
+            'read_key': 'created_by',
         },
         {
-            "read_key": "created_by",
-            "read_value": "You",
+            'read_key': 'created_by',
+            'read_value': 'You',
         },
         {
-            "read_value": "You",
+            'read_value': 'You',
         },
         {
-            "read_fields": "id, email, created_at, created_by",
+            'read_fields': 'id, email, created_at, created_by',
         },
         {
-            "read_key": "created_by",
+            'read_key': 'created_by',
         },
-    ]
-    for (i = 0; i < readUser_args.length; i++) {
+    ];
+    for (let i = 0; i < readUser_args.length; i++) {
         await ugle_auth.readUser(dtb, readUser_args[i], (err, data) => {
             if (err) {
-                console.log(`FAIL | readUser[${i}] | ${err.message}`)
+                console.log(`FAIL | readUser[${i}] | ${err.message}`);
             } else {
-                console.log(`PASS | readUser[${i}] | ${JSON.stringify(data)}`)
+                console.log(`PASS | readUser[${i}] | ${JSON.stringify(data)}`);
             }
-        })
+        });
     }
     // ugle_auth.readUser(dtb, args, (err) => {
     //     if (err) {
@@ -276,10 +276,10 @@ const sqlite3 = require('sqlite3').verbose();
 
     ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
-            console.log('[X] allUsers(nominal) failed: ' + err.message)
+            console.log('[X] allUsers(nominal) failed: ' + err.message);
         } else {
-            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data))
+            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
         }
-    })
+    });
 
-})
+});

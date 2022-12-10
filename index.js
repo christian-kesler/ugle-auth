@@ -55,10 +55,10 @@ function parameters
 /*
     Import Statements - BEGIN
 */
-const crypto = require('crypto');
+const { pbkdf2Sync } = require('crypto');
 // const fs = require('fs');
 // const sqlite3 = require(__dirname + '/../sqlite3')
-const sqlite3 = require('sqlite3')
+const sqlite3 = require('sqlite3');
 
 /*
     Import Statements - END
@@ -86,63 +86,63 @@ async function tryCreateTable(dtb) {
         );`
         );
     } catch (err) {
-        console.log(err.message)
+        console.log(err.message);
     }
 }
 
 function validEmail(input) {
     try {
         if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
-            return true
+            return true;
         } else {
-            return false
+            return false;
         }
     } catch (err) {
         // console.log(err.message)
-        return false
+        return false;
     }
 }
 function validPassword(input) {
     try {
         if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
-            return true
+            return true;
         } else {
-            return false
+            return false;
         }
     } catch (err) {
         // console.log(err.message)
-        return false
+        return false;
     }
 }
 function containsQuotes(field) {
     try {
         if (
-            field.includes("'") ||
+            field.includes('\'') ||
             field.includes('"') ||
-            field.includes("`") ||
-            field.includes("'") ||
+            field.includes('`') ||
+            field.includes('\'') ||
             field.includes('"') ||
-            field.includes("`") ||
-            field.includes("'") ||
+            field.includes('`') ||
+            field.includes('\'') ||
             field.includes('"') ||
-            field.includes("`")
+            field.includes('`')
         ) {
-            return true
+            return true;
         } else {
-            return false
+            return false;
         }
     } catch (err) {
         // console.log(err.message)
-        return false
+        return false;
     }
 }
 
 function hash(input, salt) {
     try {
-        return crypto.pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
+        return pbkdf2Sync(input, salt, 999999, 255, 'sha512').toString('hex');
     } catch (err) {
-        console.log(err.message)
-        return null
+        console.log(err.message);
+        return null;
     }
 }
 /*
@@ -159,23 +159,23 @@ module.exports = {
     */
     initDtb: async (path) => {
         try {
-            return new Promise(async (resolve) => {
+            return new Promise((resolve) => {
 
 
                 const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
                     if (err) {
-                        console.log(err.message)
-                        resolve(err)
+                        console.log(err.message);
+                        resolve(err);
                     } else {
-                        resolve(false, dtb)
+                        resolve(false, dtb);
                     }
-                })
+                });
 
 
-            })
+            });
         } catch (err) {
-            console.log(err.message)
-            return (err)
+            console.log(err.message);
+            return (err);
         }
     },
     /*
@@ -193,23 +193,23 @@ module.exports = {
     */
     createUser: (dtb, args, callback) => {
         // Testing Completed
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             try {
 
-                await tryCreateTable(dtb)
+                tryCreateTable(dtb);
 
                 if (!validEmail(args.create_params.email)) {
                     callback({
-                        message: "invalid email"
-                    })
-                    resolve()
+                        message: 'invalid email'
+                    });
+                    resolve();
 
                 } else {
                     if (!validPassword(args.create_params.password)) {
                         callback({
-                            message: "invalid password"
-                        })
-                        resolve()
+                            message: 'invalid password'
+                        });
+                        resolve();
 
                     } else {
 
@@ -218,35 +218,35 @@ module.exports = {
 
                                 callback({
                                     message: err.message
-                                })
-                                resolve()
+                                });
+                                resolve();
 
                             } else {
 
-                                callback(null)
-                                resolve()
+                                callback(null);
+                                resolve();
 
                             }
-                        })
+                        });
                     }
                 }
             } catch (err) {
                 callback({
-                    message: "CATCH ERROR " + err.message
-                })
-                resolve()
+                    message: 'CATCH ERROR ' + err.message
+                });
+                resolve();
 
             }
-        })
+        });
     },
     readUser: async (dtb, args, callback) => {
         // TODO: testing
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             try {
 
-                await tryCreateTable(dtb)
+                tryCreateTable(dtb);
 
-                await dtb.all(
+                dtb.all(
                     `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = '${args.read_value}';`,
                     [],
                     (err, rows) => {
@@ -254,44 +254,44 @@ module.exports = {
 
                             callback({
                                 message: err.message
-                            })
-                            resolve()
+                            });
+                            resolve();
 
                         } else if (rows.length == 0) {
 
                             callback({
-                                message: "entry not found"
-                            })
-                            resolve()
+                                message: 'entry not found'
+                            });
+                            resolve();
 
                         } else {
                             // console.log(typeof rows + " | " + rows.length)
 
-                            callback(null, rows)
-                            resolve()
+                            callback(null, rows);
+                            resolve();
 
                         }
                     }
-                )
+                );
             } catch (err) {
 
                 callback({
-                    message: "CATCH ERROR " + err.message
-                })
-                resolve()
+                    message: 'CATCH ERROR ' + err.message
+                });
+                resolve();
 
             }
-        })
+        });
     },
     updateUser: async (dtb, args, callback) => {
         // TODO: testing
-        await tryCreateTable(dtb)
+        await tryCreateTable(dtb);
 
         try {
             if (args.update_params.hash == true) {
-                args.update_params.data = hash(args.update_params.data, args.update_params.salt)
+                args.update_params.data = hash(args.update_params.data, args.update_params.salt);
             }
-            await dtb.exec(`UPDATE auth SET ? = ? WHERE ? = ?;`, [
+            await dtb.exec('UPDATE auth SET ? = ? WHERE ? = ?;', [
                 args.update_field,
                 args.update_params.data,
                 args.update_key,
@@ -300,100 +300,101 @@ module.exports = {
                 if (err) {
                     callback({
                         message: err.message
-                    })
+                    });
                 } else {
-                    callback(null)
+                    callback(null);
                 }
-            })
+            });
         } catch (err) {
             callback({
                 message: err.message
-            })
+            });
         }
     },
     deleteUser: async (dtb, args, callback) => {
         // TODO: testing
-        await tryCreateTable(dtb)
+        await tryCreateTable(dtb);
 
         try {
-            await dtb.exec(`DELETE FROM auth WHERE ? = ?;`, [
+            await dtb.exec('DELETE FROM auth WHERE ? = ?;', [
                 args.delete_key,
                 args.delete_value,
             ], (err) => {
                 if (err) {
                     callback({
                         message: err.message
-                    })
+                    });
                 } else {
-                    callback(null)
+                    callback(null);
                 }
-            })
+            });
         } catch (err) {
             callback({
                 message: err.message
-            })
+            });
         }
     },
     /*
             CRUD user functions - END
     */
 
+
     /*
             Authentication user functions - BEGIN
     */
     loginUser: async (dtb, args, callback) => {
         // TODO: testing
-        await tryCreateTable(dtb)
+        await tryCreateTable(dtb);
 
         try {
             if (!validEmail(args.login_params.email)) {
                 callback({
-                    message: "invalid email"
-                })
+                    message: 'invalid email'
+                });
             } else {
                 if (!validPassword(args.login_params.password)) {
                     callback({
-                        message: "invalid password"
-                    })
+                        message: 'invalid password'
+                    });
                 } else {
-                    await dtb.all(`SELECT * FROM auth WHERE ? = ?;`, [
+                    await dtb.all('SELECT * FROM auth WHERE ? = ?;', [
                         'email',
                         args.login_params.email
-                    ], (err) => {
+                    ], (err, rows) => {
                         if (err) {
                             callback({
                                 message: err.message
-                            })
+                            });
                         } else {
                             if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
                                 callback({
                                     message: 'credentials failed'
-                                })
+                                });
                             } else {
-                                args.session.email = rows[0].email
-                                args.session.id = rows[0].id
+                                args.session.email = rows[0].email;
+                                args.session.id = rows[0].id;
 
-                                callback(null)
+                                callback(null);
                             }
                         }
-                    })
+                    });
                 }
             }
         } catch (err) {
             callback({
                 message: err.message
-            })
+            });
         }
     },
     logoutUser: async (dtb, args, callback) => {
         // TODO: programming
 
         try {
-            args.session.destroy()
+            args.session.destroy();
         } catch (err) {
             callback({
                 message: err.message
-            })
+            });
         }
     },
     /*
@@ -409,29 +410,29 @@ module.exports = {
     */
     allUsers: async (dtb, callback) => {
         // TODO: testing
-        await tryCreateTable(dtb)
+        await tryCreateTable(dtb);
 
         try {
-            await dtb.all(`SELECT * FROM auth;`, [], (err, rows) => {
+            await dtb.all('SELECT * FROM auth;', [], (err, rows) => {
                 if (err) {
                     callback({
                         message: err.message
-                    })
+                    });
                 } else {
-                    callback(null, rows)
+                    callback(null, rows);
                 }
-            })
+            });
         } catch (err) {
             callback({
                 message: err.message
-            })
+            });
         }
 
     },
     /*
         functionName: async (dtb, callback) => { }- END
     */
-}
+};
 /*
     Public Functions - END
 */

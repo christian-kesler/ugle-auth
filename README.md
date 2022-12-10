@@ -129,7 +129,7 @@ I've made an effort to delete any and all variables used within this package bef
 
 The hashing algorithm used is below, and relies on the built-in crypto package for NodeJS:
 
-    crypto.pbkdf2Sync(input, salt, 1000000, 255, `sha512`).toString(`hex`)
+    pbkdf2Sync(input, salt, 1000000, 255, `sha512`).toString(`hex`)
 
 As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 1,000,000 times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
 
