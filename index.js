@@ -56,7 +56,7 @@ function parameters
     Import Statements - BEGIN
 */
 const crypto = require('crypto');
-const fs = require('fs');
+// const fs = require('fs');
 // const sqlite3 = require(__dirname + '/../sqlite3')
 const sqlite3 = require('sqlite3')
 
@@ -154,6 +154,37 @@ function hash(input, salt) {
     Public Functions - BEGIN
 */
 module.exports = {
+    /*
+        Database Connection Function - BEGIN
+    */
+    initDtb: async (path) => {
+        try {
+            return new Promise(async (resolve) => {
+
+
+                const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
+                    if (err) {
+                        console.log(err.message)
+                        resolve(err)
+                    } else {
+                        resolve(false, dtb)
+                    }
+                })
+
+
+            })
+        } catch (err) {
+            console.log(err.message)
+            return (err)
+        }
+    },
+    /*
+        Database Connection Function - END
+    */
+
+
+
+
     /*
         functionName: async (dtb, args, callback) => { } - BEGIN
     */
