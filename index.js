@@ -346,22 +346,43 @@ module.exports = {
         await tryCreateTable(dtb);
 
         try {
-            await dtb.exec('DELETE FROM auth WHERE ? = ?;', [
-                args.delete_key,
-                args.delete_value,
-            ], (err) => {
+            await dtb.run(`DELETE FROM auth WHERE ${args.delete_key} = ?;`, [args.delete_value], async function (err) {
                 if (err) {
+
                     callback({
-                        message: err.message
+                        message: err.message,
                     });
+
+                } else if (this.changes == 0) {
+
+                    callback(
+                        {
+                            message: `Row(s) affected: ${this.changes}`
+                        },
+                        {
+                            count: this.changes,
+                            message: `Row(s) affected: ${this.changes}`
+                        }
+                    );
+
                 } else {
-                    callback(null);
+
+                    callback(
+                        null,
+                        {
+                            count: this.changes,
+                            message: `Row(s) affected: ${this.changes}`
+                        }
+                    );
+
                 }
             });
         } catch (err) {
+
             callback({
                 message: err.message
             });
+
         }
     },
     /*

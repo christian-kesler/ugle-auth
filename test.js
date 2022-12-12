@@ -25,10 +25,20 @@ const sqlite3 = require('sqlite3').verbose();
             'create_fields': 'email, hash, created_at, created_by',
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
-                'password': 'examplePassword',
-                'salt': 'exampleSalt',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
                 'created_at': 'Today :)',
                 'created_by': 'Me',
+            }
+        },
+        {
+            'create_fields': 'email, hash, created_at, created_by',
+            'create_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'uglesoftPassword',
+                'salt': 'uglesoftSalt',
+                'created_at': 'This Exact Moment',
+                'created_by': 'The Supreme Owl Tester',
             }
         },
         {
@@ -162,6 +172,17 @@ const sqlite3 = require('sqlite3').verbose();
     }
 
 
+    ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[X] allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('================================================================')
+            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('================================================================')
+        }
+    });
+
+
     var readUser_args = [
         {
             'read_fields': 'id, email, created_at, created_by',
@@ -235,6 +256,16 @@ const sqlite3 = require('sqlite3').verbose();
         });
     }
 
+    ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[X] allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('================================================================')
+            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('================================================================')
+        }
+    });
+
     var updateUser_args = [
         {
             'update_field': 'hash',
@@ -264,21 +295,51 @@ const sqlite3 = require('sqlite3').verbose();
         });
     }
 
-    // ugle_auth.updateUser(dtb, args, (err) => {
-    //     if (err) {
-    //         console.log('[X] updateUser(nominal) failed: ' + err.message)
-    //     } else {
-    //         console.log('[X] updateUser(nominal) passed')
-    //     }
-    // })
+    ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[X] allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('================================================================')
+            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('================================================================')
+        }
+    });
 
-    // ugle_auth.deleteUser(dtb, args, (err) => {
-    //     if (err) {
-    //         console.log('[X] deleteUser(nominal) failed: ' + err.message)
-    //     } else {
-    //         console.log('[X] deleteUser(nominal) passed')
-    //     }
-    // })
+    var deleteUser_args = [
+        {
+            'delete_key': 'id',
+            'delete_value': 1
+        },
+        {
+            'delete_key': 'id',
+            'delete_value': 3
+        },
+        {
+            'delete_key': 'id',
+            'delete_value': '0'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': 1
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': 'christian.j.kesler@gmail'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': 'uglesoft@gmail.com'
+        },
+    ];
+    for (let i = 0; i < deleteUser_args.length; i++) {
+        await ugle_auth.deleteUser(dtb, deleteUser_args[i], (err, changes) => {
+            if (err) {
+                console.log(`FAIL | deleteUser[${i}] | ${err.message}`);
+            } else {
+                console.log(`PASS | deleteUser[${i}] | ${changes.message}`);
+            }
+        });
+    }
 
     // ugle_auth.loginUser(dtb, args, (err) => {
     //     if (err) {
