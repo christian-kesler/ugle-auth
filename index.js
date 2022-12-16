@@ -45,6 +45,13 @@ function parameters
             (id || email)
         delete_value - variable containing the value to search for
             ${varies}
+
+        login_params - the values to be compared to the database
+            email - variable
+            password - variable
+            salt - variable
+        session - the express-session to be modified 
+         
     callback - executed upon completion of the package function
         err - FALSE if successful, object if function failed
             message - descriptive string of what went wrong, taken from sqlite when possible
@@ -72,25 +79,29 @@ const sqlite3 = require('sqlite3');
     Private Functions - BEGIN
 */
 async function tryCreateTable(dtb) {
-    try {
-        await dtb.exec(
-            `CREATE TABLE IF NOT EXISTS auth(
-        'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+    return new Promise((resolve) => {
+        try {
+            dtb.exec(
+                `CREATE TABLE IF NOT EXISTS auth(
+                'id' INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        'email' VARCHAR(255) UNIQUE,
-        'hash' VARCHAR(255),
-        'tempkey' VARCHAR(255),
-        'tempkey_datetime' DATE,
+                'email' VARCHAR(255) UNIQUE,
+                'hash' VARCHAR(255),
+                'tempkey' VARCHAR(255),
+                'tempkey_datetime' DATE,
 
-        'created_at' DATETIME,
-        'created_by' DATETIME,
-        'deleted_at' DATETIME,
-        'deleted_by' DATETIME
-        );`
-        );
-    } catch (err) {
-        console.log(err.message);
-    }
+                'created_at' DATETIME,
+                'created_by' DATETIME,
+                'deleted_at' DATETIME,
+                'deleted_by' DATETIME
+                );`
+            );
+            resolve()
+        } catch (err) {
+            // console.log(err.message);
+            resolve()
+        }
+    })
 }
 
 function validEmail(input) {
@@ -98,6 +109,7 @@ function validEmail(input) {
         if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
             return true;
         } else {
+            // console.log('invalid email')
             return false;
         }
     } catch (err) {
@@ -110,6 +122,7 @@ function validPassword(input) {
         if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
             return true;
         } else {
+            // console.log('invalid password')
             return false;
         }
     } catch (err) {
@@ -130,21 +143,40 @@ function containsQuotes(field) {
             field.includes('"') ||
             field.includes('`')
         ) {
+            // console.log('input contains quotes')
             return true;
         } else {
             return false;
         }
     } catch (err) {
         // console.log(err.message)
+        return true;
+    }
+}
+function allValuesAreStrings(input) {
+
+    if (typeof input === "object" && input !== null) {
+        if (Object.keys(input).length === 0) {
+            return false;
+        } else {
+            for (const key of Object.keys(input)) {
+                if (!allValuesAreStrings(input[key])) {
+                    return false;
+                }
+            }
+        }
+    } else if (typeof input !== "string" || input == null || typeof input == 'undefined') {
         return false;
     }
+
+    return true;
 }
 
 function hash(input, salt) {
     try {
         return pbkdf2Sync(input, salt, 999999, 255, 'sha512').toString('hex');
     } catch (err) {
-        console.log(err.message);
+        // console.log(err.message);
         return null;
     }
 }
@@ -167,7 +199,7 @@ module.exports = {
 
                 const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
                     if (err) {
-                        console.log(err.message);
+                        // console.log(err.message);
                         resolve(err);
                     } else {
                         resolve(false, dtb);
@@ -177,7 +209,7 @@ module.exports = {
 
             });
         } catch (err) {
-            console.log(err.message);
+            // console.log(err.message);
             return (err);
         }
     },
@@ -194,87 +226,137 @@ module.exports = {
     /*
             CRUD user functions - BEGIN
     */
-    createUser: (dtb, args, callback) => {
+    createUser: async (dtb, args, callback) => {
         // Testing Completed
+        await tryCreateTable(dtb);
+
         return new Promise((resolve) => {
             try {
 
                 tryCreateTable(dtb);
 
-                if (!validEmail(args.create_params.email)) {
+                if (!allValuesAreStrings(args)) {
                     callback({
-                        message: 'invalid email'
+                        message: 'non-string values detected'
                     });
                     resolve();
-
                 } else {
-                    if (!validPassword(args.create_params.password)) {
+
+                    if (args.create_fields === undefined ||
+                        args.create_params === undefined ||
+                        args.create_params.email === undefined ||
+                        args.create_params.password === undefined ||
+                        args.create_params.salt === undefined ||
+                        args.create_params.created_at === undefined ||
+                        args.create_params.created_by === undefined
+                    ) {
+
                         callback({
-                            message: 'invalid password'
+                            message: 'missing args'
                         });
                         resolve();
 
                     } else {
 
-                        dtb.run(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?, ?, ?);`, [args.create_params.email, hash(args.create_params.password, args.create_params.salt), args.create_params.created_at, args.create_params.created_by], (err) => {
-                            if (err) {
+                        if (!validEmail(args.create_params.email)) {
+                            callback({
+                                message: 'invalid email'
+                            });
+                            resolve();
 
+                        } else {
+                            if (!validPassword(args.create_params.password)) {
                                 callback({
-                                    message: err.message
+                                    message: 'invalid password'
                                 });
                                 resolve();
 
                             } else {
 
-                                callback(null);
-                                resolve();
+                                dtb.run(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?, ?, ?);`, [args.create_params.email, hash(args.create_params.password, args.create_params.salt), args.create_params.created_at, args.create_params.created_by], (err) => {
+                                    if (err) {
 
+                                        callback({
+                                            message: err.message
+                                        });
+                                        resolve();
+
+                                    } else {
+
+                                        callback(null);
+                                        resolve();
+
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
                 }
+
             } catch (err) {
                 callback({
                     message: 'CATCH ERROR ' + err.message
                 });
                 resolve();
-
             }
         });
     },
     readUser: async (dtb, args, callback) => {
         // TODO: testing
+        await tryCreateTable(dtb);
+
         return new Promise((resolve) => {
             try {
 
                 tryCreateTable(dtb);
 
-                dtb.all(
-                    `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
-                    [args.read_value],
-                    (err, rows) => {
-                        if (err) {
+                if (!allValuesAreStrings(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
 
-                            callback({
-                                message: err.message
-                            });
-                            resolve();
+                    if (args.read_fields === undefined ||
+                        args.read_key === undefined ||
+                        args.read_value === undefined
+                    ) {
 
-                        } else if (rows.length == 0) {
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
 
-                            callback({
-                                message: 'entry not found'
-                            });
-                            resolve();
+                    } else {
 
-                        } else {
+                        dtb.all(
+                            `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
+                            [args.read_value],
+                            (err, rows) => {
+                                if (err) {
 
-                            callback(null, rows);
-                            resolve();
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve();
 
-                        }
+                                } else if (rows.length == 0) {
+
+                                    callback({
+                                        message: 'entry not found'
+                                    });
+                                    resolve();
+
+                                } else {
+
+                                    callback(null, rows);
+                                    resolve();
+
+                                }
+                            }
+                        );
                     }
-                );
+                }
             } catch (err) {
 
                 callback({
@@ -289,101 +371,160 @@ module.exports = {
         // TODO: testing
         await tryCreateTable(dtb);
 
-        try {
-            if (args.update_params.salt != undefined) {
-                try {
-                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
-                } catch (err) {
+        return new Promise((resolve) => {
+            try {
 
+                if (!allValuesAreStrings(args)) {
                     callback({
-                        message: err.message
+                        message: 'non-string values detected'
                     });
-
-                }
-            }
-
-            await dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
-                if (err) {
-
-                    callback({
-                        message: err.message,
-                    });
-
-                } else if (this.changes == 0) {
-
-                    callback(
-                        {
-                            message: `Row(s) affected: ${this.changes}`
-                        },
-                        {
-                            count: this.changes,
-                            message: `Row(s) affected: ${this.changes}`
-                        }
-                    );
-
+                    resolve();
                 } else {
 
-                    callback(
-                        null,
-                        {
-                            count: this.changes,
-                            message: `Row(s) affected: ${this.changes}`
+                    if (args.update_field === undefined ||
+                        args.update_params === undefined ||
+                        args.update_params.data === undefined ||
+                        args.update_key === undefined ||
+                        args.update_value === undefined
+                    ) {
+
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        // TODO: only allow dtb query to be run if this condition has been handled
+                        // Entries are able to overwrite hash fields by failing to pass salt
+                        if (args.update_field == 'hash') {
+                            if (args.update_params.salt === undefined) {
+
+                                callback({
+                                    message: 'missing args'
+                                });
+                                resolve();
+
+                            } else {
+
+                                try {
+                                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
+                                } catch (err) {
+
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve()
+                                }
+                            }
                         }
-                    );
 
+                        dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
+                            if (err) {
+
+                                callback({
+                                    message: err.message,
+                                });
+                                resolve()
+                            } else if (this.changes == 0) {
+
+                                callback(
+                                    {
+                                        message: `Row(s) affected: ${this.changes}`
+                                    },
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve()
+                            } else {
+
+                                callback(
+                                    null,
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve()
+                            }
+                        });
+                    }
                 }
-            });
-        } catch (err) {
+            } catch (err) {
 
-            callback({
-                message: err.message
-            });
-
-        }
+                callback({
+                    message: err.message
+                });
+                resolve()
+            }
+        })
     },
     deleteUser: async (dtb, args, callback) => {
         // TODO: testing
         await tryCreateTable(dtb);
 
-        try {
-            await dtb.run(`DELETE FROM auth WHERE ${args.delete_key} = ?;`, [args.delete_value], async function (err) {
-                if (err) {
-
+        return new Promise((resolve) => {
+            try {
+                if (!allValuesAreStrings(args)) {
                     callback({
-                        message: err.message,
+                        message: 'non-string values detected'
                     });
-
-                } else if (this.changes == 0) {
-
-                    callback(
-                        {
-                            message: `Row(s) affected: ${this.changes}`
-                        },
-                        {
-                            count: this.changes,
-                            message: `Row(s) affected: ${this.changes}`
-                        }
-                    );
-
+                    resolve();
                 } else {
 
-                    callback(
-                        null,
-                        {
-                            count: this.changes,
-                            message: `Row(s) affected: ${this.changes}`
-                        }
-                    );
+                    if (args.delete_key === undefined ||
+                        args.delete_value === undefined
+                    ) {
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
 
+                    } else {
+
+                        dtb.run(`DELETE FROM auth WHERE ${args.delete_key} = ?;`, [args.delete_value], async function (err) {
+                            if (err) {
+
+                                callback({
+                                    message: err.message,
+                                });
+                                resolve()
+                            } else if (this.changes == 0) {
+
+                                callback(
+                                    {
+                                        message: `Row(s) affected: ${this.changes}`
+                                    },
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve()
+                            } else {
+
+                                callback(
+                                    null,
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve()
+                            }
+                        });
+                    }
                 }
-            });
-        } catch (err) {
+            } catch (err) {
 
-            callback({
-                message: err.message
-            });
-
-        }
+                callback({
+                    message: err.message
+                });
+                resolve()
+            }
+        })
     },
     /*
             CRUD user functions - END
@@ -397,56 +538,126 @@ module.exports = {
         // TODO: testing
         await tryCreateTable(dtb);
 
-        try {
-            if (!validEmail(args.login_params.email)) {
-                callback({
-                    message: 'invalid email'
-                });
-            } else {
-                if (!validPassword(args.login_params.password)) {
-                    callback({
-                        message: 'invalid password'
-                    });
-                } else {
-                    await dtb.all('SELECT * FROM auth WHERE ? = ?;', [
-                        'email',
-                        args.login_params.email
-                    ], (err, rows) => {
-                        if (err) {
-                            callback({
-                                message: err.message
-                            });
-                        } else {
-                            if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
-                                callback({
-                                    message: 'credentials failed'
-                                });
-                            } else {
-                                args.session.email = rows[0].email;
-                                args.session.id = rows[0].id;
+        return new Promise((resolve) => {
+            try {
 
-                                callback(null);
+                if (!allValuesAreStrings(args.login_params)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
+
+                    if (args.login_params === undefined ||
+                        args.login_params.email === undefined ||
+                        args.login_params.password === undefined ||
+                        args.login_params.salt === undefined ||
+                        args.session === undefined
+                    ) {
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        if (!validEmail(args.login_params.email)) {
+                            callback({
+                                message: 'invalid email'
+                            });
+                            resolve()
+                        } else {
+                            if (!validPassword(args.login_params.password)) {
+                                callback({
+                                    message: 'invalid password'
+                                });
+                                resolve()
+                            } else {
+                                if (typeof args.session != 'object' && args.session != null) {
+                                    callback({
+                                        message: 'session must be object'
+                                    });
+                                    resolve()
+                                } else {
+
+                                    dtb.all(`SELECT * FROM auth WHERE email = ?;`, [
+                                        args.login_params.email
+                                    ], (err, rows) => {
+                                        if (err) {
+                                            callback({
+                                                message: err.message
+                                            });
+                                            resolve()
+                                        } else if (rows[0] == undefined) {
+                                            callback({
+                                                message: 'credentials failed'
+                                            });
+                                            resolve()
+                                        } else {
+                                            if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
+                                                callback({
+                                                    message: 'credentials failed'
+                                                });
+                                                resolve()
+                                            } else {
+                                                args.session.email = rows[0].email;
+                                                args.session.id = rows[0].id;
+                                                // args.session.loggedIn = true;
+
+                                                callback(null);
+                                                resolve()
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
-                    });
+                    }
                 }
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve()
             }
-        } catch (err) {
-            callback({
-                message: err.message
-            });
-        }
+        })
     },
-    logoutUser: async (dtb, args, callback) => {
-        // TODO: programming
+    logoutUser: async (args, callback) => {
+        // TODO: testing
+        return new Promise((resolve) => {
+            try {
 
-        try {
-            args.session.destroy();
-        } catch (err) {
-            callback({
-                message: err.message
-            });
-        }
+                if (args.session === undefined) {
+                    callback({
+                        message: 'missing args'
+                    });
+                    resolve();
+
+                } else {
+
+                    if (typeof args.session != 'object') {
+                        callback({
+                            message: 'session is not an object'
+                        });
+                        resolve()
+                    } else {
+                        for (const key in args.session) {
+                            delete args.session[key];
+                        }
+                        // args.session.loggedIn = false
+
+                        callback(null)
+                        resolve()
+                    }
+                }
+
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve()
+            }
+        })
     },
     /*
             Authentication user functions - END
@@ -463,22 +674,26 @@ module.exports = {
         // TODO: testing
         await tryCreateTable(dtb);
 
-        try {
-            await dtb.all('SELECT * FROM auth;', [], (err, rows) => {
-                if (err) {
-                    callback({
-                        message: err.message
-                    });
-                } else {
-                    callback(null, rows);
-                }
-            });
-        } catch (err) {
-            callback({
-                message: err.message
-            });
-        }
-
+        return new Promise((resolve) => {
+            try {
+                dtb.all('SELECT * FROM auth;', [], (err, rows) => {
+                    if (err) {
+                        callback({
+                            message: err.message
+                        });
+                        resolve()
+                    } else {
+                        callback(null, rows);
+                        resolve()
+                    }
+                });
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve()
+            }
+        })
     },
     /*
         functionName: async (dtb, callback) => { }- END
