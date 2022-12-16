@@ -1,26 +1,25 @@
+/* 
+    The console output will begin with [X] EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
+
+    If the package is functioning as it should, the entirety of the terminal output from this program will begin with [X].
+*/
+
+
 const ugle_auth = require('./index.js');
-
 const sqlite3 = require('sqlite3').verbose();
-// const dtb = new sqlite3.Database(':memory:');
 
-// valid strings
-// invalid strings
-// integers
-// objects
-// arrays
-// null
-// undefined
-// absent
+
+
+
 (async () => {
-    // TODO: convert to promise with .then to ensure dtb is loaded prior to other functions
     return new Promise((resolve) => {
 
         const dtb = new sqlite3.Database('./test.db', sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
-                console.log(`[ ] FAIL | new sqlite3.Database | ${err.message}`);
+                console.log(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
                 resolve(null);
             } else {
-                console.log(`[X] PASS | new sqlite3.Database`);
+                console.log(`[X] EXPECTED PASS | new sqlite3.Database`);
                 dtb.exec('DROP TABLE IF EXISTS auth;');
                 resolve(dtb);
             }
@@ -474,30 +473,21 @@ const sqlite3 = require('sqlite3').verbose();
         await ugle_auth.createUser(dtb, createUser_args[i], (err) => {
             if (i <= 1) {
                 if (err) {
-                    console.log(`[ ] FAIL | createUser[${i}] | ${err.message}`);
+                    console.log(`[ ] UNEXPECTED FAIL | createUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[X] PASS | createUser[${i}]`);
+                    console.log(`[X] EXPECTED PASS | createUser[${i}]`);
                 }
             } else {
                 if (err) {
-                    console.log(`[X] FAIL | createUser[${i}] | ${err.message}`);
+                    console.log(`[X] EXPECTED FAIL | createUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] PASS | createUser[${i}]`);
+                    console.log(`[ ] UNEXPECTED PASS | createUser[${i}]`);
                 }
             }
         });
     }
 
 
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] allUsers(nominal) failed: ' + err.message);
-        } else {
-            console.log('================================================================')
-            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
-            console.log('================================================================')
-        }
-    });
 
 
     var readUser_args = [
@@ -626,30 +616,21 @@ const sqlite3 = require('sqlite3').verbose();
         await ugle_auth.readUser(dtb, readUser_args[i], (err, data) => {
             if (i <= 1) {
                 if (err) {
-                    console.log(`[ ] FAIL | readUser[${i}] | ${err.message}`);
+                    console.log(`[ ] UNEXPECTED FAIL | readUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[X] PASS | readUser[${i}] | ${JSON.stringify(data)}`);
+                    console.log(`[X] EXPECTED PASS | readUser[${i}] | ${JSON.stringify(data)}`);
                 }
             } else {
                 if (err) {
-                    console.log(`[X] FAIL | readUser[${i}] | ${err.message}`);
+                    console.log(`[X] EXPECTED FAIL | readUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] PASS | readUser[${i}] | ${JSON.stringify(data)}`);
+                    console.log(`[ ] UNEXPECTED PASS | readUser[${i}] | ${JSON.stringify(data)}`);
                 }
             }
         });
     }
 
 
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] allUsers(nominal) failed: ' + err.message);
-        } else {
-            console.log('================================================================')
-            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
-            console.log('================================================================')
-        }
-    });
 
 
     var updateUser_args = [
@@ -1054,14 +1035,6 @@ const sqlite3 = require('sqlite3').verbose();
             'update_value': 'uglesoft@gmail.com'
         },
         {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
@@ -1082,34 +1055,24 @@ const sqlite3 = require('sqlite3').verbose();
         await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
             if (i <= 1) {
                 if (err) {
-                    console.log(`[ ] FAIL | updateUser[${i}] | ${err.message}`);
+                    console.log(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[X] PASS | updateUser[${i}] | ${changes.message}`);
+                    console.log(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
                 }
             } else {
                 if (err) {
-                    console.log(`[X] FAIL | updateUser[${i}] | ${err.message}`);
+                    console.log(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] PASS | updateUser[${i}] | ${changes.message}`);
+                    console.log(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
                 }
             }
         });
     }
 
 
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] allUsers(nominal) failed: ' + err.message);
-        } else {
-            console.log('================================================================')
-            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
-            console.log('================================================================')
-        }
-    });
 
 
     global.session = {}
-    console.log(`SESSION | ${JSON.stringify(session)}`);
 
 
     var loginUser_args = [
@@ -1125,11 +1088,20 @@ const sqlite3 = require('sqlite3').verbose();
         {
             'login_params': {
                 'email': 'uglesoft@gmail.com',
-                'password': 'uglesoftPassword',
-                'salt': 'uglesoftSalt',
+                'password': 'new_password',
+                'salt': 'exampleSalt',
             },
             'session': session
         },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': {}
+        },
+
         // invalid strings
         {
             'login_params': {
@@ -1228,14 +1200,6 @@ const sqlite3 = require('sqlite3').verbose();
                 'salt': {},
             },
             'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': {}
         },
         // arrays
         {
@@ -1382,93 +1346,177 @@ const sqlite3 = require('sqlite3').verbose();
         },
     ];
     for (let i = 0; i < loginUser_args.length; i++) {
-        await ugle_auth.loginUser(dtb, loginUser_args[i], (err) => {
-            if (i <= 1) {
+        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
+            // global.session = data
+            // console.log(data)
+
+            if (i <= 2) {
                 if (err) {
-                    console.log(`[ ] FAIL | loginUser[${i}] | ${err.message}`);
+                    console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[X] PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    global.session = data
+
+                    console.log(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
                 }
             } else {
                 if (err) {
-                    console.log(`[X] FAIL | loginUser[${i}] | ${err.message}`);
+                    console.log(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    global.session = data
+
+                    console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
                 }
             }
         });
     }
 
 
-    console.log(`SESSION | ${JSON.stringify(session)}`);
 
 
     var logoutUser_args = [
+        // valid strings
         {
             'session': session
         },
         {
-            'session': null
+            'session': {}
         },
-        {
-            'session': undefined
-        },
+        // invalid strings
         {
             'session': 'string'
         },
+        // integers
         {
             'session': 8
         },
+        // arrays
         {
             'session': []
         },
+        // null
+        {
+            'session': null
+        },
+        // undefined
+        {
+            'session': undefined
+        },
+        // absent
+        {},
     ];
     for (let i = 0; i < logoutUser_args.length; i++) {
-        await ugle_auth.logoutUser(logoutUser_args[i], (err) => {
-            if (err) {
-                console.log(`FAIL | logoutUser[${i}] | ${err.message}`);
+        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
+            // global.session = data
+
+            if (i <= 1) {
+                if (err) {
+                    console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data
+
+                    console.log(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
             } else {
-                console.log(`PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                if (err) {
+                    console.log(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data
+
+                    console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
             }
         });
     }
 
 
-    console.log(`SESSION | ${JSON.stringify(session)}`);
 
 
     var deleteUser_args = [
+        // valid entries
         {
             'delete_key': 'id',
-            'delete_value': 1
-        },
-        {
-            'delete_key': 'id',
-            'delete_value': 3
-        },
-        {
-            'delete_key': 'id',
-            'delete_value': '0'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': 1
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': 'christian.j.kesler@gmail'
+            'delete_value': '1'
         },
         {
             'delete_key': 'email',
             'delete_value': 'uglesoft@gmail.com'
         },
+        // invalid entries
+        {
+            'delete_key': 'id',
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': 'uglesoft@gmail.com'
+        },
+        // integers
+        {
+            'delete_key': 8,
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': 8
+        },
+        // objects
+        {
+            'delete_key': {},
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': {}
+        },
+        // arrays
+        {
+            'delete_key': [],
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': []
+        },
+        // null
+        {
+            'delete_key': null,
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': null
+        },
+        // undefined
+        {
+            'delete_key': undefined,
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+            'delete_value': undefined
+        },
+        // absent
+        {
+            'delete_value': '1'
+        },
+        {
+            'delete_key': 'email',
+        },
     ];
     for (let i = 0; i < deleteUser_args.length; i++) {
         await ugle_auth.deleteUser(dtb, deleteUser_args[i], (err, changes) => {
-            if (err) {
-                console.log(`FAIL | deleteUser[${i}] | ${err.message}`);
+            if (i <= 1) {
+                if (err) {
+                    console.log(`[ ] UNEXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                } else {
+                    console.log(`[X] EXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                }
             } else {
-                console.log(`PASS | deleteUser[${i}] | ${changes.message}`);
+                if (err) {
+                    console.log(`[X] EXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                } else {
+                    console.log(`[ ] UNEXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                }
             }
         });
     }
@@ -1476,9 +1524,9 @@ const sqlite3 = require('sqlite3').verbose();
 
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
-            console.log('[ ] allUsers(nominal) failed: ' + err.message);
+            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
         } else {
-            console.log('[X] allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
         }
     });
 

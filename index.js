@@ -55,7 +55,7 @@ function parameters
     callback - executed upon completion of the package function
         err - FALSE if successful, object if function failed
             message - descriptive string of what went wrong, taken from sqlite when possible
-        data - object containing sqlite data if successful, NULL if function failed
+        data - object containing sqlite data or session data if successful, NULL if function failed
 ================================================================
 */
 
@@ -302,7 +302,6 @@ module.exports = {
         });
     },
     readUser: async (dtb, args, callback) => {
-        // TODO: testing
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
@@ -368,7 +367,6 @@ module.exports = {
         });
     },
     updateUser: async (dtb, args, callback) => {
-        // TODO: testing
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
@@ -394,9 +392,6 @@ module.exports = {
                         resolve();
 
                     } else {
-
-                        // TODO: only allow dtb query to be run if this condition has been handled
-                        // Entries are able to overwrite hash fields by failing to pass salt
                         if (args.update_field == 'hash') {
                             if (args.update_params.salt === undefined) {
 
@@ -409,6 +404,39 @@ module.exports = {
 
                                 try {
                                     args.update_params.data = hash(args.update_params.data, args.update_params.salt);
+
+                                    dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
+                                        if (err) {
+
+                                            callback({
+                                                message: err.message,
+                                            });
+                                            resolve()
+                                        } else if (this.changes == 0) {
+
+                                            callback(
+                                                {
+                                                    message: `Row(s) affected: ${this.changes}`
+                                                },
+                                                {
+                                                    count: this.changes,
+                                                    message: `Row(s) affected: ${this.changes}`
+                                                }
+                                            );
+                                            resolve()
+                                        } else {
+
+                                            callback(
+                                                null,
+                                                {
+                                                    count: this.changes,
+                                                    message: `Row(s) affected: ${this.changes}`
+                                                }
+                                            );
+                                            resolve()
+                                        }
+                                    });
+
                                 } catch (err) {
 
                                     callback({
@@ -417,39 +445,41 @@ module.exports = {
                                     resolve()
                                 }
                             }
+                        } else {
+
+                            dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
+                                if (err) {
+
+                                    callback({
+                                        message: err.message,
+                                    });
+                                    resolve()
+                                } else if (this.changes == 0) {
+
+                                    callback(
+                                        {
+                                            message: `Row(s) affected: ${this.changes}`
+                                        },
+                                        {
+                                            count: this.changes,
+                                            message: `Row(s) affected: ${this.changes}`
+                                        }
+                                    );
+                                    resolve()
+                                } else {
+
+                                    callback(
+                                        null,
+                                        {
+                                            count: this.changes,
+                                            message: `Row(s) affected: ${this.changes}`
+                                        }
+                                    );
+                                    resolve()
+                                }
+                            });
                         }
 
-                        dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
-                            if (err) {
-
-                                callback({
-                                    message: err.message,
-                                });
-                                resolve()
-                            } else if (this.changes == 0) {
-
-                                callback(
-                                    {
-                                        message: `Row(s) affected: ${this.changes}`
-                                    },
-                                    {
-                                        count: this.changes,
-                                        message: `Row(s) affected: ${this.changes}`
-                                    }
-                                );
-                                resolve()
-                            } else {
-
-                                callback(
-                                    null,
-                                    {
-                                        count: this.changes,
-                                        message: `Row(s) affected: ${this.changes}`
-                                    }
-                                );
-                                resolve()
-                            }
-                        });
                     }
                 }
             } catch (err) {
@@ -462,7 +492,6 @@ module.exports = {
         })
     },
     deleteUser: async (dtb, args, callback) => {
-        // TODO: testing
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
@@ -535,7 +564,6 @@ module.exports = {
             Authentication user functions - BEGIN
     */
     loginUser: async (dtb, args, callback) => {
-        // TODO: testing
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
@@ -573,7 +601,7 @@ module.exports = {
                                 });
                                 resolve()
                             } else {
-                                if (typeof args.session != 'object' && args.session != null) {
+                                if (typeof args.session != 'object' || args.session == null || args.session == undefined || Array.isArray(args.session)) {
                                     callback({
                                         message: 'session must be object'
                                     });
@@ -602,9 +630,8 @@ module.exports = {
                                             } else {
                                                 args.session.email = rows[0].email;
                                                 args.session.id = rows[0].id;
-                                                // args.session.loggedIn = true;
 
-                                                callback(null);
+                                                callback(null, args.session);
                                                 resolve()
                                             }
                                         }
@@ -623,7 +650,6 @@ module.exports = {
         })
     },
     logoutUser: async (args, callback) => {
-        // TODO: testing
         return new Promise((resolve) => {
             try {
 
@@ -635,7 +661,7 @@ module.exports = {
 
                 } else {
 
-                    if (typeof args.session != 'object') {
+                    if (typeof args.session != 'object' || Array.isArray(args.session) || args.session == null) {
                         callback({
                             message: 'session is not an object'
                         });
@@ -646,7 +672,7 @@ module.exports = {
                         }
                         // args.session.loggedIn = false
 
-                        callback(null)
+                        callback(null, args.session)
                         resolve()
                     }
                 }
@@ -671,7 +697,6 @@ module.exports = {
         functionName: async (dtb, callback) => { } - BEGIN
     */
     allUsers: async (dtb, callback) => {
-        // TODO: testing
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
