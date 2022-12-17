@@ -1,478 +1,705 @@
-const crypto = require('crypto');
-const fs = require('fs');
+/*
+================================================================
+ugle-auth
+----------------
+callback parameters
+    callback(err)
+        createUser
+        deleteUser
+
+    callback(err, data)
+        readUser
+
+    callback(err, changes)
+        updateUser
+
+    callback(err, data)
+        loginUser
+        logoutUser
+
+----------------
+function parameters
+    dtb - variable representing sqlite database connection
+    args - object containing varying information necessary for each function
+        create_fields - string containing the database fields to write to
+            "email, hash, created_at, created_by"
+        create_params - the values to be written into the database
+            email - variable
+            password - variable
+            salt - variable
+
+        read_fields - string containing the database fields to retrieve
+            "id, email, created_at, created_by"
+        read_key - variable containing the field to index
+            (id || email || created_at || created_by)
+        read_value - variable containing the value to search for
+            ${varies}
+
+        update_field - string containing the database fields to modify
+            ("email", "hash")
+        update_params - the values to be written into the database
+            data - variable containing the actual content
+            salt - string to salt the data with.  If undefined, plaintext is stored (PASSWORDS WILL NOT WORK UNLESS HASHED)
+        update_key - variable containing the field to index
+            (id || email)
+        update_value - variable containing the value to search for
+            ${varies}
+
+        delete_key - variable containing the field to index
+            (id || email)
+        delete_value - variable containing the value to search for
+            ${varies}
+
+        login_params - the values to be compared to the database
+            email - variable
+            password - variable
+            salt - variable
+        session - the express-session object to be modified 
+         
+    callback - executed upon completion of the package function
+        err - null if successful, object if function failed
+            message - descriptive string of what went wrong, taken from sqlite when possible
+        data - object containing sqlite data or session data if successful, null if function failed
+================================================================
+*/
+
+
+
+
+/*
+    Import Statements - BEGIN
+*/
+const { pbkdf2Sync } = require('crypto');
 const sqlite3 = require(__dirname + '/../sqlite3')
+// const sqlite3 = require('sqlite3');
 
-async function initDatabase(database) {
-    await database.exec(
-        `CREATE TABLE IF NOT EXISTS auth(
-        'email' VARCHAR(255) UNIQUE,
-        'username' VARCHAR(255),
-        'hash' VARCHAR(255),
-        'tempkey' VARCHAR(255),
-        'tempkey_datetime' DATE,
+/*
+    Import Statements - END
+*/
 
-        'admin' INTEGER,
-        'manager_tags' TEXT,
-        'user_tags' TEXT,
-        'nickname' VARCHAR(255),
-        'pfp' VARCHAR(255),
-        'theme' VARCHAR(255),
-        'created_at' DATETIME,
-        'updated_at' DATETIME,
-        'deleted_at' DATETIME
-        );`
-    );
+
+/*
+    Private Functions - BEGIN
+*/
+async function tryCreateTable(dtb) {
+    return new Promise((resolve) => {
+        try {
+            dtb.exec(
+                `CREATE TABLE IF NOT EXISTS auth(
+                'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                'email' VARCHAR(255) UNIQUE,
+                'hash' VARCHAR(255),
+                'tempkey' VARCHAR(255),
+                'tempkey_datetime' DATE,
+
+                'created_at' DATETIME,
+                'created_by' DATETIME,
+                'deleted_at' DATETIME,
+                'deleted_by' DATETIME
+                );`
+            );
+            resolve();
+        } catch (err) {
+            // console.log(err.message);
+            resolve();
+        }
+    });
 }
 
-function isValidEmail(field) {
-    if (field.includes('@') && field.includes('.') && field.length >= 5) {
-        return true
-    } else {
-        return false
+function validEmail(input) {
+    try {
+        if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
+            return true;
+        } else {
+            // console.log('invalid email')
+            return false;
+        }
+    } catch (err) {
+        // console.log(err.message)
+        return false;
     }
 }
-
-function isTooShort(field) {
-    if (field.length >= 8) {
-        return false
-    } else {
-        return true
+function validPassword(input) {
+    try {
+        if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
+            return true;
+        } else {
+            // console.log('invalid password')
+            return false;
+        }
+    } catch (err) {
+        // console.log(err.message)
+        return false;
     }
 }
-
-function isTooLong(field) {
-    if (field.length <= 32) {
-        return false
-    } else {
-        return true
-    }
-}
-
 function containsQuotes(field) {
-    if (
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`") ||
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`") ||
-        field.includes("'") ||
-        field.includes('"') ||
-        field.includes("`")
-    ) {
-        return true
-    } else {
-        return false
+    try {
+        if (
+            field.includes('\'') ||
+            field.includes('"') ||
+            field.includes('`') ||
+            field.includes('\'') ||
+            field.includes('"') ||
+            field.includes('`') ||
+            field.includes('\'') ||
+            field.includes('"') ||
+            field.includes('`')
+        ) {
+            // console.log('input contains quotes')
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        // console.log(err.message)
+        return true;
     }
+}
+function allValuesAreStrings(input) {
+
+    if (typeof input === 'object' && input !== null) {
+        if (Object.keys(input).length === 0) {
+            return false;
+        } else {
+            for (const key of Object.keys(input)) {
+                if (!allValuesAreStrings(input[key])) {
+                    return false;
+                }
+            }
+        }
+    } else if (typeof input !== 'string' || input == null || typeof input == 'undefined') {
+        return false;
+    }
+
+    return true;
 }
 
 function hash(input, salt) {
-    return crypto.pbkdf2Sync(input, salt, 1000000, 255, `sha512`).toString(`hex`)
+    try {
+        return pbkdf2Sync(input, salt, 999999, 255, 'sha512').toString('hex');
+    } catch (err) {
+        // console.log(err.message);
+        return null;
+    }
 }
+/*
+    Private Functions - END
+*/
 
+
+/*
+    Public Functions - BEGIN
+*/
 module.exports = {
+    /*
+        Database Connection Function - BEGIN
+    */
+    initDtb: async (path, callback) => {
+        return new Promise((resolve) => {
+            try {
 
-    init: async function (path) {
-        try {
-            if (!fs.existsSync(path)) {
-                fs.writeFileSync(path, '', () => {
-                    console.log('new database file created. . . ')
-                })
+                const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
+                    if (err) {
+                        callback(err)
+                        resolve();
+                    } else {
+                        callback(null, dtb)
+                        resolve();
+                    }
+                });
+
+            } catch (err) {
+                callback(err)
+                resolve();
             }
-
-            const database = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
-                if (err) console.log(err.message)
-            })
-
-            return database
-        } catch (err) {
-            console.log(err.message);
-
-            return null
-        }
+        });
     },
+    /*
+        Database Connection Function - END
+    */
 
-    register: async (database, req, salt) => {
 
-        await initDatabase(database)
 
-        return (async () => {
-            // validating input
-            console.log('validating input')
 
-            return new Promise(async (resolve) => {
+    /*
+        functionName: async (dtb, args, callback) => { } - BEGIN
+    */
+    /*
+            CRUD user functions - BEGIN
+    */
+    createUser: async (dtb, args, callback) => {
+        // Testing Completed
+        await tryCreateTable(dtb);
 
-                data = {
-                    email: req.body.email1,
-                    username: req.body.username,
-                    password: req.body.password1,
-                }
+        return new Promise((resolve) => {
+            try {
 
-                if (!containsQuotes(data.email) && !containsQuotes(data.username) && !containsQuotes(data.password)) {
-                    if (isValidEmail(data.email)) {
-                        if (!isTooLong(data.username)) {
-                            if (!isTooShort(data.username)) {
-                                if (!isTooLong(data.password)) {
-                                    if (!isTooShort(data.password)) {
-                                        resolve(data)
+                tryCreateTable(dtb);
+
+                if (!allValuesAreStrings(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
+
+                    if (args.create_fields === undefined ||
+                        args.create_params === undefined ||
+                        args.create_params.email === undefined ||
+                        args.create_params.password === undefined ||
+                        args.create_params.salt === undefined ||
+                        args.create_params.created_at === undefined ||
+                        args.create_params.created_by === undefined
+                    ) {
+
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        if (!validEmail(args.create_params.email)) {
+                            callback({
+                                message: 'invalid email'
+                            });
+                            resolve();
+
+                        } else {
+                            if (!validPassword(args.create_params.password)) {
+                                callback({
+                                    message: 'invalid password'
+                                });
+                                resolve();
+
+                            } else {
+
+                                dtb.run(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?, ?, ?);`, [args.create_params.email, hash(args.create_params.password, args.create_params.salt), args.create_params.created_at, args.create_params.created_by], (err) => {
+                                    if (err) {
+
+                                        callback({
+                                            message: err.message
+                                        });
+                                        resolve();
+
                                     } else {
-                                        delete data
-                                        resolve({
-                                            'return': true,
-                                            'valid': false,
-                                            'code': 'password-too-short',
-                                            'message': 'Password is too short (minimum 8 characters)'
-                                        })
+
+                                        callback(null);
+                                        resolve();
+
                                     }
-                                } else {
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'password-too-long',
-                                        'message': 'Password is too long (maximum 32 characters)'
-                                    })
-                                }
-                            } else {
-                                delete data
-                                resolve({
-                                    'return': true,
-                                    'valid': false,
-                                    'code': 'username-too-short',
-                                    'message': 'Username is too short (minimum 8 characters)'
-                                })
+                                });
                             }
-                        } else {
-                            resolve({
-                                'return': true,
-                                'valid': false,
-                                'code': 'username-too-long',
-                                'message': 'Username is too long (maximum 32 characters)'
-                            })
                         }
-                    } else {
-                        resolve({
-                            'return': true,
-                            'valid': false,
-                            'code': 'email-is-invalid',
-                            'message': 'Email is invalid (requires ampersand and period characters, and minimum 5 characters)'
-                        })
                     }
-                } else {
-                    delete data
-                    resolve({
-                        'return': true,
-                        'valid': false,
-                        'code': 'input-contains-quotes',
-                        'message': 'Quote characters are not allowed'
-                    })
                 }
-            })
-        })().then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // checking input originality
-                console.log('checking input originality')
 
-                return new Promise(async (resolve) => {
-
-                    await database.all(`SELECT * FROM auth WHERE email LIKE '${data.email}' OR username LIKE '${data.username}'`, [], (err, rows) => {
-                        if (err) { console.log(err.message) }
-                        if (rows != undefined && rows.length > 0) {
-                            for (let z = 0; z < rows.length; z++) {
-                                if (data.email == rows[z].email) {
-                                    z = rows.length
-
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'email-in-use',
-                                        'message': 'That email is already in use'
-                                    })
-                                } else if (data.username == rows[z].username) {
-                                    z = rows.length
-
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'username-in-use',
-                                        'message': 'That username is already in use'
-                                    })
-                                } else {
-
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'database-code-error',
-                                        'message': 'Database error: rows matching username or email were returned positive but no matches were found in the result'
-                                    })
-                                }
-                            }
-                        } else {
-                            resolve(data)
-                        }
-                    })
-
-                })
+            } catch (err) {
+                callback({
+                    message: 'CATCH ERROR ' + err.message
+                });
+                resolve();
             }
-
-        }).then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // creating database entry for new user
-                console.log('creating database entry for new user')
-
-                return new Promise(async (resolve) => {
-
-                    await database.run("INSERT INTO auth(email, username, hash) VALUES(?, ?, ?);", [
-                        data.email,
-                        data.username,
-                        hash(data.password, salt)
-                    ], (err) => {
-                        if (err) {
-                            delete data;
-                            console.log(err.message);
-                        }
-                    })
-
-                    delete data
-                    resolve({
-                        'return': true,
-                        'valid': true,
-                        'code': 'registration-is-valid',
-                        'message': 'Registration was successful'
-                    })
-                })
-            }
-        })
+        });
     },
+    readUser: async (dtb, args, callback) => {
+        await tryCreateTable(dtb);
 
-    login: async (database, req, salt) => {
+        return new Promise((resolve) => {
+            try {
 
-        await initDatabase(database)
+                tryCreateTable(dtb);
 
-        return (async () => {
-            // validating input
-            console.log('validating input')
+                if (!allValuesAreStrings(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
 
-            return new Promise(async (resolve) => {
+                    if (args.read_fields === undefined ||
+                        args.read_key === undefined ||
+                        args.read_value === undefined
+                    ) {
 
-                data = {
-                    identifier: req.body.identifier,
-                    hash: hash(req.body.password, salt),
-                }
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
 
-                if (!containsQuotes(data.identifier) && !containsQuotes(req.body.password)) {
-                    if (!isTooLong(data.identifier)) {
-                        if (!isTooShort(data.identifier)) {
-                            if (!isTooLong(req.body.password)) {
-                                if (!isTooShort(req.body.password)) {
-                                    resolve(data)
-                                } else {
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'password-too-short',
-                                        'message': 'Password is too short (minimum 8 characters)'
-                                    })
-                                }
-                            } else {
-                                delete data
-                                resolve({
-                                    'return': true,
-                                    'valid': false,
-                                    'code': 'password-too-long',
-                                    'message': 'Password is too long (maximum 32 characters)'
-                                })
-                            }
-                        } else {
-                            delete data
-                            resolve({
-                                'return': true,
-                                'valid': false,
-                                'code': 'identifier-too-short',
-                                'message': 'Identifier is too short (minimum 8 characters)'
-                            })
-                        }
                     } else {
-                        delete data
-                        resolve({
-                            'return': true,
-                            'valid': false,
-                            'code': 'identifier-too-long',
-                            'message': 'Identifier is too long (maximum 32 characters)'
-                        })
-                    }
-                } else {
-                    delete data
-                    resolve({
-                        'return': true,
-                        'valid': false,
-                        'code': 'input-contains-quotes',
-                        'message': 'Quote characters are not allowed'
-                    })
-                }
-            })
-        })().then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // comparing to database
-                console.log('comparing to database')
 
-                return new Promise(async (resolve) => {
+                        dtb.all(
+                            `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
+                            [args.read_value],
+                            (err, rows) => {
+                                if (err) {
 
-                    await database.all(`SELECT * FROM auth WHERE email LIKE '${data.identifier}' OR username LIKE '${data.identifier}'`, [], (err, rows) => {
-                        if (err) { console.log(err.message); return err }
-                        if (rows != undefined && rows.length > 0) {
-                            for (let z = 0; z < rows.length; z++) {
-                                if (data.hash == rows[z].hash) {
-                                    delete data
-                                    resolve(rows[z])
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve();
+
+                                } else if (rows.length == 0) {
+
+                                    callback({
+                                        message: 'entry not found'
+                                    });
+                                    resolve();
+
                                 } else {
-                                    z = rows.length
 
-                                    delete rows
-                                    delete data
-                                    resolve({
-                                        'return': true,
-                                        'valid': false,
-                                        'code': 'credentials-not-present',
-                                        'message': 'Those credentials did not match any existing records'
-                                    })
+                                    callback(null, rows);
+                                    resolve();
+
+                                }
+                            }
+                        );
+                    }
+                }
+            } catch (err) {
+
+                callback({
+                    message: 'CATCH ERROR ' + err.message
+                });
+                resolve();
+
+            }
+        });
+    },
+    updateUser: async (dtb, args, callback) => {
+        await tryCreateTable(dtb);
+
+        return new Promise((resolve) => {
+            try {
+
+                if (!allValuesAreStrings(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
+
+                    if (args.update_field === undefined ||
+                        args.update_params === undefined ||
+                        args.update_params.data === undefined ||
+                        args.update_key === undefined ||
+                        args.update_value === undefined
+                    ) {
+
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        var execute = false;
+
+                        if (args.update_field == 'hash') {
+                            if (args.update_params.salt === undefined) {
+
+                                callback({
+                                    message: 'missing args'
+                                });
+                                resolve();
+
+                            } else {
+
+                                try {
+                                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
+
+                                    execute = true;
+                                } catch (err) {
+
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve();
                                 }
                             }
                         } else {
-                            delete rows
-                            delete data
-                            resolve({
-                                'return': true,
-                                'valid': false,
-                                'code': 'credentials-not-present',
-                                'message': 'Those credentials did not match any existing records'
-                            })
+                            execute = true;
                         }
-                    })
 
-                })
-            }
-        }).then((data) => {
-            if (data.return == true) {
-                return data
-            } else {
-                // creating session
-                console.log('creating session')
+                        if (execute) {
+                            dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
+                                if (err) {
 
-                req.session.loggedin = true;
-                req.session.email = data.email;
-                req.session.username = data.username;
-                req.session.ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+                                    callback({
+                                        message: err.message,
+                                    });
+                                    resolve();
+                                } else if (this.changes == 0) {
 
-                delete data
-                delete rows
-                return {
-                    'return': true,
-                    'valid': true,
-                    'code': 'login-was-successful',
-                    'message': 'Login was successful'
+                                    callback(
+                                        {
+                                            message: `Row(s) affected: ${this.changes}`
+                                        },
+                                        {
+                                            count: this.changes,
+                                            message: `Row(s) affected: ${this.changes}`
+                                        }
+                                    );
+                                    resolve();
+                                } else {
+
+                                    callback(
+                                        null,
+                                        {
+                                            count: this.changes,
+                                            message: `Row(s) affected: ${this.changes}`
+                                        }
+                                    );
+                                    resolve();
+                                }
+                            });
+                        }
+                    }
                 }
+            } catch (err) {
+
+                callback({
+                    message: err.message
+                });
+                resolve();
             }
-        })
+        });
     },
+    deleteUser: async (dtb, args, callback) => {
+        await tryCreateTable(dtb);
 
-    logout: async (req) => {
+        return new Promise((resolve) => {
+            try {
+                if (!allValuesAreStrings(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
 
-        req.session.destroy()
+                    if (args.delete_key === undefined ||
+                        args.delete_value === undefined
+                    ) {
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
 
+                    } else {
+
+                        dtb.run(`DELETE FROM auth WHERE ${args.delete_key} = ?;`, [args.delete_value], async function (err) {
+                            if (err) {
+
+                                callback({
+                                    message: err.message,
+                                });
+                                resolve();
+                            } else if (this.changes == 0) {
+
+                                callback(
+                                    {
+                                        message: `Row(s) affected: ${this.changes}`
+                                    },
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve();
+                            } else {
+
+                                callback(
+                                    null,
+                                    {
+                                        count: this.changes,
+                                        message: `Row(s) affected: ${this.changes}`
+                                    }
+                                );
+                                resolve();
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+
+                callback({
+                    message: err.message
+                });
+                resolve();
+            }
+        });
     },
-
-    // set_tempkey: async (database, email, salt) => {
-
-    //     await initDatabase(database)
-
-    //     return (async () => {
-    //         // validating input
-    //         console.log('validating input')
-
-    //         return new Promise((resolve) => {
-    //             if (!isTooLong(email) && !isTooShort(email) && !containsQuotes(email) && isValidEmail(email)) {
-
-    //             } else {
-    //                 resolve({
-    //                     'return': true,
-    //                     'valid': false,
-    //                     'code': 'email-is-invalid',
-    //                     'message': 'That email does not pass input validation'
-    //                 })
-    //             }
-    //         })
-    //     })().then((data) => {
-    //         if (data.return == true) {
-    //             return data
-    //         } else {
-    //             // inserting tempkey
-    //             console.log('inserting tempkey')
-
-    //             return new Promise(async (resolve) => {
-    //                 var hash = await hash(Math.random() * 1000000, salt)
-
-    //                 database.all(
-    //                     `UPDATE auth
-    //                     SET tempkey = '${hash}'
-    //                     WHERE email = '${email}';`,
-    //                     [],
-    //                     (err, rows) => {
-    //                         if (err) { console.log(err.message); return err }
-    //                         if (rows != undefined && rows.length == 1) {
-    //                             if (email == rows[0].email) {
-    //                                 resolve({
-    //                                     'return': true,
-    //                                     'valid': true,
-    //                                     'code': 'tempkey-set-successfully',
-    //                                     'message': 'Those credentials did not match any existing records'
-    //                                 })
-    //                             } else {
-    //                                 delete rows
-    //                                 resolve({
-    //                                     'return': true,
-    //                                     'valid': false,
-    //                                     'code': 'credentials-not-present',
-    //                                     'message': 'Those credentials did not match any existing records'
-    //                                 })
-    //                             }
-    //                         } else {
-    //                             delete rows
-    //                             resolve({
-    //                                 'return': true,
-    //                                 'valid': false,
-    //                                 'code': 'credentials-not-present',
-    //                                 'message': 'Those credentials did not match any existing records'
-    //                             })
-    //                         }
-    //                     }
-    //                 )
-    //             })
-
-    //         }
-    //     }).then((data) => {
-    //         if (data.return == true) {
-    //             return data
-    //         } else {
-    //             // sending email
-    //             console.log('sending email')
-
-    //             return new Promise(async (resolve) => {
+    /*
+            CRUD user functions - END
+    */
 
 
-    //             })
-    //         }
-    //     })
+    /*
+            Authentication user functions - BEGIN
+    */
+    loginUser: async (dtb, args, callback) => {
+        await tryCreateTable(dtb);
 
-    // },
-}
+        return new Promise((resolve) => {
+            try {
+
+                if (!allValuesAreStrings(args.login_params)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
+
+                    if (args.login_params === undefined ||
+                        args.login_params.email === undefined ||
+                        args.login_params.password === undefined ||
+                        args.login_params.salt === undefined ||
+                        args.session === undefined
+                    ) {
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        if (!validEmail(args.login_params.email)) {
+                            callback({
+                                message: 'invalid email'
+                            });
+                            resolve();
+                        } else {
+                            if (!validPassword(args.login_params.password)) {
+                                callback({
+                                    message: 'invalid password'
+                                });
+                                resolve();
+                            } else {
+                                if (typeof args.session != 'object' || args.session == null || args.session == undefined || Array.isArray(args.session)) {
+                                    callback({
+                                        message: 'session must be object'
+                                    });
+                                    resolve();
+                                } else {
+
+                                    dtb.all('SELECT * FROM auth WHERE email = ?;', [
+                                        args.login_params.email
+                                    ], (err, rows) => {
+                                        if (err) {
+                                            callback({
+                                                message: err.message
+                                            });
+                                            resolve();
+                                        } else if (rows[0] == undefined) {
+                                            callback({
+                                                message: 'credentials failed'
+                                            });
+                                            resolve();
+                                        } else {
+                                            if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
+                                                callback({
+                                                    message: 'credentials failed'
+                                                });
+                                                resolve();
+                                            } else {
+                                                args.session.email = rows[0].email;
+                                                args.session.id = rows[0].id;
+
+                                                callback(null, args.session);
+                                                resolve();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve();
+            }
+        });
+    },
+    logoutUser: async (args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (args.session === undefined) {
+                    callback({
+                        message: 'missing args'
+                    });
+                    resolve();
+
+                } else {
+
+                    if (typeof args.session != 'object' || Array.isArray(args.session) || args.session == null) {
+                        callback({
+                            message: 'session is not an object'
+                        });
+                        resolve();
+                    } else {
+                        for (const key in args.session) {
+                            delete args.session[key];
+                        }
+                        // args.session.loggedIn = false
+
+                        callback(null, args.session);
+                        resolve();
+                    }
+                }
+
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve();
+            }
+        });
+    },
+    /*
+            Authentication user functions - END
+    */
+    /*
+        functionName: async (dtb, args, callback) => { } - END
+    */
+
+
+    /*
+        functionName: async (dtb, callback) => { } - BEGIN
+    */
+    allUsers: async (dtb, callback) => {
+        await tryCreateTable(dtb);
+
+        return new Promise((resolve) => {
+            try {
+                dtb.all('SELECT * FROM auth;', [], (err, rows) => {
+                    if (err) {
+                        callback({
+                            message: err.message
+                        });
+                        resolve();
+                    } else {
+                        callback(null, rows);
+                        resolve();
+                    }
+                });
+            } catch (err) {
+                callback({
+                    message: err.message
+                });
+                resolve();
+            }
+        });
+    },
+    /*
+        functionName: async (dtb, callback) => { }- END
+    */
+};
+/*
+    Public Functions - END
+*/
