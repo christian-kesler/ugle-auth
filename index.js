@@ -10,8 +10,12 @@ callback parameters
     callback(err, data)
         readUser
 
-    callback(err, data)
+    callback(err, changes)
         updateUser
+
+    callback(err, data)
+        loginUser
+        logoutUser
 
 ----------------
 function parameters
@@ -50,12 +54,12 @@ function parameters
             email - variable
             password - variable
             salt - variable
-        session - the express-session to be modified 
+        session - the express-session object to be modified 
          
     callback - executed upon completion of the package function
-        err - FALSE if successful, object if function failed
+        err - null if successful, object if function failed
             message - descriptive string of what went wrong, taken from sqlite when possible
-        data - object containing sqlite data or session data if successful, NULL if function failed
+        data - object containing sqlite data or session data if successful, null if function failed
 ================================================================
 */
 
@@ -66,7 +70,6 @@ function parameters
     Import Statements - BEGIN
 */
 const { pbkdf2Sync } = require('crypto');
-// const fs = require('fs');
 // const sqlite3 = require(__dirname + '/../sqlite3')
 const sqlite3 = require('sqlite3');
 
@@ -96,12 +99,12 @@ async function tryCreateTable(dtb) {
                 'deleted_by' DATETIME
                 );`
             );
-            resolve()
+            resolve();
         } catch (err) {
             // console.log(err.message);
-            resolve()
+            resolve();
         }
-    })
+    });
 }
 
 function validEmail(input) {
@@ -155,7 +158,7 @@ function containsQuotes(field) {
 }
 function allValuesAreStrings(input) {
 
-    if (typeof input === "object" && input !== null) {
+    if (typeof input === 'object' && input !== null) {
         if (Object.keys(input).length === 0) {
             return false;
         } else {
@@ -165,7 +168,7 @@ function allValuesAreStrings(input) {
                 }
             }
         }
-    } else if (typeof input !== "string" || input == null || typeof input == 'undefined') {
+    } else if (typeof input !== 'string' || input == null || typeof input == 'undefined') {
         return false;
     }
 
@@ -199,7 +202,6 @@ module.exports = {
 
                 const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
                     if (err) {
-                        // console.log(err.message);
                         resolve(err);
                     } else {
                         resolve(false, dtb);
@@ -209,7 +211,6 @@ module.exports = {
 
             });
         } catch (err) {
-            // console.log(err.message);
             return (err);
         }
     },
@@ -392,6 +393,9 @@ module.exports = {
                         resolve();
 
                     } else {
+
+                        var execute = false;
+
                         if (args.update_field == 'hash') {
                             if (args.update_params.salt === undefined) {
 
@@ -405,55 +409,27 @@ module.exports = {
                                 try {
                                     args.update_params.data = hash(args.update_params.data, args.update_params.salt);
 
-                                    dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
-                                        if (err) {
-
-                                            callback({
-                                                message: err.message,
-                                            });
-                                            resolve()
-                                        } else if (this.changes == 0) {
-
-                                            callback(
-                                                {
-                                                    message: `Row(s) affected: ${this.changes}`
-                                                },
-                                                {
-                                                    count: this.changes,
-                                                    message: `Row(s) affected: ${this.changes}`
-                                                }
-                                            );
-                                            resolve()
-                                        } else {
-
-                                            callback(
-                                                null,
-                                                {
-                                                    count: this.changes,
-                                                    message: `Row(s) affected: ${this.changes}`
-                                                }
-                                            );
-                                            resolve()
-                                        }
-                                    });
-
+                                    execute = true;
                                 } catch (err) {
 
                                     callback({
                                         message: err.message
                                     });
-                                    resolve()
+                                    resolve();
                                 }
                             }
                         } else {
+                            execute = true;
+                        }
 
+                        if (execute) {
                             dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
                                 if (err) {
 
                                     callback({
                                         message: err.message,
                                     });
-                                    resolve()
+                                    resolve();
                                 } else if (this.changes == 0) {
 
                                     callback(
@@ -465,7 +441,7 @@ module.exports = {
                                             message: `Row(s) affected: ${this.changes}`
                                         }
                                     );
-                                    resolve()
+                                    resolve();
                                 } else {
 
                                     callback(
@@ -475,11 +451,10 @@ module.exports = {
                                             message: `Row(s) affected: ${this.changes}`
                                         }
                                     );
-                                    resolve()
+                                    resolve();
                                 }
                             });
                         }
-
                     }
                 }
             } catch (err) {
@@ -487,9 +462,9 @@ module.exports = {
                 callback({
                     message: err.message
                 });
-                resolve()
+                resolve();
             }
-        })
+        });
     },
     deleteUser: async (dtb, args, callback) => {
         await tryCreateTable(dtb);
@@ -519,7 +494,7 @@ module.exports = {
                                 callback({
                                     message: err.message,
                                 });
-                                resolve()
+                                resolve();
                             } else if (this.changes == 0) {
 
                                 callback(
@@ -531,7 +506,7 @@ module.exports = {
                                         message: `Row(s) affected: ${this.changes}`
                                     }
                                 );
-                                resolve()
+                                resolve();
                             } else {
 
                                 callback(
@@ -541,7 +516,7 @@ module.exports = {
                                         message: `Row(s) affected: ${this.changes}`
                                     }
                                 );
-                                resolve()
+                                resolve();
                             }
                         });
                     }
@@ -551,9 +526,9 @@ module.exports = {
                 callback({
                     message: err.message
                 });
-                resolve()
+                resolve();
             }
-        })
+        });
     },
     /*
             CRUD user functions - END
@@ -593,46 +568,46 @@ module.exports = {
                             callback({
                                 message: 'invalid email'
                             });
-                            resolve()
+                            resolve();
                         } else {
                             if (!validPassword(args.login_params.password)) {
                                 callback({
                                     message: 'invalid password'
                                 });
-                                resolve()
+                                resolve();
                             } else {
                                 if (typeof args.session != 'object' || args.session == null || args.session == undefined || Array.isArray(args.session)) {
                                     callback({
                                         message: 'session must be object'
                                     });
-                                    resolve()
+                                    resolve();
                                 } else {
 
-                                    dtb.all(`SELECT * FROM auth WHERE email = ?;`, [
+                                    dtb.all('SELECT * FROM auth WHERE email = ?;', [
                                         args.login_params.email
                                     ], (err, rows) => {
                                         if (err) {
                                             callback({
                                                 message: err.message
                                             });
-                                            resolve()
+                                            resolve();
                                         } else if (rows[0] == undefined) {
                                             callback({
                                                 message: 'credentials failed'
                                             });
-                                            resolve()
+                                            resolve();
                                         } else {
                                             if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
                                                 callback({
                                                     message: 'credentials failed'
                                                 });
-                                                resolve()
+                                                resolve();
                                             } else {
                                                 args.session.email = rows[0].email;
                                                 args.session.id = rows[0].id;
 
                                                 callback(null, args.session);
-                                                resolve()
+                                                resolve();
                                             }
                                         }
                                     });
@@ -645,9 +620,9 @@ module.exports = {
                 callback({
                     message: err.message
                 });
-                resolve()
+                resolve();
             }
-        })
+        });
     },
     logoutUser: async (args, callback) => {
         return new Promise((resolve) => {
@@ -665,15 +640,15 @@ module.exports = {
                         callback({
                             message: 'session is not an object'
                         });
-                        resolve()
+                        resolve();
                     } else {
                         for (const key in args.session) {
                             delete args.session[key];
                         }
                         // args.session.loggedIn = false
 
-                        callback(null, args.session)
-                        resolve()
+                        callback(null, args.session);
+                        resolve();
                     }
                 }
 
@@ -681,9 +656,9 @@ module.exports = {
                 callback({
                     message: err.message
                 });
-                resolve()
+                resolve();
             }
-        })
+        });
     },
     /*
             Authentication user functions - END
@@ -706,19 +681,19 @@ module.exports = {
                         callback({
                             message: err.message
                         });
-                        resolve()
+                        resolve();
                     } else {
                         callback(null, rows);
-                        resolve()
+                        resolve();
                     }
                 });
             } catch (err) {
                 callback({
                     message: err.message
                 });
-                resolve()
+                resolve();
             }
-        })
+        });
     },
     /*
         functionName: async (dtb, callback) => { }- END

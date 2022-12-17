@@ -30,6 +30,8 @@
         "__dirname": true,
         "require": true,
         "module": true,
-        "process": true
+        "process": true,
+        "global": true,
+        "session": true
     }
 }

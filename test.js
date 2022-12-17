@@ -19,7 +19,7 @@ const sqlite3 = require('sqlite3').verbose();
                 console.log(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
                 resolve(null);
             } else {
-                console.log(`[X] EXPECTED PASS | new sqlite3.Database`);
+                console.log('[X] EXPECTED PASS | new sqlite3.Database');
                 dtb.exec('DROP TABLE IF EXISTS auth;');
                 resolve(dtb);
             }
@@ -1072,7 +1072,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 
 
-    global.session = {}
+    global.session = {};
 
 
     var loginUser_args = [
@@ -1347,14 +1347,11 @@ const sqlite3 = require('sqlite3').verbose();
     ];
     for (let i = 0; i < loginUser_args.length; i++) {
         await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
-            // global.session = data
-            // console.log(data)
-
             if (i <= 2) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
                 } else {
-                    global.session = data
+                    global.session = data;
 
                     console.log(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
                 }
@@ -1362,7 +1359,7 @@ const sqlite3 = require('sqlite3').verbose();
                 if (err) {
                     console.log(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
                 } else {
-                    global.session = data
+                    global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
                 }
@@ -1406,13 +1403,11 @@ const sqlite3 = require('sqlite3').verbose();
     ];
     for (let i = 0; i < logoutUser_args.length; i++) {
         await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
-            // global.session = data
-
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
                 } else {
-                    global.session = data
+                    global.session = data;
 
                     console.log(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
                 }
@@ -1420,7 +1415,7 @@ const sqlite3 = require('sqlite3').verbose();
                 if (err) {
                     console.log(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
                 } else {
-                    global.session = data
+                    global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
                 }
