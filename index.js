@@ -70,8 +70,8 @@ function parameters
     Import Statements - BEGIN
 */
 const { pbkdf2Sync } = require('crypto');
-// const sqlite3 = require(__dirname + '/../sqlite3')
-const sqlite3 = require('sqlite3');
+const sqlite3 = require(__dirname + '/../sqlite3')
+// const sqlite3 = require('sqlite3');
 
 /*
     Import Statements - END
@@ -195,24 +195,25 @@ module.exports = {
     /*
         Database Connection Function - BEGIN
     */
-    initDtb: async (path) => {
-        try {
-            return new Promise((resolve) => {
-
+    initDtb: async (path, callback) => {
+        return new Promise((resolve) => {
+            try {
 
                 const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
                     if (err) {
-                        resolve(err);
+                        callback(err)
+                        resolve();
                     } else {
-                        resolve(false, dtb);
+                        callback(null, dtb)
+                        resolve();
                     }
                 });
 
-
-            });
-        } catch (err) {
-            return (err);
-        }
+            } catch (err) {
+                callback(err)
+                resolve();
+            }
+        });
     },
     /*
         Database Connection Function - END

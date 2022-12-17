@@ -1,12 +1,9 @@
+const ugle_auth = require('./index.js');
 /* 
     The console output will begin with [X] EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
-
+ 
     If the package is functioning as it should, the entirety of the terminal output from this program will begin with [X].
 */
-
-
-const ugle_auth = require('./index.js');
-const sqlite3 = require('sqlite3').verbose();
 
 
 
@@ -14,7 +11,7 @@ const sqlite3 = require('sqlite3').verbose();
 (async () => {
     return new Promise((resolve) => {
 
-        const dtb = new sqlite3.Database('./test.db', sqlite3.OPEN_READWRITE, (err) => {
+        ugle_auth.initDtb('./test.db', (err, dtb) => {
             if (err) {
                 console.log(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
                 resolve(null);
@@ -23,7 +20,7 @@ const sqlite3 = require('sqlite3').verbose();
                 dtb.exec('DROP TABLE IF EXISTS auth;');
                 resolve(dtb);
             }
-        });
+        })
     });
 })().then(async (dtb) => {
 

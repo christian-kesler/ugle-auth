@@ -7,129 +7,167 @@ An authentication package by Uglesoft
 
     npm install ugle-auth
 
+
 ## Dependencies
 
 You will probably be able to use this package with older or newer versions than these, but I know these work for sure.  
 
     "dependencies": {
-        "express": "4.18.2",
-        "express-session": "1.17.3",
-        "sqlite": "4.1.2",
         "sqlite3": "5.1.2",
     }
 
+
 ## Usage
-
-ugle-auth will handle the session variables for you, but first, you need to configure your express app and utilize express-session.  
-
-### Function inputs
 
 IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
 
-### express & express-session configuration
-
-    const express = require('express');
-    const session = require('express-session');
-    const sqlite3 = require('sqlite3').verbose();
-
-    (async () => {
-        const app = await express()
-        const database = await new sqlite3.Database(
-            __dirname + '/your-database.db',
-            sqlite3.OPEN_READWRITE,
-            (err) => {
-                if (err) console.log(err.message)
-            }
-        )
-
-        app.use(
-            session({
-                cookie: {
-                    sameSite: true,
-                    maxAge: 5 * 60 * 1000,
-                },
-                resave: true,
-                saveUninitialized: true,
-                secret: 'your-secret-here',
-                secure: true,
-            })
-        );
-    });
 
 ### Loading package
 
     const ugle_auth = require('ugle-auth')
 
-### Register a new account - example routing
 
-Note - the following examples assume your express app is using a view engine such as EJS, and an environment variable solution such as 'dotenv'
+### Connecting to Database
 
-    // register
-    app.post('/auth/register', async (req, res) => {
-
-        args = {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {                
-                'email': req.body.email,
-                'password': req.body.password,
-                'salt': process.env.AUTH_SALT,
-                'created_at': `${new Date}`,
-                'created_by': req.session.email,
-            }
+    await ugle_auth.initDtb('./database.db', (err, dtb) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            global.dtb = dtb;
         }
+    })
 
-        ugle_auth.createUser(dtb, args, (err) => {
-            if (err) {
-                console.log(err.message);
-            } else {
-                res.redirect('/auth/login?redirect=registration-successful')
-            }
-        });
 
+### CREATE New User Account
+
+    args = {
+        'create_fields': 'email, hash, created_at, created_by',
+        'create_params': {
+            'email': 'uglesoft@gmail.com',
+            'password': 'uglesoftPassword',
+            'salt': 'uglesoftSalt',
+            'created_at': 'This Exact Moment',
+            'created_by': 'The Supreme Owl Tester',
+        }
+    }
+
+    await ugle_auth.createUser(dtb, args, (err) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(`createUser successful`);
+        }
     });
 
-### Login to an existing account - example routing
 
-    // login
-    app.post('/auth/login', (req, res) => {
+### READ Existing User Account
 
-        args = {
-            'login_params': {
-                'email': req.body.email,
-                'password': req.body.password,
-                'salt': process.env.AUTH_SALT,
-            },
-            'session': req.session
+    args = {
+        'read_fields': 'id, email, created_at, created_by',
+        'read_key': 'id',
+        'read_value': '1',
+    }
+
+    await ugle_auth.readUser(dtb, args, (err, data) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(`readUser successful | ${JSON.stringify(data)}`);
         }
-
-        ugle_auth.loginUser(dtb, args, (err, session) => {
-            if (err) {
-                console.log(err.message);
-            } else {
-                req.session = session;
-                res.redirect('/account/home');
-            }
-        });
-
     });
 
-### Logout of an existing session - example routing
 
-    // logout
-    app.post('/auth/logout', (req, res) => {
+### UPDATE Existing User Account
 
-        ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
-            if (err) {
-                console.log(err.message);
-            } else {
-                res.redirect('/auth/login?redirect=logout');
-            }
-        });
+    args = {
+        'update_field': 'hash',
+        'update_params': {
+            'data': 'new_password',
+            'salt': 'exampleSalt',
+        },
+        'update_key': 'email',
+        'update_value': 'uglesoft@gmail.com'
+    }
 
+    await ugle_auth.updateUser(dtb, args, (err, changes) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(`updateUser successful | ${changes.message}`);
+        }
+    });
+
+
+### DELETE Existing User Account
+
+    args = {
+        'delete_key': 'id',
+        'delete_value': '1'
+    }
+
+    await ugle_auth.deleteUser(dtb, args, (err, changes) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(`deleteUser successful | ${changes.message}`);
+        }
+    });
+
+
+### Login to User Account
+
+    global.session = {}
+
+    args = {
+        'login_params': {
+            'email': 'christian.j.kesler@gmail.com',
+            'password': 'personalPassword',
+            'salt': 'personalSalt',
+        },
+        'session': session
+    }
+
+    await ugle_auth.loginUser(dtb, args, (err, session) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            global.session = session;
+            console.log(`loginUser successful | ${JSON.stringify(session)}`);
+        }
+    });
+
+
+### Logout of User Account
+
+    global.session = { "email": "uglesoft@gmail.com", "id": 1 }
+
+    args = {
+        'session': session
+    }
+
+    await ugle_auth.logoutUser(args, (err, session) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            global.session = session;
+            console.log(`logoutUser successful | ${JSON.stringify(session)}`);
+        }
+    });
+
+
+### List All User Accounts
+
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(JSON.stringify(data));
+        }
     });
 
 
 ## Security
+
 
 ### Password Hashing
 
@@ -138,6 +176,7 @@ The hashing algorithm used is below, and relies on the built-in crypto package f
     pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
 
 As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 999,999 times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
+
 
 ### Login Attempts
 
