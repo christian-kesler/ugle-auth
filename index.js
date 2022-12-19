@@ -13,7 +13,7 @@ callback parameters
     callback(err, changes)
         updateUser
 
-    callback(err, data)
+    callback(err, session)
         loginUser
         logoutUser
 

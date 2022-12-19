@@ -2,6 +2,9 @@
 
 An authentication package by Uglesoft
 
+## TODO
+
+Hard code create fields and remove from args
 
 ## Installation
 
