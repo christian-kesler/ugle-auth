@@ -27,6 +27,7 @@ function parameters
             email - variable
             password - variable
             salt - variable
+            perms - object of booleans
 
         read_fields - string containing the database fields to retrieve
             "id, email, created_at, created_by"
@@ -70,9 +71,8 @@ function parameters
     Import Statements - BEGIN
 */
 const { pbkdf2Sync } = require('crypto');
-const sqlite3 = require(__dirname + '/../sqlite3')
-// const sqlite3 = require('sqlite3');
-
+// const sqlite3 = require(__dirname + '/../sqlite3')
+const sqlite3 = require('sqlite3');
 /*
     Import Statements - END
 */
@@ -90,6 +90,7 @@ async function tryCreateTable(dtb) {
 
                 'email' VARCHAR(255) UNIQUE,
                 'hash' VARCHAR(255),
+                'perms' TEXT,
                 'tempkey' VARCHAR(255),
                 'tempkey_datetime' DATE,
 
@@ -101,7 +102,6 @@ async function tryCreateTable(dtb) {
             );
             resolve();
         } catch (err) {
-            // console.log(err.message);
             resolve();
         }
     });
@@ -112,11 +112,9 @@ function validEmail(input) {
         if (!containsQuotes(input) && input.includes('@') && input.includes('.') && input.length >= 5 && input.length <= 64) {
             return true;
         } else {
-            // console.log('invalid email')
             return false;
         }
     } catch (err) {
-        // console.log(err.message)
         return false;
     }
 }
@@ -125,11 +123,9 @@ function validPassword(input) {
         if (!containsQuotes(input) && input.length >= 8 && input.length <= 32) {
             return true;
         } else {
-            // console.log('invalid password')
             return false;
         }
     } catch (err) {
-        // console.log(err.message)
         return false;
     }
 }
@@ -146,40 +142,38 @@ function containsQuotes(field) {
             field.includes('"') ||
             field.includes('`')
         ) {
-            // console.log('input contains quotes')
             return true;
         } else {
             return false;
         }
     } catch (err) {
-        // console.log(err.message)
         return true;
     }
 }
-function allValuesAreStrings(input) {
+function allValuesAreStringsOrBools(input) {
 
     if (typeof input === 'object' && input !== null) {
         if (Object.keys(input).length === 0) {
             return false;
         } else {
             for (const key of Object.keys(input)) {
-                if (!allValuesAreStrings(input[key])) {
+                if (!allValuesAreStringsOrBools(input[key])) {
                     return false;
                 }
             }
         }
-    } else if (typeof input !== 'string' || input == null || typeof input == 'undefined') {
+    } else if (typeof input !== 'string' && typeof input !== 'boolean') {
         return false;
     }
 
     return true;
+
 }
 
 function hash(input, salt) {
     try {
         return pbkdf2Sync(input, salt, 999999, 255, 'sha512').toString('hex');
     } catch (err) {
-        // console.log(err.message);
         return null;
     }
 }
@@ -237,63 +231,68 @@ module.exports = {
 
                 tryCreateTable(dtb);
 
-                if (!allValuesAreStrings(args)) {
+                if (!allValuesAreStringsOrBools(args)) {
                     callback({
                         message: 'non-string values detected'
                     });
                     resolve();
+                } else if (
+                    args.create_params === undefined ||
+                    args.create_params.email === undefined ||
+                    args.create_params.password === undefined ||
+                    args.create_params.salt === undefined ||
+                    args.create_params.perms === undefined ||
+                    args.create_params.created_at === undefined ||
+                    args.create_params.created_by === undefined
+                ) {
+                    callback({
+                        message: 'missing args'
+                    });
+                    resolve();
+
+                } else if (!validEmail(args.create_params.email)) {
+                    callback({
+                        message: 'invalid email'
+                    });
+                    resolve();
+
+                } else if (!validPassword(args.create_params.password)) {
+                    callback({
+                        message: 'invalid password'
+                    });
+                    resolve();
+
+                } else if (typeof args.create_params.perms != 'object') {
+                    callback({
+                        message: 'invalid perms'
+                    });
+                    resolve();
+
                 } else {
 
-                    if (args.create_fields === undefined ||
-                        args.create_params === undefined ||
-                        args.create_params.email === undefined ||
-                        args.create_params.password === undefined ||
-                        args.create_params.salt === undefined ||
-                        args.create_params.created_at === undefined ||
-                        args.create_params.created_by === undefined
-                    ) {
+                    dtb.run(`INSERT INTO auth(email, hash, perms, created_at, created_by) VALUES(?, ?, ?, ?, ?);`, [
+                        args.create_params.email,
+                        hash(args.create_params.password, args.create_params.salt),
+                        JSON.stringify(args.create_params.perms),
+                        args.create_params.created_at,
+                        args.create_params.created_by
+                    ], (err) => {
+                        if (err) {
 
-                        callback({
-                            message: 'missing args'
-                        });
-                        resolve();
-
-                    } else {
-
-                        if (!validEmail(args.create_params.email)) {
                             callback({
-                                message: 'invalid email'
+                                message: err.message
                             });
                             resolve();
 
                         } else {
-                            if (!validPassword(args.create_params.password)) {
-                                callback({
-                                    message: 'invalid password'
-                                });
-                                resolve();
 
-                            } else {
+                            callback(null);
+                            resolve();
 
-                                dtb.run(`INSERT INTO auth(${args.create_fields}) VALUES(?, ?, ?, ?);`, [args.create_params.email, hash(args.create_params.password, args.create_params.salt), args.create_params.created_at, args.create_params.created_by], (err) => {
-                                    if (err) {
-
-                                        callback({
-                                            message: err.message
-                                        });
-                                        resolve();
-
-                                    } else {
-
-                                        callback(null);
-                                        resolve();
-
-                                    }
-                                });
-                            }
                         }
-                    }
+                    });
                 }
+
 
             } catch (err) {
                 callback({
@@ -311,7 +310,7 @@ module.exports = {
 
                 tryCreateTable(dtb);
 
-                if (!allValuesAreStrings(args)) {
+                if (!allValuesAreStringsOrBools(args)) {
                     callback({
                         message: 'non-string values detected'
                     });
@@ -374,7 +373,7 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (!allValuesAreStrings(args)) {
+                if (!allValuesAreStringsOrBools(args)) {
                     callback({
                         message: 'non-string values detected'
                     });
@@ -409,6 +408,28 @@ module.exports = {
 
                                 try {
                                     args.update_params.data = hash(args.update_params.data, args.update_params.salt);
+
+                                    execute = true;
+                                } catch (err) {
+
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve();
+                                }
+                            }
+                        } else if (args.update_field == 'perms') {
+                            if (typeof args.update_params.data != 'object') {
+
+                                callback({
+                                    message: 'missing args'
+                                });
+                                resolve();
+
+                            } else {
+
+                                try {
+                                    args.update_params.data = JSON.stringify(args.update_params.data);
 
                                     execute = true;
                                 } catch (err) {
@@ -472,7 +493,7 @@ module.exports = {
 
         return new Promise((resolve) => {
             try {
-                if (!allValuesAreStrings(args)) {
+                if (!allValuesAreStringsOrBools(args)) {
                     callback({
                         message: 'non-string values detected'
                     });
@@ -545,7 +566,7 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (!allValuesAreStrings(args.login_params)) {
+                if (!allValuesAreStringsOrBools(args.login_params)) {
                     callback({
                         message: 'non-string values detected'
                     });
@@ -606,6 +627,7 @@ module.exports = {
                                             } else {
                                                 args.session.email = rows[0].email;
                                                 args.session.id = rows[0].id;
+                                                args.session.perms = JSON.parse(rows[0].perms);
 
                                                 callback(null, args.session);
                                                 resolve();
@@ -643,12 +665,11 @@ module.exports = {
                         });
                         resolve();
                     } else {
-                        for (const key in args.session) {
-                            delete args.session[key];
-                        }
-                        // args.session.loggedIn = false
+                        args.session.email = null;
+                        args.session.id = null;
+                        args.session.perms = null;
 
-                        callback(null, args.session);
+                        callback(null, {});
                         resolve();
                     }
                 }

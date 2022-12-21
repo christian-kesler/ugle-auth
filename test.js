@@ -28,387 +28,646 @@ const ugle_auth = require('./index.js');
     var createUser_args = [
         // valid strings
         {
-            'create_fields': 'email, hash, created_at, created_by',
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'uglesoft@gmail.com',
                 'password': 'uglesoftPassword',
                 'salt': 'uglesoftSalt',
+                'perms': {
+                    'mage': false,
+                    'user': true,
+                    'GOD': true
+                },
                 'created_at': 'This Exact Moment',
                 'created_by': 'The Supreme Owl Tester',
             }
         },
         // invalid strings
         {
-            'create_fields': 'email, hash, created_at',
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'c@gmail',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'pass',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': 'args_obj'
+        },
+        {
+
+            'create_params': {
+                'email': 'j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': 'puppy',
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
         },
         // integers
         {
-            'create_fields': 8,
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 8,
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 8,
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 8,
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 8,
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 8,
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': 8
         },
-        // objects
         {
-            'create_fields': {},
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': 8,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': 8,
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+
+        // objects
+        {
+
             'create_params': {
                 'email': {},
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': {},
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': {},
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': {},
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': {},
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {}
         },
-        // arrays
         {
-            'create_fields': [],
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': {},
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': {},
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+
+        // arrays
+        {
+
             'create_params': {
                 'email': [],
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': [],
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': [],
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': [],
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': [],
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': []
         },
-        // null
         {
-            'create_fields': null,
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': [],
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': [],
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+
+        // null
+        {
+
             'create_params': {
                 'email': null,
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': null,
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': null,
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': null,
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': null,
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': null
         },
-        // undefined
         {
-            'create_fields': undefined,
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': null,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': null,
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+
+        // undefined
+        {
+
             'create_params': {
                 'email': undefined,
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': undefined,
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': undefined,
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': undefined,
                 'created_by': 'Me',
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
                 'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
                 'created_at': 'Today :)',
                 'created_by': undefined,
             }
         },
         {
-            'create_fields': 'email, hash, created_at, created_by',
+
             'create_params': undefined,
         },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': {
+                    'admin': undefined,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': undefined,
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+
         // absent
         {
+
+            'create_params': {
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
+            }
+        },
+        {
+
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
@@ -416,54 +675,6 @@ const ugle_auth = require('./index.js');
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'salt': 'personalSalt',
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-                'created_by': 'Me',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-                'created_at': 'Today :)',
-            }
-        },
-        {
-            'create_fields': 'email, hash, created_at, created_by',
         },
     ];
     for (let i = 0; i < createUser_args.length; i++) {
@@ -490,12 +701,12 @@ const ugle_auth = require('./index.js');
     var readUser_args = [
         // valid strings
         {
-            'read_fields': 'id, email, created_at, created_by',
+            'read_fields': 'id, email, perms, created_at, created_by',
             'read_key': 'id',
             'read_value': '2',
         },
         {
-            'read_fields': 'id, email, created_at, created_by',
+            'read_fields': 'id, email, perms, created_at, created_by',
             'read_key': 'email',
             'read_value': 'christian.j.kesler@gmail.com',
         },
@@ -642,9 +853,12 @@ const ugle_auth = require('./index.js');
             'update_value': 'uglesoft@gmail.com'
         },
         {
-            'update_field': 'created_by',
+            'update_field': 'perms',
             'update_params': {
-                'data': 'A Cool Test Script',
+                'data': {
+                    'administrator': true,
+                    'tester': false
+                },
             },
             'update_key': 'email',
             'update_value': 'christian.j.kesler@gmail.com'
@@ -674,6 +888,15 @@ const ugle_auth = require('./index.js');
             'update_key': 'email',
             'update_value': 'fake'
         },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': 'puppy',
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
         // integers
         {
             'update_field': 8,
@@ -738,6 +961,27 @@ const ugle_auth = require('./index.js');
             'update_key': 'email',
             'update_value': 8
         },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': 8,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': 8,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+
         // objects
         {
             'update_field': {},
@@ -801,6 +1045,25 @@ const ugle_auth = require('./index.js');
             },
             'update_key': 'email',
             'update_value': {}
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': {},
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {},
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
         },
 
         // arrays
@@ -867,6 +1130,25 @@ const ugle_auth = require('./index.js');
             'update_key': 'email',
             'update_value': []
         },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': [],
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': [],
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
 
         // null
         {
@@ -932,6 +1214,25 @@ const ugle_auth = require('./index.js');
             'update_key': 'email',
             'update_value': null
         },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': null,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': null,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
 
         // undefined
         {
@@ -996,6 +1297,25 @@ const ugle_auth = require('./index.js');
             },
             'update_key': 'email',
             'update_value': undefined
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': undefined,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': undefined,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
         },
 
         // absent
