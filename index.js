@@ -8,7 +8,7 @@ callback parameters
         deleteUser
 
     callback(err, data)
-        readUser
+        readUser{s}
 
     callback(err, changes)
         updateUser
@@ -303,6 +303,71 @@ module.exports = {
         });
     },
     readUser: async (dtb, args, callback) => {
+        await tryCreateTable(dtb);
+
+        return new Promise((resolve) => {
+            try {
+
+                tryCreateTable(dtb);
+
+                if (!allValuesAreStringsOrBools(args)) {
+                    callback({
+                        message: 'non-string values detected'
+                    });
+                    resolve();
+                } else {
+
+                    if (args.read_fields === undefined ||
+                        args.read_key === undefined ||
+                        args.read_value === undefined
+                    ) {
+
+                        callback({
+                            message: 'missing args'
+                        });
+                        resolve();
+
+                    } else {
+
+                        dtb.all(
+                            `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
+                            [args.read_value],
+                            (err, rows) => {
+                                if (err) {
+
+                                    callback({
+                                        message: err.message
+                                    });
+                                    resolve();
+
+                                } else if (rows.length == 0) {
+
+                                    callback({
+                                        message: 'entry not found'
+                                    });
+                                    resolve();
+
+                                } else {
+
+                                    callback(null, rows[0]);
+                                    resolve();
+
+                                }
+                            }
+                        );
+                    }
+                }
+            } catch (err) {
+
+                callback({
+                    message: 'CATCH ERROR ' + err.message
+                });
+                resolve();
+
+            }
+        });
+    },
+    readUsers: async (dtb, args, callback) => {
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
@@ -669,7 +734,7 @@ module.exports = {
                         args.session.id = null;
                         args.session.perms = null;
 
-                        callback(null, {});
+                        callback(null, args.session);
                         resolve();
                     }
                 }
