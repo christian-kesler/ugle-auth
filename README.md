@@ -2,9 +2,12 @@
 
 An authentication package by Uglesoft
 
+
 ## TODO
 
-Hard code create fields and remove from args
+Develop tempkey functions
+Login attempt tracker
+
 
 ## Installation
 

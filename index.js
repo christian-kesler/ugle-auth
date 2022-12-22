@@ -21,13 +21,13 @@ callback parameters
 function parameters
     dtb - variable representing sqlite database connection
     args - object containing varying information necessary for each function
-        create_fields - string containing the database fields to write to
-            "email, hash, created_at, created_by"
         create_params - the values to be written into the database
             email - variable
             password - variable
             salt - variable
             perms - object of booleans
+            created_at - string of datetime
+            created_by - string of creator email or other identifier
 
         read_fields - string containing the database fields to retrieve
             "id, email, created_at, created_by"
