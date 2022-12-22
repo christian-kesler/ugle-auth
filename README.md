@@ -3,12 +3,6 @@
 An authentication package by Uglesoft
 
 
-## TODO
-
-Develop tempkey functions
-Login attempt tracker
-
-
 ## Installation
 
     npm install ugle-auth
@@ -47,7 +41,6 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 ### CREATE New User Account
 
     args = {
-        'create_fields': 'email, hash, created_at, created_by',
         'create_params': {
             'email': 'uglesoft@gmail.com',
             'password': 'uglesoftPassword',
@@ -186,4 +179,17 @@ As you can see, it hashes to a 255 character output (a convenient number for SQL
 
 ### Login Attempts
 
-There is currently no limit on the quantity or frequency of login attempts; I intend to implement this feature in the future.  
+If a login attempt makes it through all input validation AND finds a valid email but the password hashes do not match, then a failed_login_attempts integer is incremented.  If the failed_login_attempts for a given email is equal to 4 or greater, login attempts are denied until the password is reset.  
+
+
+### Password Reset
+
+This is currently in the developers hands, but the tempkey field will help with that.  When updating a user's tempkey field, it will hash in any value you provide other than FALSE.  The intent is to offer a secure non password string to use as a url parameter towards a reset password page.
+
+One recommended way to approach this would be as follows:
+
+User attempts to Login too many times -> User clicks 'Reset Password' (which creates a random tempkey on the User's account and sends an email with the tempkey included as a url parameter within the reset password link) -> User receives an email and clicks the reset password link -> User enters their new password (which updates the User's hash, reseting the login attempts)
+
+A more locked down version might look like
+
+Admin Logs in -> Admin Views all Users -> Admin selects User that is Locked Out -> Admin selects 'Send User Reset Password Email' (updates user's tempkey and uses it to generate reset password link in email) -> User receives email and opens link -> User enters new password (updates user's hash, which resets the login attempt counter) -> User logs in successfully

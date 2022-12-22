@@ -841,555 +841,16 @@ const ugle_auth = require('./index.js');
 
 
 
-    var updateUser_args = [
-        // valid strings
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': true,
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        // invalid strings
-        {
-            'update_field': 'fake',
-            'update_params': {
-                'data': 'A Cool Test Script',
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'A Cool Test Script',
-            },
-            'update_key': 'fake',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'A Cool Test Script',
-            },
-            'update_key': 'email',
-            'update_value': 'fake'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': 'puppy',
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-        // integers
-        {
-            'update_field': 8,
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 8,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 8,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 8,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 8,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 8,
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 8
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': 8,
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': 8,
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-
-        // objects
-        {
-            'update_field': {},
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': {},
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': {},
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': {},
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-                'salt': {},
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': {},
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': {}
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': {},
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {},
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-        // arrays
-        {
-            'update_field': [],
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': [],
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': [],
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': [],
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-                'salt': [],
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': [],
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': []
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': [],
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': [],
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-        // null
-        {
-            'update_field': null,
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': null,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': null,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': null,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-                'salt': null,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': null,
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': null
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': null,
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': null,
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-        // undefined
-        {
-            'update_field': undefined,
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': undefined,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': undefined,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': undefined,
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'data': 'new_password',
-                'salt': undefined,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': undefined,
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': undefined
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': {
-                    'administrator': undefined,
-                    'tester': false
-                },
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'perms',
-            'update_params': {
-                'data': undefined,
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-
-        // absent
-        {
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'created_by',
-            'update_params': {
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'update_key': 'email',
-        },
-    ];
-    for (let i = 0; i < updateUser_args.length; i++) {
-        await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
-            if (i <= 1) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
-                } else {
-                    console.log(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
-                } else {
-                    console.log(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
-                }
-            }
-        });
-    }
-
-
-
-
     global.session = {};
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+        }
+    });
+
+
 
 
     var loginUser_args = [
@@ -1405,8 +866,8 @@ const ugle_auth = require('./index.js');
         {
             'login_params': {
                 'email': 'uglesoft@gmail.com',
-                'password': 'new_password',
-                'salt': 'exampleSalt',
+                'password': 'uglesoftPassword',
+                'salt': 'uglesoftSalt',
             },
             'session': session
         },
@@ -1451,6 +912,48 @@ const ugle_auth = require('./index.js');
                 'salt': 'personalSalt',
             },
             'session': 'fake'
+        },
+        // invalid spam for lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        // valid strings to test lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'uglesoftPassword',
+                'salt': 'uglesoftSalt',
+            },
+            'session': session
         },
         // integers
         {
@@ -1687,6 +1190,1092 @@ const ugle_auth = require('./index.js');
 
 
 
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+        }
+    });
+
+
+
+
+    var logoutUser_args = [
+        // valid strings
+        {
+            'session': session
+        },
+        {
+            'session': {}
+        },
+        // invalid strings
+        {
+            'session': 'string'
+        },
+        // integers
+        {
+            'session': 8
+        },
+        // arrays
+        {
+            'session': []
+        },
+        // null
+        {
+            'session': null
+        },
+        // undefined
+        {
+            'session': undefined
+        },
+        // absent
+        {},
+    ];
+    for (let i = 0; i < logoutUser_args.length; i++) {
+        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
+            if (i <= 1) {
+                if (err) {
+                    console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.log(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.log(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            }
+        });
+    }
+
+
+
+
+    var updateUser_args = [
+        // valid strings
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': true,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': 'a random string',
+                'salt': 'a random salt',
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': false,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // invalid strings
+        {
+            'update_field': 'fake',
+            'update_params': {
+                'data': 'A Cool Test Script',
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'A Cool Test Script',
+            },
+            'update_key': 'fake',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'A Cool Test Script',
+            },
+            'update_key': 'email',
+            'update_value': 'fake'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': 'puppy',
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // integers
+        {
+            'update_field': 8,
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 8,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 8,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 8,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 8,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 8,
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 8
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': 8,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': 8,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': 8,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+
+        // objects
+        {
+            'update_field': {},
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': {},
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': {},
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': {},
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'new_password',
+                'salt': {},
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': {},
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': {}
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': {},
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {},
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': {},
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // arrays
+        {
+            'update_field': [],
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': [],
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': [],
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': [],
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'new_password',
+                'salt': [],
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': [],
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': []
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': [],
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': [],
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': [],
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // null
+        {
+            'update_field': null,
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': null,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': null,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': null,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'new_password',
+                'salt': null,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': null,
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': null
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': null,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': null,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': null,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // undefined
+        {
+            'update_field': undefined,
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': undefined,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': undefined,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': undefined,
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'data': 'new_password',
+                'salt': undefined,
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': undefined,
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': undefined
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': {
+                    'administrator': undefined,
+                    'tester': false
+                },
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'perms',
+            'update_params': {
+                'data': undefined,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+        {
+            'update_field': 'tempkey',
+            'update_params': {
+                'data': undefined,
+            },
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+        // absent
+        {
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'created_by',
+            'update_params': {
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_value': 'uglesoft@gmail.com'
+        },
+        {
+            'update_field': 'hash',
+            'update_params': {
+                'data': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'update_key': 'email',
+        },
+        {
+            'update_field': 'tempkey',
+            'update_key': 'email',
+            'update_value': 'christian.j.kesler@gmail.com'
+        },
+
+    ];
+    for (let i = 0; i < updateUser_args.length; i++) {
+        await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
+            if (i <= 3) {
+                if (err) {
+                    console.log(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
+                } else {
+                    console.log(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
+                }
+            } else {
+                if (err) {
+                    console.log(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
+                } else {
+                    console.log(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
+                }
+            }
+        });
+    }
+
+
+
+
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+        }
+    });
+
+
+
+
+    var loginUser_args = [
+        // valid strings
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'new_password',
+                'salt': 'exampleSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': {}
+        },
+
+        // invalid strings
+        {
+            'login_params': {
+                'email': 'fake@gmail',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'fake',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': 'fake'
+        },
+        // invalid spam for lockout
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        // valid strings to test lockout
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        // integers
+        {
+            'login_params': 8,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 8,
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 8,
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 8,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': 8
+        },
+        // objects
+        {
+            'login_params': {},
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': {},
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': {},
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': {},
+            },
+            'session': session
+        },
+        // arrays
+        {
+            'login_params': [],
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': [],
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': [],
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': [],
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': []
+        },
+        // null
+        {
+            'login_params': null,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': null,
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': null,
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': null,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': null
+        },
+        // undefined
+        {
+            'login_params': undefined,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': undefined,
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': undefined,
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': undefined,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': undefined
+        },
+        // absent
+        {
+            'session': session
+        },
+        {
+            'login_params': {
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'salt': 'personalSalt',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'personalSalt',
+            },
+        },
+    ];
+    for (let i = 0; i < loginUser_args.length; i++) {
+        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
+            if (i <= 2) {
+                if (err) {
+                    console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.log(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.log(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            }
+        });
+    }
+
+
+
+
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+        } else {
+            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+        }
+    });
+
+
+
+
     var logoutUser_args = [
         // valid strings
         {
@@ -1832,6 +2421,8 @@ const ugle_auth = require('./index.js');
             }
         });
     }
+
+
 
 
     await ugle_auth.allUsers(dtb, (err, data) => {
