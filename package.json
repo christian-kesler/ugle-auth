@@ -1,6 +1,6 @@
 {
   "name": "ugle-auth",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "An authentication system for NodeJS web apps using sqlite",
   "main": "index.js",
   "scripts": {
