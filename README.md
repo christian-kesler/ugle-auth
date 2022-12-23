@@ -42,13 +42,17 @@ IMPORTANT - your salt must not change once you enter a production environment; d
 
     args = {
         'create_params': {
-            'email': 'uglesoft@gmail.com',
-            'password': 'uglesoftPassword',
-            'salt': 'uglesoftSalt',
-            'created_at': 'This Exact Moment',
-            'created_by': 'The Supreme Owl Tester',
+            'email': req.body.email,
+            'password': req.body.password,
+            'salt': process.env.AUTH_SALT,
+            'perms': {
+                'admin': false,
+                'user': true,
+            },
+            'created_at': `${new Date}`,
+            'created_by': `${req.session.email}`,
         }
-    }
+    },
 
     await ugle_auth.createUser(dtb, args, (err) => {
         if (err) {
