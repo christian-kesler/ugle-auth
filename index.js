@@ -204,8 +204,12 @@ module.exports = {
                 });
 
             } catch (err) {
-                callback(err)
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -315,10 +319,12 @@ module.exports = {
 
 
             } catch (err) {
-                callback({
-                    'message': 'CATCH ERROR ' + err.message
-                });
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -382,12 +388,12 @@ module.exports = {
                     }
                 }
             } catch (err) {
-
-                callback({
-                    'message': 'CATCH ERROR ' + err.message
-                });
-                resolve();
-
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -451,12 +457,12 @@ module.exports = {
                     }
                 }
             } catch (err) {
-
-                callback({
-                    'message': 'CATCH ERROR ' + err.message
-                });
-                resolve();
-
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -633,9 +639,12 @@ module.exports = {
                     }
                 }
             } catch (err) {
-
-                callback(err);
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -700,9 +709,12 @@ module.exports = {
                     }
                 }
             } catch (err) {
-
-                callback(err);
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -837,8 +849,12 @@ module.exports = {
                     }
                 }
             } catch (err) {
-                callback(err);
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -871,8 +887,12 @@ module.exports = {
                 }
 
             } catch (err) {
-                callback(err);
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
@@ -902,8 +922,12 @@ module.exports = {
                     }
                 });
             } catch (err) {
-                callback(err);
-                resolve();
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve()
+                }
             }
         });
     },
