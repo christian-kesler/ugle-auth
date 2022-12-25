@@ -826,13 +826,13 @@ const ugle_auth = require('./index.js');
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | readUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[X] EXPECTED PASS | readUser[${i}] | ${JSON.stringify(data)}`);
+                    console.log(`[X] EXPECTED PASS | readUser[${i}] | ${data}`);
                 }
             } else {
                 if (err) {
                     console.log(`[X] EXPECTED FAIL | readUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] UNEXPECTED PASS | readUser[${i}] | ${JSON.stringify(data)}`);
+                    console.log(`[ ] UNEXPECTED PASS | readUser[${i}] | ${data}`);
                 }
             }
         });
