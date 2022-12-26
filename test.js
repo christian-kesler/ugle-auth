@@ -4,6 +4,7 @@ const ugle_auth = require('./index.js');
  
     If the package is functioning as it should, the entirety of the terminal output from this program will begin with [X].
 */
+var err_count = 0;
 
 
 
@@ -14,15 +15,18 @@ const ugle_auth = require('./index.js');
         ugle_auth.initDtb('./test.db', (err, dtb) => {
             if (err) {
                 console.log(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
+                err_count++;
                 resolve(null);
             } else {
                 console.log('[X] EXPECTED PASS | new sqlite3.Database');
                 dtb.exec('DROP TABLE IF EXISTS auth;');
                 resolve(dtb);
             }
-        })
+        });
     });
 })().then(async (dtb) => {
+
+
 
 
     var createUser_args = [
@@ -682,6 +686,7 @@ const ugle_auth = require('./index.js');
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | createUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     console.log(`[X] EXPECTED PASS | createUser[${i}]`);
                 }
@@ -690,6 +695,7 @@ const ugle_auth = require('./index.js');
                     console.log(`[X] EXPECTED FAIL | createUser[${i}] | ${err.message}`);
                 } else {
                     console.log(`[ ] UNEXPECTED PASS | createUser[${i}]`);
+                    err_count++;
                 }
             }
         });
@@ -825,6 +831,7 @@ const ugle_auth = require('./index.js');
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | readUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     console.log(`[X] EXPECTED PASS | readUser[${i}] | ${data}`);
                 }
@@ -833,6 +840,7 @@ const ugle_auth = require('./index.js');
                     console.log(`[X] EXPECTED FAIL | readUser[${i}] | ${err.message}`);
                 } else {
                     console.log(`[ ] UNEXPECTED PASS | readUser[${i}] | ${data}`);
+                    err_count++;
                 }
             }
         });
@@ -845,8 +853,10 @@ const ugle_auth = require('./index.js');
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
             console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed : ');
+            console.log(data);
         }
     });
 
@@ -1170,6 +1180,7 @@ const ugle_auth = require('./index.js');
             if (i <= 2) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     global.session = data;
 
@@ -1182,6 +1193,7 @@ const ugle_auth = require('./index.js');
                     global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
                 }
             }
         });
@@ -1193,8 +1205,10 @@ const ugle_auth = require('./index.js');
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
             console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed : ');
+            console.log(data);
         }
     });
 
@@ -1237,6 +1251,7 @@ const ugle_auth = require('./index.js');
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     global.session = data;
 
@@ -1249,6 +1264,7 @@ const ugle_auth = require('./index.js');
                     global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
                 }
             }
         });
@@ -1853,6 +1869,7 @@ const ugle_auth = require('./index.js');
             if (i <= 3) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     console.log(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
                 }
@@ -1861,6 +1878,7 @@ const ugle_auth = require('./index.js');
                     console.log(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
                 } else {
                     console.log(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
+                    err_count++;
                 }
             }
         });
@@ -1872,15 +1890,17 @@ const ugle_auth = require('./index.js');
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
             console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed : ');
+            console.log(data);
         }
     });
 
 
 
 
-    var loginUser_args = [
+    loginUser_args = [
         // valid strings
         {
             'login_params': {
@@ -2245,6 +2265,7 @@ const ugle_auth = require('./index.js');
             if (i <= 2) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     global.session = data;
 
@@ -2257,6 +2278,7 @@ const ugle_auth = require('./index.js');
                     global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
                 }
             }
         });
@@ -2268,15 +2290,17 @@ const ugle_auth = require('./index.js');
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
             console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed : ');
+            console.log(data);
         }
     });
 
 
 
 
-    var logoutUser_args = [
+    logoutUser_args = [
         // valid strings
         {
             'session': session
@@ -2312,6 +2336,7 @@ const ugle_auth = require('./index.js');
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     global.session = data;
 
@@ -2324,6 +2349,7 @@ const ugle_auth = require('./index.js');
                     global.session = data;
 
                     console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
                 }
             }
         });
@@ -2409,6 +2435,7 @@ const ugle_auth = require('./index.js');
             if (i <= 1) {
                 if (err) {
                     console.log(`[ ] UNEXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
                     console.log(`[X] EXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
                 }
@@ -2417,6 +2444,7 @@ const ugle_auth = require('./index.js');
                     console.log(`[X] EXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
                 } else {
                     console.log(`[ ] UNEXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                    err_count++;
                 }
             }
         });
@@ -2428,9 +2456,17 @@ const ugle_auth = require('./index.js');
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
             console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed | ' + JSON.stringify(data));
+            console.log('[X] EXPECTED allUsers(nominal) passed : ');
+            console.log(data);
         }
     });
 
+
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log(`TEST COMPLETED: ${err_count} errors found`);
 });

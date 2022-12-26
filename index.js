@@ -195,10 +195,10 @@ module.exports = {
 
                 const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
                     if (err) {
-                        callback(err)
+                        callback(err);
                         resolve();
                     } else {
-                        callback(null, dtb)
+                        callback(null, dtb);
                         resolve();
                     }
                 });
@@ -208,7 +208,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -296,7 +296,7 @@ module.exports = {
 
                 } else {
 
-                    dtb.run(`INSERT INTO auth(email, hash, perms, created_at, created_by) VALUES(?, ?, ?, ?, ?);`, [
+                    dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by) VALUES(?, ?, ?, ?, ?);', [
                         args.create_params.email,
                         hash(args.create_params.password, args.create_params.salt),
                         JSON.stringify(args.create_params.perms),
@@ -323,7 +323,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -392,7 +392,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -461,7 +461,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -557,7 +557,7 @@ module.exports = {
                                 resolve();
 
                             } else if (args.update_params.data == false) {
-                                execute = true
+                                execute = true;
                             } else {
                                 try {
                                     args.update_params.data = hash(args.update_params.data, args.update_params.salt);
@@ -622,7 +622,7 @@ module.exports = {
                                                 );
                                                 resolve();
                                             }
-                                        })
+                                        });
                                     } else {
                                         callback(
                                             null,
@@ -643,7 +643,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -713,7 +713,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -805,7 +805,7 @@ module.exports = {
                                                 });
                                                 resolve();
                                             } else if (hash(args.login_params.password, args.login_params.salt) != rows[0].hash) {
-                                                dtb.run(`UPDATE auth SET failed_login_attempts = ? WHERE email = ?;`, [(rows[0].failed_login_attempts + 1), args.login_params.email], async function (err) {
+                                                dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [(rows[0].failed_login_attempts + 1), args.login_params.email], async function (err) {
                                                     if (err) {
 
                                                         callback({
@@ -831,12 +831,12 @@ module.exports = {
                                                         });
                                                         resolve();
                                                     }
-                                                })
+                                                });
                                             } else {
                                                 args.session.email = rows[0].email;
                                                 args.session.id = rows[0].id;
                                                 args.session.perms = JSON.parse(rows[0].perms);
-                                                args.session.valid = true
+                                                args.session.valid = true;
 
                                                 callback(null, args.session);
                                                 resolve();
@@ -853,7 +853,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -879,7 +879,7 @@ module.exports = {
                         args.session.email = null;
                         args.session.id = null;
                         args.session.perms = null;
-                        args.session.valid = false
+                        args.session.valid = false;
 
                         callback(null, args.session);
                         resolve();
@@ -891,7 +891,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });
@@ -926,7 +926,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    resolve()
+                    resolve();
                 }
             }
         });

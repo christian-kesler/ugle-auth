@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node test.js",
-    "eslint": "node node_modules/eslint/bin/eslint.js  .",
-    "eslint_fix": "node node_modules/eslint/bin/eslint.js  . --fix"
+    "lint": "node node_modules/eslint/bin/eslint.js  .",
+    "lintfix": "node node_modules/eslint/bin/eslint.js  . --fix"
   },
   "repository": {
     "type": "git",
