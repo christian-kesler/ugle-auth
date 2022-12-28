@@ -1,6 +1,6 @@
 # ugle-auth
 
-An authentication package by Uglesoft
+An authentication system for NodeJS web apps using sqlite
 
 
 ## Installation
