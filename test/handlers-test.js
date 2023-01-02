@@ -1,4 +1,12 @@
-const ugle_auth = require('./index.js');
+const dotenv = require('dotenv');
+dotenv.config();
+
+
+const ugle_auth = require(`${__dirname}/../index.js`);
+
+
+
+
 /* 
     The console output will begin with [X] EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
  
@@ -12,13 +20,13 @@ var err_count = 0;
 (async () => {
     return new Promise((resolve) => {
 
-        ugle_auth.initDtb('./test.db', (err, dtb) => {
+        ugle_auth.initDtb(`${__dirname}/test.db`, (err, dtb) => {
             if (err) {
-                console.log(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
+                console.debug(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
                 err_count++;
                 resolve(null);
             } else {
-                console.log('[X] EXPECTED PASS | new sqlite3.Database');
+                console.debug('[X] EXPECTED PASS | new sqlite3.Database');
                 dtb.exec('DROP TABLE IF EXISTS auth;');
                 resolve(dtb);
             }
@@ -29,13 +37,16 @@ var err_count = 0;
 
 
 
+    global.session = {};
+
+
     var createUser_args = [
         // valid strings
         {
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -49,7 +60,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'uglesoft@gmail.com',
                 'password': 'uglesoftPassword',
-                'salt': 'uglesoftSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'mage': false,
                     'user': true,
@@ -65,7 +76,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'c@gmail',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -79,7 +90,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'pass',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -97,7 +108,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': 'puppy',
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -109,7 +120,7 @@ var err_count = 0;
             'create_params': {
                 'email': 8,
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -123,7 +134,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 8,
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -151,7 +162,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -165,7 +176,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -183,7 +194,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': 8,
                     'user': true,
@@ -197,7 +208,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': 8,
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -210,7 +221,7 @@ var err_count = 0;
             'create_params': {
                 'email': {},
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -224,7 +235,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': {},
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -252,7 +263,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -266,7 +277,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -284,7 +295,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': {},
                     'user': true,
@@ -298,7 +309,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {},
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -311,7 +322,7 @@ var err_count = 0;
             'create_params': {
                 'email': [],
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -325,7 +336,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': [],
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -353,7 +364,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -367,7 +378,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -385,7 +396,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': [],
                     'user': true,
@@ -399,7 +410,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': [],
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -412,7 +423,7 @@ var err_count = 0;
             'create_params': {
                 'email': null,
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -426,7 +437,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': null,
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -454,7 +465,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -468,7 +479,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -486,7 +497,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': null,
                     'user': true,
@@ -500,7 +511,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': null,
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -513,7 +524,7 @@ var err_count = 0;
             'create_params': {
                 'email': undefined,
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -527,7 +538,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': undefined,
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -555,7 +566,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -569,7 +580,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -587,7 +598,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': undefined,
                     'user': true,
@@ -601,7 +612,7 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': undefined,
                 'created_at': 'Today :)',
                 'created_by': 'Me',
@@ -613,7 +624,7 @@ var err_count = 0;
 
             'create_params': {
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -626,20 +637,7 @@ var err_count = 0;
 
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
-                'salt': 'personalSalt',
-                'perms': {
-                    'admin': false,
-                    'user': true,
-                },
-                'created_at': 'Today :)',
-                'created_by': 'Me',
-            }
-        },
-        {
-
-            'create_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -653,7 +651,11 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'perms': {
+                    'admin': false,
+                    'user': true,
+                },
+                'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
@@ -662,7 +664,16 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
+                'created_by': 'Me',
+            }
+        },
+        {
+
+            'create_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
                 'perms': {
                     'admin': false,
                     'user': true,
@@ -675,35 +686,12 @@ var err_count = 0;
             'create_params': {
                 'email': 'christian.j.kesler@gmail.com',
                 'password': 'personalPassword',
-                'salt': 'personalSalt',
+                'salt': process.env.AUTH_SALT,
                 'created_at': 'Today :)',
                 'created_by': 'Me',
             }
         },
     ];
-    for (let i = 0; i < createUser_args.length; i++) {
-        await ugle_auth.createUser(dtb, createUser_args[i], (err) => {
-            if (i <= 1) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | createUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.log(`[X] EXPECTED PASS | createUser[${i}]`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | createUser[${i}] | ${err.message}`);
-                } else {
-                    console.log(`[ ] UNEXPECTED PASS | createUser[${i}]`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
     var readUser_args = [
         // valid strings
         {
@@ -826,460 +814,13 @@ var err_count = 0;
             'read_key': 'email',
         },
     ];
-    for (let i = 0; i < readUser_args.length; i++) {
-        await ugle_auth.readUser(dtb, readUser_args[i], (err, data) => {
-            if (i <= 1) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | readUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.log(`[X] EXPECTED PASS | readUser[${i}] | ${data}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | readUser[${i}] | ${err.message}`);
-                } else {
-                    console.log(`[ ] UNEXPECTED PASS | readUser[${i}] | ${data}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
-    global.session = {};
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
-            err_count++;
-        } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed : ');
-            console.log(data);
-        }
-    });
-
-
-
-
-    var loginUser_args = [
-        // valid strings
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'uglesoftPassword',
-                'salt': 'uglesoftSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': {}
-        },
-
-        // invalid strings
-        {
-            'login_params': {
-                'email': 'fake@gmail',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'fake',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': 'fake'
-        },
-        // invalid spam for lockout
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        // valid strings to test lockout
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'uglesoftPassword',
-                'salt': 'uglesoftSalt',
-            },
-            'session': session
-        },
-        // integers
-        {
-            'login_params': 8,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 8,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 8,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 8,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': 8
-        },
-        // objects
-        {
-            'login_params': {},
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': {},
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': {},
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': {},
-            },
-            'session': session
-        },
-        // arrays
-        {
-            'login_params': [],
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': [],
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': [],
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': [],
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': []
-        },
-        // null
-        {
-            'login_params': null,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': null,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': null,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': null,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': null
-        },
-        // undefined
-        {
-            'login_params': undefined,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': undefined,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': undefined,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': undefined,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': undefined
-        },
-        // absent
-        {
-            'session': session
-        },
-        {
-            'login_params': {
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-        },
-    ];
-    for (let i = 0; i < loginUser_args.length; i++) {
-        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
-            if (i <= 2) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    global.session = data;
-
-                    console.log(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
-                } else {
-                    global.session = data;
-
-                    console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
-            err_count++;
-        } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed : ');
-            console.log(data);
-        }
-    });
-
-
-
-
-    var logoutUser_args = [
-        // valid strings
-        {
-            'session': session
-        },
-        {
-            'session': {}
-        },
-        // invalid strings
-        {
-            'session': 'string'
-        },
-        // integers
-        {
-            'session': 8
-        },
-        // arrays
-        {
-            'session': []
-        },
-        // null
-        {
-            'session': null
-        },
-        // undefined
-        {
-            'session': undefined
-        },
-        // absent
-        {},
-    ];
-    for (let i = 0; i < logoutUser_args.length; i++) {
-        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
-            if (i <= 1) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    global.session = data;
-
-                    console.log(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
-                } else {
-                    global.session = data;
-
-                    console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
     var updateUser_args = [
         // valid strings
         {
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1352,7 +893,7 @@ var err_count = 0;
             'update_field': 8,
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1361,7 +902,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 8,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1379,7 +920,7 @@ var err_count = 0;
             'update_field': 'created_by',
             'update_params': {
                 'data': 8,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1397,7 +938,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 8,
             'update_value': 'uglesoft@gmail.com'
@@ -1406,7 +947,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 8
@@ -1445,7 +986,7 @@ var err_count = 0;
             'update_field': {},
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1454,7 +995,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': {},
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1472,7 +1013,7 @@ var err_count = 0;
             'update_field': 'created_by',
             'update_params': {
                 'data': {},
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1490,7 +1031,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': {},
             'update_value': 'uglesoft@gmail.com'
@@ -1499,7 +1040,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': {}
@@ -1537,7 +1078,7 @@ var err_count = 0;
             'update_field': [],
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1546,7 +1087,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': [],
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1564,7 +1105,7 @@ var err_count = 0;
             'update_field': 'created_by',
             'update_params': {
                 'data': [],
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1582,7 +1123,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': [],
             'update_value': 'uglesoft@gmail.com'
@@ -1591,7 +1132,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': []
@@ -1629,7 +1170,7 @@ var err_count = 0;
             'update_field': null,
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1638,7 +1179,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': null,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1656,7 +1197,7 @@ var err_count = 0;
             'update_field': 'created_by',
             'update_params': {
                 'data': null,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1674,7 +1215,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': null,
             'update_value': 'uglesoft@gmail.com'
@@ -1683,7 +1224,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': null
@@ -1721,7 +1262,7 @@ var err_count = 0;
             'update_field': undefined,
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1730,7 +1271,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': undefined,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1748,7 +1289,7 @@ var err_count = 0;
             'update_field': 'created_by',
             'update_params': {
                 'data': undefined,
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1766,7 +1307,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': undefined,
             'update_value': 'uglesoft@gmail.com'
@@ -1775,7 +1316,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': undefined
@@ -1812,7 +1353,7 @@ var err_count = 0;
         {
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1820,7 +1361,7 @@ var err_count = 0;
         {
             'update_field': 'hash',
             'update_params': {
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1836,7 +1377,7 @@ var err_count = 0;
         {
             'update_field': 'created_by',
             'update_params': {
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
             'update_value': 'uglesoft@gmail.com'
@@ -1845,7 +1386,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_value': 'uglesoft@gmail.com'
         },
@@ -1853,7 +1394,7 @@ var err_count = 0;
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
-                'salt': 'exampleSalt',
+                'salt': process.env.AUTH_SALT,
             },
             'update_key': 'email',
         },
@@ -1864,500 +1405,6 @@ var err_count = 0;
         },
 
     ];
-    for (let i = 0; i < updateUser_args.length; i++) {
-        await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
-            if (i <= 3) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.log(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
-                } else {
-                    console.log(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
-            err_count++;
-        } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed : ');
-            console.log(data);
-        }
-    });
-
-
-
-
-    loginUser_args = [
-        // valid strings
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'uglesoft@gmail.com',
-                'password': 'new_password',
-                'salt': 'exampleSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': {}
-        },
-
-        // invalid strings
-        {
-            'login_params': {
-                'email': 'fake@gmail',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'fake',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': 'fake'
-        },
-        // invalid spam for lockout
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'fake',
-            },
-            'session': session
-        },
-        // valid strings to test lockout
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        // integers
-        {
-            'login_params': 8,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 8,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 8,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 8,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': 8
-        },
-        // objects
-        {
-            'login_params': {},
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': {},
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': {},
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': {},
-            },
-            'session': session
-        },
-        // arrays
-        {
-            'login_params': [],
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': [],
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': [],
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': [],
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': []
-        },
-        // null
-        {
-            'login_params': null,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': null,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': null,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': null,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': null
-        },
-        // undefined
-        {
-            'login_params': undefined,
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': undefined,
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': undefined,
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': undefined,
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': undefined
-        },
-        // absent
-        {
-            'session': session
-        },
-        {
-            'login_params': {
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'salt': 'personalSalt',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-            },
-            'session': session
-        },
-        {
-            'login_params': {
-                'email': 'christian.j.kesler@gmail.com',
-                'password': 'personalPassword',
-                'salt': 'personalSalt',
-            },
-        },
-    ];
-    for (let i = 0; i < loginUser_args.length; i++) {
-        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
-            if (i <= 2) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    global.session = data;
-
-                    console.log(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
-                } else {
-                    global.session = data;
-
-                    console.log(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
-    await ugle_auth.allUsers(dtb, (err, data) => {
-        if (err) {
-            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
-            err_count++;
-        } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed : ');
-            console.log(data);
-        }
-    });
-
-
-
-
-    logoutUser_args = [
-        // valid strings
-        {
-            'session': session
-        },
-        {
-            'session': {}
-        },
-        // invalid strings
-        {
-            'session': 'string'
-        },
-        // integers
-        {
-            'session': 8
-        },
-        // arrays
-        {
-            'session': []
-        },
-        // null
-        {
-            'session': null
-        },
-        // undefined
-        {
-            'session': undefined
-        },
-        // absent
-        {},
-    ];
-    for (let i = 0; i < logoutUser_args.length; i++) {
-        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
-            if (i <= 1) {
-                if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    global.session = data;
-
-                    console.log(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.log(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
-                } else {
-                    global.session = data;
-
-                    console.log(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-
-
-
-
     var deleteUser_args = [
         // valid entries
         {
@@ -2430,43 +1477,919 @@ var err_count = 0;
             'delete_key': 'email',
         },
     ];
-    for (let i = 0; i < deleteUser_args.length; i++) {
-        await ugle_auth.deleteUser(dtb, deleteUser_args[i], (err, changes) => {
+
+    var loginUser_args = [
+        // valid strings
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'uglesoftPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': {}
+        },
+
+        // invalid strings
+        {
+            'login_params': {
+                'email': 'fake@gmail',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'fake',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': 'fake'
+        },
+        // invalid spam for lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        // valid strings to test lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'uglesoftPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        // integers
+        {
+            'login_params': 8,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 8,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 8,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 8,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': 8
+        },
+        // objects
+        {
+            'login_params': {},
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': {},
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': {},
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': {},
+            },
+            'session': session
+        },
+        // arrays
+        {
+            'login_params': [],
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': [],
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': [],
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': [],
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': []
+        },
+        // null
+        {
+            'login_params': null,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': null,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': null,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': null,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': null
+        },
+        // undefined
+        {
+            'login_params': undefined,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': undefined,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': undefined,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': undefined,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': undefined
+        },
+        // absent
+        {
+            'session': session
+        },
+        {
+            'login_params': {
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+        },
+    ];
+    var logoutUser_args = [
+        // valid strings
+        {
+            'session': session
+        },
+        {
+            'session': {}
+        },
+        // invalid strings
+        {
+            'session': 'string'
+        },
+        // integers
+        {
+            'session': 8
+        },
+        // arrays
+        {
+            'session': []
+        },
+        // null
+        {
+            'session': null
+        },
+        // undefined
+        {
+            'session': undefined
+        },
+        // absent
+        {},
+    ];
+
+
+
+
+    // createUser
+    for (let i = 0; i < createUser_args.length; i++) {
+        await ugle_auth.createUser(dtb, createUser_args[i], (err) => {
             if (i <= 1) {
                 if (err) {
-                    console.log(`[ ] UNEXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                    console.debug(`[ ] UNEXPECTED FAIL | createUser[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.log(`[X] EXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                    console.debug(`[X] EXPECTED PASS | createUser[${i}]`);
                 }
             } else {
                 if (err) {
-                    console.log(`[X] EXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                    console.debug(`[X] EXPECTED FAIL | createUser[${i}] | ${err.message}`);
                 } else {
-                    console.log(`[ ] UNEXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                    console.debug(`[ ] UNEXPECTED PASS | createUser[${i}]`);
                     err_count++;
                 }
             }
         });
     }
 
+    // readUser
+    for (let i = 0; i < readUser_args.length; i++) {
+        await ugle_auth.readUser(dtb, readUser_args[i], (err, data) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | readUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X] EXPECTED PASS | readUser[${i}] | ${data}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | readUser[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | readUser[${i}] | ${data}`);
+                    err_count++;
+                }
+            }
+        });
+    }
 
-
-
+    // allUsers
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
-            console.log('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            console.debug('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
             err_count++;
         } else {
-            console.log('[X] EXPECTED allUsers(nominal) passed : ');
-            console.log(data);
+            console.debug('[X] EXPECTED allUsers(nominal) passed : ');
+            console.debug(data);
+        }
+    });
+
+    // loginUser
+    for (let i = 0; i < loginUser_args.length; i++) {
+        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
+            if (i <= 2) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    global.session = data;
+
+                    console.debug(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.debug(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // allUsers
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.debug('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
+        } else {
+            console.debug('[X] EXPECTED allUsers(nominal) passed : ');
+            console.debug(data);
+        }
+    });
+
+    // logoutUser
+    for (let i = 0; i < logoutUser_args.length; i++) {
+        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    global.session = data;
+
+                    console.debug(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.debug(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // updateUser
+    for (let i = 0; i < updateUser_args.length; i++) {
+        await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
+            if (i <= 3) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X] EXPECTED PASS | updateUser[${i}] | ${changes.message}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | updateUser[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | updateUser[${i}] | ${changes.message}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // allUsers
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.debug('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
+        } else {
+            console.debug('[X] EXPECTED allUsers(nominal) passed : ');
+            console.debug(data);
         }
     });
 
 
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log(`TEST COMPLETED: ${err_count} errors found`);
+
+
+    // loginUser with new creds
+    loginUser_args = [
+        // valid strings
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'new_password',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': {}
+        },
+
+        // invalid strings
+        {
+            'login_params': {
+                'email': 'fake@gmail',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'fake',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': 'fake'
+        },
+        // invalid spam for lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'personalPassword',
+                'salt': 'fake',
+            },
+            'session': session
+        },
+        // valid strings to test lockout
+        {
+            'login_params': {
+                'email': 'uglesoft@gmail.com',
+                'password': 'uglesoftPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        // integers
+        {
+            'login_params': 8,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 8,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 8,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': 8,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': 8
+        },
+        // objects
+        {
+            'login_params': {},
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': {},
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': {},
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': {},
+            },
+            'session': session
+        },
+        // arrays
+        {
+            'login_params': [],
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': [],
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': [],
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': [],
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': []
+        },
+        // null
+        {
+            'login_params': null,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': null,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': null,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': null,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': null
+        },
+        // undefined
+        {
+            'login_params': undefined,
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': undefined,
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': undefined,
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': undefined,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': undefined
+        },
+        // absent
+        {
+            'session': session
+        },
+        {
+            'login_params': {
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'salt': process.env.AUTH_SALT,
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+            },
+            'session': session
+        },
+        {
+            'login_params': {
+                'email': 'christian.j.kesler@gmail.com',
+                'password': 'personalPassword',
+                'salt': process.env.AUTH_SALT,
+            },
+        },
+    ];
+    for (let i = 0; i < loginUser_args.length; i++) {
+        await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
+            if (i <= 2) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    global.session = data;
+
+                    console.debug(`[X] EXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | loginUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.debug(`[ ] UNEXPECTED PASS | loginUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // allUsers
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.debug('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
+        } else {
+            console.debug('[X] EXPECTED allUsers(nominal) passed : ');
+            console.debug(data);
+        }
+    });
+
+    // logoutUser
+    for (let i = 0; i < logoutUser_args.length; i++) {
+        await ugle_auth.logoutUser(logoutUser_args[i], (err, data) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    global.session = data;
+
+                    console.debug(`[X] EXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | logoutUser[${i}] | ${err.message}`);
+                } else {
+                    global.session = data;
+
+                    console.debug(`[ ] UNEXPECTED PASS | logoutUser[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // deleteUser
+    for (let i = 0; i < deleteUser_args.length; i++) {
+        await ugle_auth.deleteUser(dtb, deleteUser_args[i], (err, changes) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X] EXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | deleteUser[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | deleteUser[${i}] | ${changes.message}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+
+    // allUsers
+    await ugle_auth.allUsers(dtb, (err, data) => {
+        if (err) {
+            console.debug('[ ] UNEXPECTED allUsers(nominal) failed: ' + err.message);
+            err_count++;
+        } else {
+            console.debug('[X] EXPECTED allUsers(nominal) passed : ');
+            console.debug(data);
+        }
+    });
+
+
+
+
+    console.debug();
+    console.debug();
+    console.debug();
+    console.debug();
+    console.info(`AUTOMATED TEST COMPLETED: ${err_count} errors found`);
+    // console.warn(`FOR MANUAL TESTING, PLEASE NAVIGATE TO http://localhost:3000/auth IN YOUR BROWSER OF CHOICE`)
+
+
+
+
 });

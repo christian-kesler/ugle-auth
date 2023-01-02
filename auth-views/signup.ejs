@@ -1,7 +1,7 @@
 <%- include('./layout/auth_begin' ) %>
 
 
-<script>
+<!-- <script>
     function checkForm(form) {
         password1 = form.password1.value;
         password2 = form.password2.value;
@@ -22,19 +22,16 @@
             }
         }
     }
-</script>
+</script> -->
 
 
-<h1 class="h3 mb-3 font-weight-normal">Auth - Register</h1>
+<h1 class="h3 mb-3 font-weight-normal">Auth - Signup</h1>
 
 <%- include('./layout/messages') %>
 
-<input type="email" name="email1" id="email1" class="form-control" placeholder="Email address" required="" autofocus="">
-<input type="email" name="email2" id="email2" class="form-control" placeholder="Confirm Email" required="" style="margin-bottom: 8px">
+<input type="email" name="email" id="email1" class="form-control" placeholder="Email address" required="" autofocus="">
 
-<input type="username" name="username" id="username" class="form-control" placeholder="Username" required="" style="margin-bottom: 8px">
-
-<input type="password" name="password1" id="password1" class="form-control" placeholder="New Password" required="">
+<input type="password" name="password" id="password1" class="form-control" placeholder="New Password" required="">
 <input type="password" name="password2" id="password2" class="form-control" placeholder="Confirm Password" required="">
 
 <button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>

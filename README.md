@@ -8,16 +8,53 @@ An authentication system for NodeJS web apps using sqlite
     npm install ugle-auth
 
 
+## Overview
+
+There are two ways to use ugle-auth:
+
+- You can call our predefined route function and let the package do all the work, 
+- You can call individual functions inside custom routing.
+
+We'll walk through both below.
+
 ## Dependencies
 
 You will probably be able to use this package with older or newer versions than these, but I know these work for sure.  
 
+
+### Preset Routing 
+
     "dependencies": {
-        "sqlite3": "5.1.2",
+        "nodemailer": "^6.8.0",
+        "sqlite3": "^5.1.2"
+        "dotenv": "^16.0.3",
+        "ejs": "^3.1.8",
+        "express": "^4.18.2",
+    }
+
+You will also need a .env file that looks like the following
+
+
+    RECIPIENT = "example@gmail.com"
+
+    EMAIL_SENDER = "automated@company.com"
+    EMAIL_DOMAIN = "company"
+    EMAIL_TOKEN = "eqf8416581a684f698aqwef"
+
+    AUTH_SALT = "A Cool Salt String"
+
+    WEBAPP_DOMAIN = "https://company.com"
+
+
+### Custom Routing
+
+    "dependencies": {
+        "nodemailer": "6.8.0",
+        "sqlite3": "5.1.2"
     }
 
 
-## Usage
+## Usage 
 
 IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
 
@@ -27,18 +64,44 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     const ugle_auth = require('ugle-auth')
 
 
+### Connection to Database with Preset Routing
+
+    ugle_auth.initDtb(`${__dirname}/test.db`, (err, dtb) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            ugle_auth.routes(app, dtb);
+        }
+    })
+
+
 ### Connecting to Database
 
     await ugle_auth.initDtb('./database.db', (err, dtb) => {
         if (err) {
             console.log(err.message);
         } else {
-            global.dtb = dtb;
+            // do something with dtb connection
         }
     })
 
 
-### CREATE New User Account
+### Preset Routes
+
+    /auth
+    /auth/signup
+    /auth/login
+    /auth/logout
+    /auth/forgot-password
+    /auth/change-password
+    /auth/verify
+    /auth/verify/request
+    /auth/verify/confirm
+
+
+### Custom Routing Functions
+
+#### CREATE New User Account
 
     args = {
         'create_params': {
@@ -63,7 +126,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### READ Existing User Account
+#### READ Existing User Account
 
     args = {
         'read_fields': 'id, email, created_at, created_by',
@@ -80,7 +143,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### UPDATE Existing User Account
+#### UPDATE Existing User Account
 
     args = {
         'update_field': 'hash',
@@ -101,7 +164,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### DELETE Existing User Account
+#### DELETE Existing User Account
 
     args = {
         'delete_key': 'id',
@@ -117,7 +180,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### Login to User Account
+#### Login to User Account
 
     global.session = {}
 
@@ -140,7 +203,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### Logout of User Account
+#### Logout of User Account
 
     global.session = { "email": "uglesoft@gmail.com", "id": 1 }
 
@@ -158,7 +221,7 @@ IMPORTANT - your salt must not change once you enter a production environment; d
     });
 
 
-### List All User Accounts
+#### List All User Accounts
 
     await ugle_auth.allUsers(dtb, (err, data) => {
         if (err) {
