@@ -40,7 +40,7 @@ module.exports = function (app, dtb) {
     // signup
     app.get('/auth/signup', (req, res) => {
         try {
-            res.render('auth-views/signup');
+            res.render('auth/signup');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -83,7 +83,7 @@ module.exports = function (app, dtb) {
     // login
     app.get('/auth/login', (req, res) => {
         try {
-            res.render('auth-views/login');
+            res.render('auth/login');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -121,7 +121,7 @@ module.exports = function (app, dtb) {
     // logout
     app.get('/auth/logout', (req, res) => {
         try {
-            res.render('auth-views/logout');
+            res.render('auth/logout');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -155,7 +155,7 @@ module.exports = function (app, dtb) {
     // forgot password
     app.get('/auth/forgot-password', (req, res) => {
         try {
-            res.render('auth-views/forgot-password');
+            res.render('auth/forgot-password');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -192,7 +192,7 @@ module.exports = function (app, dtb) {
     // change password
     app.get('/auth/change-password', (req, res) => {
         try {
-            res.render('auth-views/change-password');
+            res.render('auth/change-password');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -230,15 +230,15 @@ module.exports = function (app, dtb) {
     app.get('/auth/verify', (req, res) => {
         res.redirect('/auth/verify/request');
     });
-    app.get('/auth/verify/request', (req, res) => {
+    app.get('/auth/verify-request', (req, res) => {
         try {
-            res.render('auth-views/verify-account');
+            res.render('auth/verify-request');
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
         }
     });
-    app.post('/auth/verify/request', (req, res) => {
+    app.post('/auth/verify-request', (req, res) => {
         try {
 
             var args = {
@@ -266,7 +266,7 @@ module.exports = function (app, dtb) {
 
     });
 
-    app.get('/auth/verify/confirm', (req, res) => {
+    app.get('/auth/verify-confirm', (req, res) => {
         try {
 
             var args = {
