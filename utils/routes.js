@@ -40,7 +40,10 @@ module.exports = function (app, dtb) {
     // signup
     app.get('/auth/signup', (req, res) => {
         try {
-            res.render('auth/signup');
+            res.render('auth/signup', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -83,7 +86,10 @@ module.exports = function (app, dtb) {
     // login
     app.get('/auth/login', (req, res) => {
         try {
-            res.render('auth/login');
+            res.render('auth/login', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -104,7 +110,7 @@ module.exports = function (app, dtb) {
             ugle_auth.loginUser(dtb, args, (err, session) => {
                 if (err) {
                     console.log(err.message);
-                    res.redirect('/auth/login?login-failed');
+                    res.redirect('/auth/login?msg=login-failed');
                 } else {
                     req.session = session;
                     res.redirect('/account/home');
@@ -121,7 +127,10 @@ module.exports = function (app, dtb) {
     // logout
     app.get('/auth/logout', (req, res) => {
         try {
-            res.render('auth/logout');
+            res.render('auth/logout', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -136,10 +145,10 @@ module.exports = function (app, dtb) {
             ugle_auth.logoutUser(args, (err, session) => {
                 if (err) {
                     console.log(err.message);
-                    res.redirect('/auth/login?logout-failed');
+                    res.redirect('/auth/login?msg=logout-failed');
                 } else {
                     req.session = session;
-                    res.redirect('/auth/login?logout-successful');
+                    res.redirect('/auth/login?msg=logout-successful');
                 }
             });
 
@@ -155,7 +164,10 @@ module.exports = function (app, dtb) {
     // forgot password
     app.get('/auth/forgot-password', (req, res) => {
         try {
-            res.render('auth/forgot-password');
+            res.render('auth/forgot-password', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -192,7 +204,10 @@ module.exports = function (app, dtb) {
     // change password
     app.get('/auth/change-password', (req, res) => {
         try {
-            res.render('auth/change-password');
+            res.render('auth/change-password', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -228,11 +243,14 @@ module.exports = function (app, dtb) {
 
     // verify account
     app.get('/auth/verify', (req, res) => {
-        res.redirect('/auth/verify/request');
+        res.redirect('/auth/verify-request');
     });
     app.get('/auth/verify-request', (req, res) => {
         try {
-            res.render('auth/verify-request');
+            res.render('auth/verify-request', {
+                query: req.query,
+                session: req.session
+            });
         } catch (err) {
             console.log(err.message);
             res.redirect('/?msg=server-error');
@@ -247,7 +265,7 @@ module.exports = function (app, dtb) {
                 'domain': process.env.EMAIL_DOMAIN,
                 'token': process.env.EMAIL_TOKEN,
                 'text': 'Requested Account Verification Link',
-                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify/confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
+                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify-confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
             };
 
             ugle_auth.sendTempkeyEmail(dtb, args, (err) => {

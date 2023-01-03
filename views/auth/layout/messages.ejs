@@ -22,3 +22,13 @@
 <% try { if (msg_dark != undefined) { %>
 <%- '<div class="alert alert-dark" role="alert">' + msg_dark + '</div>' %>
 <% } } catch {} %>
+
+
+
+<%
+if(query.msg){
+%>
+<div class="alert alert-info"><%= query.msg %></div>
+<%
+}
+%>

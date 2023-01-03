@@ -55,11 +55,17 @@ ugle_auth.initDtb(`${__dirname}/test.db`, (err, dtb) => {
 
         // custom routing
         app.get('/', (req, res) => {
-            res.render('auth-views/test/homepage');
+            res.render('test-views/homepage', {
+                query: req.query,
+                session: req.session
+            });
         });
 
         app.get('/account/home', (req, res) => {
-            res.render('auth-views/test/account-home');
+            res.render('test-views/account-home', {
+                query: req.query,
+                session: req.session
+            });
         });
 
         app.get('/debug/session', (req, res) => {

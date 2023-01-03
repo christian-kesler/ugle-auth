@@ -1,3 +1,6 @@
+TODO: Add sendTempkeyEmail, verifyUser, and changePassword example functions
+
+
 # ugle-auth
 
 An authentication system for NodeJS web apps using sqlite
@@ -236,12 +239,60 @@ await ugle_auth.logoutUser(args, (err, session) => {
 });
 
 
-// List all user accounts
+// ALL user accounts
 await ugle_auth.allUsers(dtb, (err, data) => {
     if (err) {
         console.log(err.message);
     } else {
         console.log(JSON.stringify(data));
+    }
+});
+
+
+// SEND tempkey email
+var args = {
+    'recipient': req.session.email,
+    'sender': process.env.EMAIL_SENDER,
+    'domain': process.env.EMAIL_DOMAIN,
+    'token': process.env.EMAIL_TOKEN,
+    'text': 'Requested Account Verification Link',
+    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify-confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
+};
+ugle_auth.sendTempkeyEmail(dtb, args, (err, info) => {
+    if (err) {
+        console.log(err.message);
+    } else {
+        console.log(info);
+    }
+});
+
+
+// VERIFY user
+var args = {
+    'email': req.query.email,
+    'tempkey': req.query.tempkey,
+};
+ugle_auth.verifyUser(dtb, args, (err) => {
+    if (err) {
+        console.log(err.message);
+    } else {
+        // do something
+    }
+});
+
+
+// CHANGE password
+var args = {
+    'email': req.query.email,
+    'tempkey': req.query.tempkey,
+    'password': req.body.password,
+    'salt': process.env.AUTH_SALT
+};
+ugle_auth.changePassword(dtb, args, (err) => {
+    if (err) {
+        console.log(err.message);
+    } else {
+        // do something
     }
 });
 

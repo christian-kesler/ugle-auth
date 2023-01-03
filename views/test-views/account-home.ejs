@@ -74,16 +74,41 @@
     <div class="row">
         <div class="col align-self-center">
             <div class="card">
+                <%
+if(session.email){
+    if(session.status == 'verified'){
+        verify_class = 'disabled'
+    } else {
+        verify_class = ''
+    }
+%>
                 <div class="card-header">
+
                     <p>
-                        Welcome to ugle-auth! You can navigate to http://localhost:3000/auth or click the link below to get started.
+                        Welcome <%=session.email%>! You've logged in!
+                        <hr>
+                        Your account status is "<%=session.status%>".
+                        <hr>
+                        Now that you are all logged in, try verifying your account below if you haven't already, or you can change your password.
                     </p>
                 </div>
                 <div class="card-body">
-                    <a href="/auth">Begin Manual Testing</a>
-                    <a href="/debug/session">Debug Session</a>
-                    <a href="/debug/auth">Debug Auth</a>
+                    <a class="btn btn-primary <%=verify_class%>" href="/auth/verify">Verify Account</a>
+                    <a class="btn btn-primary" href="/auth/forgot-password">Change Password</a>
                 </div>
+
+                <%
+} else {
+%>
+                <div class="card-header">
+                    <p>Looks like you haven't logged in yet, try clicking the link below to do so</p>
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="/auth/login">Login</a>
+                </div>
+                <%
+}
+%>
             </div>
         </div>
     </div>

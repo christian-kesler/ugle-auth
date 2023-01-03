@@ -844,6 +844,7 @@ module.exports = {
                                                 args.session.id = rows[0].id;
                                                 args.session.perms = JSON.parse(rows[0].perms);
                                                 args.session.valid = true;
+                                                args.session.status = rows[0].status;
 
                                                 callback(null, args.session);
                                                 resolve();
@@ -947,8 +948,7 @@ module.exports = {
 
 
 
-    // REQUIRE MANUAL TESTING
-    // tempkey functions
+    // tempkey functions - manual testing only 
     sendTempkeyEmail: async (dtb, args, callback) => {
         // args = {
         //     recipient:user_email,
@@ -1121,8 +1121,6 @@ module.exports = {
         });
     },
     verifyUser: async (dtb, args, callback) => {
-
-        console.log(args);
         // args = {
         //     email:email,
         //     tempkey:tempkey
