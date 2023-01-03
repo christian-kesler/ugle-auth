@@ -33,7 +33,7 @@ function parameters
             "id, email, created_at, created_by"
         read_key - variable containing the field to index
             (id || email || created_at || created_by)
-        read_value - variable containing the value to search for
+        email - variable containing the value to search for
             ${varies}
 
         update_field - string containing the database fields to modify
@@ -41,14 +41,12 @@ function parameters
         update_params - the values to be written into the database
             data - variable containing the actual content
             salt - string to salt the data with.  If undefined, plaintext is stored (PASSWORDS WILL NOT WORK UNLESS HASHED)
-        update_key - variable containing the field to index
-            (id || email)
-        update_value - variable containing the value to search for
+        email - variable containing the value to search for
             ${varies}
 
         delete_key - variable containing the field to index
             (id || email)
-        delete_value - variable containing the value to search for
+        email - variable containing the value to search for
             ${varies}
 
         login_params - the values to be compared to the database
@@ -85,6 +83,11 @@ const crypto = require('crypto');
 async function tryCreateTable(dtb) {
     return new Promise((resolve) => {
         try {
+            // SENSITIVE
+            // hash, tempkey
+
+            // CONVENTIONAL
+            // id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by
             dtb.exec(
                 `CREATE TABLE IF NOT EXISTS auth(
                 'id' INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -343,57 +346,46 @@ module.exports = {
 
                 tryCreateTable(dtb);
 
-                if (!allValuesAreStringsOrBools(args)) {
+                if (args.email === undefined) {
                     callback({
-                        'message': 'non-string values detected'
+                        'message': 'missing args | args.email is undefined'
                     });
                     resolve();
+                } else if (typeof args.email != 'string') {
+                    callback({
+                        'message': 'missing args | args.email is undefined'
+                    });
+                    resolve();
+
+
                 } else {
 
-                    if (args.read_fields === undefined) {
-                        callback({
-                            'message': 'missing args | read_fields is undefined'
-                        });
-                        resolve();
-                    } else if (args.read_key === undefined) {
-                        callback({
-                            'message': 'missing args | read_key is undefined'
-                        });
-                        resolve();
-                    } else if (args.read_value === undefined) {
-                        callback({
-                            'message': 'missing args | read_value is undefined'
-                        });
-                        resolve();
+                    dtb.all(
+                        `SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;`,
+                        [args.email],
+                        (err, rows) => {
+                            if (err) {
 
-                    } else {
+                                callback(err);
+                                resolve();
 
-                        dtb.all(
-                            `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
-                            [args.read_value],
-                            (err, rows) => {
-                                if (err) {
+                            } else if (rows.length == 0) {
 
-                                    callback(err);
-                                    resolve();
+                                callback({
+                                    'message': 'entry not found'
+                                });
+                                resolve();
 
-                                } else if (rows.length == 0) {
+                            } else {
 
-                                    callback({
-                                        'message': 'entry not found'
-                                    });
-                                    resolve();
+                                callback(null, rows[0]);
+                                resolve();
 
-                                } else {
-
-                                    callback(null, rows[0]);
-                                    resolve();
-
-                                }
                             }
-                        );
-                    }
+                        }
+                    );
                 }
+
             } catch (err) {
                 try {
                     callback(err);
@@ -412,57 +404,46 @@ module.exports = {
 
                 tryCreateTable(dtb);
 
-                if (!allValuesAreStringsOrBools(args)) {
+                if (args.email === undefined) {
                     callback({
-                        'message': 'non-string values detected'
+                        'message': 'missing args | args.email is undefined'
                     });
                     resolve();
+                } else if (typeof args.email != 'string') {
+                    callback({
+                        'message': 'missing args | args.email is undefined'
+                    });
+                    resolve();
+
+
                 } else {
 
-                    if (args.read_fields === undefined) {
-                        callback({
-                            'message': 'missing args | read_fields is undefined'
-                        });
-                        resolve();
-                    } else if (args.read_key === undefined) {
-                        callback({
-                            'message': 'missing args | read_key is undefined'
-                        });
-                        resolve();
-                    } else if (args.read_value === undefined) {
-                        callback({
-                            'message': 'missing args | read_value is undefined'
-                        });
-                        resolve();
+                    dtb.all(
+                        `SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;`,
+                        [args.email],
+                        (err, rows) => {
+                            if (err) {
 
-                    } else {
+                                callback(err);
+                                resolve();
 
-                        dtb.all(
-                            `SELECT ${args.read_fields} FROM auth WHERE ${args.read_key} = ?;`,
-                            [args.read_value],
-                            (err, rows) => {
-                                if (err) {
+                            } else if (rows.length == 0) {
 
-                                    callback(err);
-                                    resolve();
+                                callback({
+                                    'message': 'entry not found'
+                                });
+                                resolve();
 
-                                } else if (rows.length == 0) {
+                            } else {
 
-                                    callback({
-                                        'message': 'entry not found'
-                                    });
-                                    resolve();
+                                callback(null, rows);
+                                resolve();
 
-                                } else {
-
-                                    callback(null, rows);
-                                    resolve();
-
-                                }
                             }
-                        );
-                    }
+                        }
+                    );
                 }
+
             } catch (err) {
                 try {
                     callback(err);
@@ -501,147 +482,108 @@ module.exports = {
                             'message': 'missing args | update_params.data is undefined'
                         });
                         resolve();
-                    } else if (args.update_key === undefined) {
+                    } else if (args.email === undefined) {
                         callback({
-                            'message': 'missing args | update_key is undefined'
-                        });
-                        resolve();
-                    } else if (args.update_value === undefined) {
-                        callback({
-                            'message': 'missing args | update_value is undefined'
+                            'message': 'missing args | email is undefined'
                         });
                         resolve();
                     } else {
 
                         var execute = false;
 
-                        if (args.update_field == 'hash') {
-                            if (args.update_params.salt === undefined) {
+                        if (args.update_field == 'status' || args.update_field == 'email' || args.update_field == 'perms' || args.update_field == 'tempkey_datetime' || args.update_field == 'failed_login_attempts') {
+                            if (args.update_field == 'perms') {
+                                if (typeof args.update_params.data != 'object') {
 
-                                callback({
-                                    'message': 'missing args | salt is undefined'
-                                });
-                                resolve();
-
-                            } else {
-
-                                try {
-                                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
-
-                                    execute = true;
-                                } catch (err) {
-
-                                    callback(err);
+                                    callback({
+                                        'message': 'missing args | perms must be object'
+                                    });
                                     resolve();
-                                }
-                            }
-                        } else if (args.update_field == 'perms') {
-                            if (typeof args.update_params.data != 'object') {
 
-                                callback({
-                                    'message': 'missing args | perms must be object'
-                                });
-                                resolve();
-
-                            } else {
-
-                                try {
-                                    args.update_params.data = JSON.stringify(args.update_params.data);
-
-                                    execute = true;
-                                } catch (err) {
-
-                                    callback(err);
-                                    resolve();
-                                }
-                            }
-                        } else if (args.update_field == 'tempkey') {
-                            if (args.update_params.data != false && args.update_params.salt === undefined) {
-
-                                callback({
-                                    'message': 'missing args | salt is undefined'
-                                });
-                                resolve();
-
-                            } else if (args.update_params.data == false) {
-                                execute = true;
-                            } else {
-                                try {
-                                    args.update_params.data = hash(args.update_params.data, args.update_params.salt);
-
-                                    execute = true;
-                                } catch (err) {
-
-                                    callback(err);
-                                    resolve();
-                                }
-                            }
-                        } else {
-                            execute = true;
-                        }
-
-                        if (execute) {
-                            dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE ${args.update_key} = ?;`, [args.update_params.data, args.update_value], async function (err) {
-                                if (err) {
-
-                                    callback(err);
-                                    resolve();
-                                } else if (this.changes == 0) {
-
-                                    callback(
-                                        {
-                                            'message': `Row(s) affected: ${this.changes}`
-                                        },
-                                        {
-                                            'count': this.changes,
-                                            'message': `Row(s) affected: ${this.changes}`
-                                        }
-                                    );
-                                    resolve();
                                 } else {
 
-                                    if (args.update_field == 'hash') {
-                                        dtb.run(`UPDATE auth SET failed_login_attempts = 0 WHERE ${args.update_key} = ?;`, [args.update_value], async function (err) {
-                                            if (err) {
+                                    try {
+                                        args.update_params.data = JSON.stringify(args.update_params.data);
 
-                                                callback(err);
-                                                resolve();
-                                            } else if (this.changes == 0) {
+                                        execute = true;
+                                    } catch (err) {
 
-                                                callback(
-                                                    {
-                                                        'message': `Row(s) affected: ${this.changes}`
-                                                    },
-                                                    {
-                                                        'count': this.changes,
-                                                        'message': `Row(s) affected: ${this.changes}`
-                                                    }
-                                                );
-                                                resolve();
-                                            } else {
+                                        callback(err);
+                                        resolve();
+                                    }
+                                }
+                            } else {
+                                execute = true;
+                            }
 
-                                                callback(
-                                                    null,
-                                                    {
-                                                        'count': this.changes,
-                                                        'message': `Row(s) affected: ${this.changes}`
-                                                    }
-                                                );
-                                                resolve();
-                                            }
-                                        });
-                                    } else {
+                            if (execute) {
+                                dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE email = ?;`, [args.update_params.data, args.email], async function (err) {
+                                    if (err) {
+
+                                        callback(err);
+                                        resolve();
+                                    } else if (this.changes == 0) {
+
                                         callback(
-                                            null,
+                                            {
+                                                'message': `Row(s) affected: ${this.changes}`
+                                            },
                                             {
                                                 'count': this.changes,
                                                 'message': `Row(s) affected: ${this.changes}`
                                             }
                                         );
                                         resolve();
+                                    } else {
+
+                                        if (args.update_field == 'hash') {
+                                            dtb.run(`UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;`, [args.email], async function (err) {
+                                                if (err) {
+
+                                                    callback(err);
+                                                    resolve();
+                                                } else if (this.changes == 0) {
+
+                                                    callback(
+                                                        {
+                                                            'message': `Row(s) affected: ${this.changes}`
+                                                        },
+                                                        {
+                                                            'count': this.changes,
+                                                            'message': `Row(s) affected: ${this.changes}`
+                                                        }
+                                                    );
+                                                    resolve();
+                                                } else {
+
+                                                    callback(
+                                                        null,
+                                                        {
+                                                            'count': this.changes,
+                                                            'message': `Row(s) affected: ${this.changes}`
+                                                        }
+                                                    );
+                                                    resolve();
+                                                }
+                                            });
+                                        } else {
+                                            callback(
+                                                null,
+                                                {
+                                                    'count': this.changes,
+                                                    'message': `Row(s) affected: ${this.changes}`
+                                                }
+                                            );
+                                            resolve();
+                                        }
                                     }
-                                }
+                                });
+                            }
+                        } else {
+                            callback({
+                                'message': 'missing args | update_field is invalid'
                             });
+                            resolve();
                         }
                     }
                 }
@@ -660,61 +602,48 @@ module.exports = {
 
         return new Promise((resolve) => {
             try {
-                if (!allValuesAreStringsOrBools(args)) {
+
+                if (
+                    args.email === undefined
+                ) {
                     callback({
-                        'message': 'non-string values detected'
+                        'message': 'missing args | email is undefined'
                     });
                     resolve();
+
                 } else {
 
-                    if (
-                        args.delete_key === undefined
-                    ) {
-                        callback({
-                            'message': 'missing args | delete_key is undefined'
-                        });
-                        resolve();
-                    } else if (
-                        args.delete_value === undefined
-                    ) {
-                        callback({
-                            'message': 'missing args | delete_value is undefined'
-                        });
-                        resolve();
+                    dtb.run(`DELETE FROM auth WHERE email = ?;`, [args.email], async function (err) {
+                        if (err) {
 
-                    } else {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
 
-                        dtb.run(`DELETE FROM auth WHERE ${args.delete_key} = ?;`, [args.delete_value], async function (err) {
-                            if (err) {
+                            callback(
+                                {
+                                    'message': `Row(s) affected: ${this.changes}`
+                                },
+                                {
+                                    'count': this.changes,
+                                    'message': `Row(s) affected: ${this.changes}`
+                                }
+                            );
+                            resolve();
+                        } else {
 
-                                callback(err);
-                                resolve();
-                            } else if (this.changes == 0) {
-
-                                callback(
-                                    {
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    },
-                                    {
-                                        'count': this.changes,
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    }
-                                );
-                                resolve();
-                            } else {
-
-                                callback(
-                                    null,
-                                    {
-                                        'count': this.changes,
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    }
-                                );
-                                resolve();
-                            }
-                        });
-                    }
+                            callback(
+                                null,
+                                {
+                                    'count': this.changes,
+                                    'message': `Row(s) affected: ${this.changes}`
+                                }
+                            );
+                            resolve();
+                        }
+                    });
                 }
+
             } catch (err) {
                 try {
                     callback(err);
@@ -920,7 +849,7 @@ module.exports = {
 
         return new Promise((resolve) => {
             try {
-                dtb.all('SELECT id, status, email, perms, tempkey, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth;', [], (err, rows) => {
+                dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth;', [], (err, rows) => {
                     if (err) {
                         callback(err);
                         resolve();

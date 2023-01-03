@@ -695,136 +695,40 @@ var err_count = 0;
     var readUser_args = [
         // valid strings
         {
-            'read_fields': 'id, email, perms, created_at, created_by',
-            'read_key': 'id',
-            'read_value': '2',
+            'email': 'uglesoft@gmail.com',
         },
         {
-            'read_fields': 'id, email, perms, created_at, created_by',
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
+            'email': 'christian.j.kesler@gmail.com',
         },
         // invalid strings
         {
-            'read_fields': 'fake',
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
+            'email': 'fake',
         },
         {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'fake',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': 'fake',
-        },
-        // integers
-        {
-            'read_fields': 8,
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 8,
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': 8,
+            'email': 8,
         },
         // objects
         {
-            'read_fields': {},
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': {},
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': {},
+            'email': {},
         },
         // arrays
         {
-            'read_fields': [],
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': [],
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': [],
+            'email': [],
         },
         // null
         {
-            'read_fields': null,
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': null,
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': null,
+            'email': null,
         },
         // undefined
         {
-            'read_fields': undefined,
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': undefined,
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
-            'read_value': undefined,
+            'email': undefined,
         },
         // absent
         {
-            'read_key': 'email',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_value': 'christian.j.kesler@gmail.com',
-        },
-        {
-            'read_fields': 'id, email, created_at, created_by',
-            'read_key': 'email',
         },
     ];
     var updateUser_args = [
         // valid strings
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': process.env.AUTH_SALT,
-            },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
-        },
         {
             'update_field': 'perms',
             'update_params': {
@@ -833,25 +737,14 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
-            'update_field': 'tempkey',
+            'update_field': 'status',
             'update_params': {
-                'data': 'a random string',
-                'salt': 'a random salt',
+                'data': 'pending',
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
-        },
-        {
-            'update_field': 'tempkey',
-            'update_params': {
-                'data': false,
-            },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // invalid strings
@@ -860,32 +753,28 @@ var err_count = 0;
             'update_params': {
                 'data': 'A Cool Test Script',
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'created_by',
             'update_params': {
                 'data': 'A Cool Test Script',
             },
-            'update_key': 'fake',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'created_by',
             'update_params': {
                 'data': 'A Cool Test Script',
             },
-            'update_key': 'email',
-            'update_value': 'fake'
+            'email': 'fake'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': 'puppy',
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // integers
@@ -895,8 +784,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -904,8 +792,7 @@ var err_count = 0;
                 'data': 8,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -913,8 +800,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': 8,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -922,8 +808,7 @@ var err_count = 0;
                 'data': 8,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -931,8 +816,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': 8,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -940,8 +824,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 8,
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -949,8 +832,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 8
+            'email': 8
         },
         {
             'update_field': 'perms',
@@ -960,24 +842,21 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': 8,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'tempkey',
             'update_params': {
                 'data': 8,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
 
@@ -988,8 +867,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -997,8 +875,7 @@ var err_count = 0;
                 'data': {},
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1006,8 +883,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': {},
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1015,8 +891,7 @@ var err_count = 0;
                 'data': {},
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1024,8 +899,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': {},
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1033,8 +907,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': {},
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1042,8 +915,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': {}
+            'email': {}
         },
         {
             'update_field': 'perms',
@@ -1053,24 +925,21 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': {},
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'tempkey',
             'update_params': {
                 'data': {},
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // arrays
@@ -1080,8 +949,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1089,8 +957,7 @@ var err_count = 0;
                 'data': [],
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1098,8 +965,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': [],
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1107,8 +973,7 @@ var err_count = 0;
                 'data': [],
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1116,8 +981,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': [],
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1125,8 +989,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': [],
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1134,8 +997,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': []
+            'email': []
         },
         {
             'update_field': 'perms',
@@ -1145,24 +1007,21 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': [],
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'tempkey',
             'update_params': {
                 'data': [],
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // null
@@ -1172,8 +1031,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1181,8 +1039,7 @@ var err_count = 0;
                 'data': null,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1190,8 +1047,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': null,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1199,8 +1055,7 @@ var err_count = 0;
                 'data': null,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1208,8 +1063,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': null,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1217,8 +1071,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': null,
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1226,8 +1079,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': null
+            'email': null
         },
         {
             'update_field': 'perms',
@@ -1237,24 +1089,21 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': null,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'tempkey',
             'update_params': {
                 'data': null,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // undefined
@@ -1264,8 +1113,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1273,8 +1121,7 @@ var err_count = 0;
                 'data': undefined,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1282,8 +1129,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': undefined,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1291,8 +1137,7 @@ var err_count = 0;
                 'data': undefined,
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
@@ -1300,8 +1145,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': undefined,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1309,8 +1153,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': undefined,
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1318,8 +1161,7 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': undefined
+            'email': undefined
         },
         {
             'update_field': 'perms',
@@ -1329,24 +1171,21 @@ var err_count = 0;
                     'tester': false
                 },
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'perms',
             'update_params': {
                 'data': undefined,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
             'update_field': 'tempkey',
             'update_params': {
                 'data': undefined,
             },
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
         // absent
@@ -1355,32 +1194,28 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
             'update_params': {
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
             'update_params': {
                 'data': 'new_password',
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'created_by',
             'update_params': {
                 'salt': process.env.AUTH_SALT,
             },
-            'update_key': 'email',
-            'update_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         {
             'update_field': 'hash',
@@ -1388,93 +1223,50 @@ var err_count = 0;
                 'data': 'new_password',
                 'salt': process.env.AUTH_SALT,
             },
-            'update_value': 'uglesoft@gmail.com'
-        },
-        {
-            'update_field': 'hash',
-            'update_params': {
-                'data': 'new_password',
-                'salt': process.env.AUTH_SALT,
-            },
-            'update_key': 'email',
         },
         {
             'update_field': 'tempkey',
-            'update_key': 'email',
-            'update_value': 'christian.j.kesler@gmail.com'
+            'email': 'christian.j.kesler@gmail.com'
         },
 
     ];
     var deleteUser_args = [
         // valid entries
         {
-            'delete_key': 'id',
-            'delete_value': '1'
+            'email': 'christian.j.kesler@gmail.com'
         },
         {
-            'delete_key': 'email',
-            'delete_value': 'uglesoft@gmail.com'
+            'email': 'uglesoft@gmail.com'
         },
         // invalid entries
         {
-            'delete_key': 'id',
-            'delete_value': '1'
+            'email': '1'
         },
         {
-            'delete_key': 'email',
-            'delete_value': 'uglesoft@gmail.com'
+            'email': 'fake'
         },
         // integers
         {
-            'delete_key': 8,
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': 8
+            'email': 8
         },
         // objects
         {
-            'delete_key': {},
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': {}
+            'email': {}
         },
         // arrays
         {
-            'delete_key': [],
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': []
+            'email': []
         },
         // null
         {
-            'delete_key': null,
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': null
+            'email': null
         },
         // undefined
         {
-            'delete_key': undefined,
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
-            'delete_value': undefined
+            'email': undefined
         },
         // absent
         {
-            'delete_value': '1'
-        },
-        {
-            'delete_key': 'email',
         },
     ];
 
@@ -1942,7 +1734,7 @@ var err_count = 0;
     // updateUser
     for (let i = 0; i < updateUser_args.length; i++) {
         await ugle_auth.updateUser(dtb, updateUser_args[i], (err, changes) => {
-            if (i <= 3) {
+            if (i <= 1) {
                 if (err) {
                     console.debug(`[ ] UNEXPECTED FAIL | updateUser[${i}] | ${err.message}`);
                     err_count++;
@@ -2289,7 +2081,7 @@ var err_count = 0;
     ];
     for (let i = 0; i < loginUser_args.length; i++) {
         await ugle_auth.loginUser(dtb, loginUser_args[i], (err, data) => {
-            if (i <= 2) {
+            if (i <= 1) {
                 if (err) {
                     console.debug(`[ ] UNEXPECTED FAIL | loginUser[${i}] | ${err.message}`);
                     err_count++;
