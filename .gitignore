@@ -1,4 +1,4 @@
 node_modules/
 package-lock.json
 .env
-/test-scripts/test.db
+test-scripts/test.db
