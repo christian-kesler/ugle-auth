@@ -1,31 +1,31 @@
-const ugle_auth = require(`${__dirname}/handlers.js`);
+// routes, useDefaultViews
+/* 
+signup, 
+login,
+logout, 
+forgotPassword
+resetPassword
+changePassword, for signed in users
+verifyAccount, for signed in users
+deleteAccount, for signed in users
+lockAccount, for admins only
+unlockAccount, for admins only
+*/
 
-
-function validSession(session, res) {
-    try {
-        if (
-            session.email == null ||
-            session.id == null ||
-            session.perms == null
-        ) {
-            res.redirect('/auth/login?msg=invalid-session');
-            return false;
-        } else {
-            return true;
-        }
-    } catch (err) {
-        console.log(err.message);
-        return false;
-    }
-
-}
+const auth = require(`${__dirname}/utils/authentication-session-methods.js`);
+const config = require(`${__dirname}/utils/configuration-methods.js`);
+// const hashing = require(`${__dirname}/utils/hashing-methods.js`);
+const perms = require(`${__dirname}/utils/permission-methods.js`);
+const routes = require(`${__dirname}/utils/routing-methods.js`);
+const emailer = require(`${__dirname}/utils/tempkey-email-methods.js`);
+const users = require(`${__dirname}/utils/user-crud-methods.js`);
 
 
 module.exports = function (app, dtb) {
 
     app.get('/auth', (req, res) => {
         try {
-            if (validSession(req.session, res)) {
+            if (isLoggedIn(req.session, res)) {
                 res.redirect('/account/home');
             }
         } catch (err) {

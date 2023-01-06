@@ -1,6 +1,3 @@
-TODO: Add sendTempkeyEmail, verifyUser, and changePassword example functions
-
-
 # ugle-auth
 
 An authentication system for NodeJS web apps using sqlite
