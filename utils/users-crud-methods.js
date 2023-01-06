@@ -10,97 +10,53 @@ module.exports = {
 
 
     createUser: async (dtb, args, callback) => {
-        // Testing Completed
-        await tryCreateTable(dtb);
-
+        // var args = {
+        //     'email': req.body.email,
+        //     'password': req.body.password,
+        //     'created_by': 'Self Signup',
+        // };
         return new Promise((resolve) => {
             try {
 
-                tryCreateTable(dtb);
-
-                if (!allValuesAreStringsOrBools(args)) {
+                if (args === undefined || args === null || typeof args != 'object') {
                     callback({
-                        'message': 'non-string values detected'
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
                     });
                     resolve();
-                } else if (args.create_params === undefined) {
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
-                        'message': 'missing args | create_params is undefined'
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-                } else if (args.create_params.email === undefined) {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
                     callback({
-                        'message': 'missing args | create_params.email is undefined'
+                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
-                } else if (args.create_params.password === undefined) {
+                } else if (args.created_by === undefined || args.created_by === null || typeof args.created_by != 'string') {
                     callback({
-                        'message': 'missing args | create_params.password is undefined'
+                        'message': `invalid args.created_by | args.created_by must be string, received '${args.created_by} ${typeof args.created_by}'`
                     });
                     resolve();
-                } else if (args.create_params.salt === undefined) {
-                    callback({
-                        'message': 'missing args | create_params.salt is undefined'
-                    });
-                    resolve();
-                } else if (args.create_params.perms === undefined) {
-                    callback({
-                        'message': 'missing args | create_params.perms is undefined'
-                    });
-                    resolve();
-                } else if (args.create_params.created_at === undefined) {
-                    callback({
-                        'message': 'missing args | create_params.created_at is undefined'
-                    });
-                    resolve();
-                } else if (args.create_params.created_by === undefined) {
-                    callback({
-                        'message': 'missing args | create_params.created_by is undefined'
-                    });
-                    resolve();
-
-                } else if (!validEmail(args.create_params.email)) {
-                    callback({
-                        'message': 'invalid email'
-                    });
-                    resolve();
-
-                } else if (!validPassword(args.create_params.password)) {
-                    callback({
-                        'message': 'invalid password'
-                    });
-                    resolve();
-
-                } else if (typeof args.create_params.perms != 'object') {
-                    callback({
-                        'message': 'invalid perms'
-                    });
-                    resolve();
-
                 } else {
 
                     dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
-                        args.create_params.email,
-                        hash(args.create_params.password, args.create_params.salt),
-                        JSON.stringify(args.create_params.perms),
-                        args.create_params.created_at,
-                        args.create_params.created_by,
+                        args.email,
+                        hash(args.password),
+                        JSON.stringify(default_perms),
+                        `${new Date}`,
+                        args.created_by,
                         'unverified'
                     ], (err) => {
                         if (err) {
-
                             callback(err);
                             resolve();
-
                         } else {
-
                             callback(null);
                             resolve();
-
                         }
                     });
                 }
-
 
             } catch (err) {
                 try {

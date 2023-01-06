@@ -1,6 +1,8 @@
 // connectToDatabase, defaultPerms, lockoutPolicy
 
 
+
+
 module.exports = {
 
 
@@ -13,6 +15,12 @@ module.exports = {
                         callback(err);
                         resolve();
                     } else {
+                        global.default_perms = {
+                            'admin': false,
+                            'user': true
+                        }
+                        global.lockout_policy = 4
+                        global.login_redirect = '/account/home'
                         callback(null, dtb);
                         resolve();
                     }
@@ -30,11 +38,12 @@ module.exports = {
     },
 
 
-    defaultPerms: async (perms) => {
+    defaultPerms: async (perms, callback) => {
         return new Promise((resolve) => {
             try {
 
                 global.default_perms = perms
+                callback(null)
                 resolve()
 
             } catch (err) {
@@ -47,7 +56,56 @@ module.exports = {
             }
 
         })
-    }
+    },
 
+
+    lockoutPolicy: async (attempts, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (typeof Number(attempts) != 'number') {
+                    callback(`arg1 must be number, received ${typeof Number(attempts)} ${attempts}`)
+                    resolve()
+                } else {
+                    global.lockout_policy = Number(attempts)
+                    resolve()
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+
+        })
+    },
+
+
+    loginRedirect: async (url, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (typeof url != 'string') {
+                    callback(`arg1 must be string, received ${typeof url} ${url}`)
+                    resolve()
+                } else {
+                    global.login_redirect = url
+                    resolve()
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+
+        })
+    },
 
 }

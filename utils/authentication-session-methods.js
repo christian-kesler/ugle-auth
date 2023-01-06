@@ -45,15 +45,15 @@ module.exports = {
                             resolve();
                         } else {
 
-                            if (rows[0].failed_login_attempts >= 4) {
+                            if (rows[0].failed_login_attempts >= lockout_policy) {
                                 callback({
                                     'message': 'too many failed login attempts, contact your administrator to unlock your account'
                                 });
                                 resolve();
-                            } else if (hash(args.password, process.env.AUTH_SALT) != rows[0].hash) {
+                            } else if (hash(args.password) != rows[0].hash) {
                                 dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
                                     (rows[0].failed_login_attempts + 1),
-                                    args.login_params.email
+                                    args.email
                                 ], async function (err) {
                                     if (err) {
                                         callback({

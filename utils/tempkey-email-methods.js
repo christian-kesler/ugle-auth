@@ -1,6 +1,13 @@
 // sendTempkeyEmail, verifyAccount, resetPassword
+// ENV REQUIREMENTS
+// EMAIL_DOMAIN = 'gmail'
+// EMAIL_SENDER = 'uglesoft@gmail.com'
+// EMAIL_TOKEN = 'abcdefghijklmnop'
 
 
+
+
+const nodemailer = require('nodemailer');
 
 
 const { tempkey } = require(`${__dirname}/hashing-methods.js`)
@@ -13,9 +20,7 @@ module.exports = {
     sendTempkeyEmail: async (dtb, args, callback) => {
         // args = {
         //     recipient:user_email,
-        //     sender:business_email
-        //     domain:gmail
-        //     token:business_email_token,
+        //     subject
         //     text:text
         //     html:html
         // }
@@ -25,87 +30,29 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                // input screening
-                if (args === undefined) {
+                if (args === undefined || args === null || typeof args != 'object') {
                     callback({
-                        message: 'args is undefined'
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
                     });
                     resolve();
-                } else if (typeof args != 'object') {
+                } else if (args.recipient === undefined || args.recipient === null || typeof args.recipient != 'string') {
                     callback({
-                        message: `args must be object, received "${typeof args}"`
+                        'message': `invalid args.recipient | args.recipient must be string, received '${args.recipient} ${typeof args.recipient}'`
                     });
                     resolve();
-
-
-                } else if (args.recipient === undefined) {
+                } else if (args.subject === undefined || args.subject === null || typeof args.subject != 'string') {
                     callback({
-                        message: 'args.recipient is undefined'
+                        'message': `invalid args.subject | args.subject must be string, received '${args.subject} ${typeof args.subject}'`
                     });
                     resolve();
-                } else if (typeof args.recipient != 'string') {
+                } else if (args.text === undefined || args.text === null || typeof args.text != 'string') {
                     callback({
-                        message: `args.recipient must be string, received "${typeof args.recipient}"`
+                        'message': `invalid args.text | args.text must be string, received '${args.text} ${typeof args.text}'`
                     });
                     resolve();
-
-
-                } else if (args.sender === undefined) {
+                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
                     callback({
-                        message: 'args.sender is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.sender != 'string') {
-                    callback({
-                        message: `args.sender must be string, received "${typeof args.sender}"`
-                    });
-                    resolve();
-
-
-                } else if (args.domain === undefined) {
-                    callback({
-                        message: 'args.domain is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.domain != 'string') {
-                    callback({
-                        message: `args.domain must be string, received "${typeof args.domain}"`
-                    });
-                    resolve();
-
-
-                } else if (args.token === undefined) {
-                    callback({
-                        message: 'args.token is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.token != 'string') {
-                    callback({
-                        message: `args.token must be string, received "${typeof args.token}"`
-                    });
-                    resolve();
-
-
-                } else if (args.text === undefined) {
-                    callback({
-                        message: 'args.text is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.text != 'string') {
-                    callback({
-                        message: `args.text must be string, received "${typeof args.text}"`
-                    });
-                    resolve();
-
-
-                } else if (args.html === undefined) {
-                    callback({
-                        message: 'args.html is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.html != 'string') {
-                    callback({
-                        message: `args.html must be string, received "${typeof args.html}"`
+                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
                     });
                     resolve();
 
@@ -115,13 +62,11 @@ module.exports = {
                     dtb.run('UPDATE auth SET tempkey = ? WHERE email = ?;', [
                         tempkey(),
                         args.recipient,
-                    ], async function (err) {
+                    ], function (err) {
                         if (err) {
-
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-
                             callback(
                                 {
                                     'message': `Credentials failed for ${args.recipient} | Row(s) affected: ${this.changes}`
@@ -131,31 +76,30 @@ module.exports = {
                         } else {
                             dtb.all('SELECT tempkey FROM auth WHERE email = ?;', [
                                 args.recipient,
-                            ], async function (err, data) {
+                            ], (err, data) => {
                                 if (err) {
-
                                     callback(err);
                                     resolve();
                                 } else {
 
                                     var transporter = nodemailer.createTransport({
-                                        service: args.domain,
+                                        service: process.env.EMAIL_DOMAIN,
                                         auth: {
-                                            user: args.sender,
-                                            pass: args.token
+                                            user: process.env.EMAIL_SENDER,
+                                            pass: process.env.EMAIL_TOKEN
                                         }
                                     });
 
                                     var mailOptions = {
-                                        from: args.sender,
+                                        from: process.env.EMAIL_SENDER,
                                         to: args.recipient,
-                                        subject: 'Please verify your Account',
+                                        subject: args.subject,
 
                                         text: args.text.replace('tempkey=', `tempkey=${data[0].tempkey}`),
                                         html: args.html.replace('tempkey=', `tempkey=${data[0].tempkey}`),
                                     };
 
-                                    transporter.sendMail(mailOptions, function (err, info) {
+                                    transporter.sendMail(mailOptions, (err, info) => {
                                         if (err) {
                                             callback(err);
                                             resolve();
@@ -269,101 +213,62 @@ module.exports = {
     },
 
 
-    changePassword: async (dtb, args, callback) => {
+    resetPassword: async (dtb, args, callback) => {
         // args = {
         //     email:email,
-        //     tempkey:tempkey,
         //     password:password,
-        //     salt:salt
+        //     tempkey:tempkey,
         // }
 
-        await tryCreateTable(dtb);
+        // await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
             try {
 
-                // input screening
-                if (args === undefined) {
+                if (args === undefined || args === null || typeof args != 'object') {
                     callback({
-                        message: 'args is undefined'
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
                     });
                     resolve();
-                } else if (typeof args != 'object') {
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
-                        message: `args must be object, received "${typeof args}"`
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-
-
-                } else if (args.email === undefined) {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
                     callback({
-                        message: 'args.email is undefined'
+                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
-                } else if (typeof args.email != 'string') {
+                } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
                     callback({
-                        message: `args.email must be string, received "${typeof args.email}"`
+                        'message': `invalid args.tempkey | args.tempkey must be string, received '${args.tempkey} ${typeof args.tempkey}'`
                     });
                     resolve();
-
-
-                } else if (args.tempkey === undefined) {
+                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
                     callback({
-                        message: 'args.tempkey is undefined'
+                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
                     });
                     resolve();
-                } else if (typeof args.tempkey != 'string') {
-                    callback({
-                        message: `args.tempkey must be string, received "${typeof args.tempkey}"`
-                    });
-                    resolve();
-
-
-                } else if (args.password === undefined) {
-                    callback({
-                        message: 'args.password is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.password != 'string') {
-                    callback({
-                        message: `args.password must be string, received "${typeof args.password}"`
-                    });
-                    resolve();
-
-
-                } else if (args.salt === undefined) {
-                    callback({
-                        message: 'args.salt is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.salt != 'string') {
-                    callback({
-                        message: `args.salt must be string, received "${typeof args.salt}"`
-                    });
-                    resolve();
-
 
                 } else {
 
                     dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
-                        hash(args.password, args.salt),
+                        hash(args.password),
                         args.email,
                         args.tempkey
                     ], async function (err) {
                         if (err) {
-
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-
                             callback(
                                 {
-                                    'message': `Credentials failed | Row(s) affected: ${this.changes} | ${args.email} | ${args.tempkey}`
+                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
                                 }
                             );
                             resolve();
                         } else {
-
                             callback(null);
                             resolve();
                         }

@@ -1,32 +1,35 @@
 // routes, useDefaultViews
 /* 
-signup, 
-login,
-logout, 
-forgotPassword
-resetPassword
-changePassword, for signed in users
-verifyAccount, for signed in users
-deleteAccount, for signed in users
-lockAccount, for admins only
-unlockAccount, for admins only
+    auth, redirects to 
+    signup, 
+    login,
+    logout, 
+    forgotPassword
+    resetPassword
+    changePassword, for signed in users
+    verifyAccount, for signed in users
+    deleteAccount, for signed in users
+    lockAccount, for admins only
+    unlockAccount, for admins only
 */
 
 const auth = require(`${__dirname}/utils/authentication-session-methods.js`);
-const config = require(`${__dirname}/utils/configuration-methods.js`);
+// const config = require(`${__dirname}/utils/configuration-methods.js`);
 // const hashing = require(`${__dirname}/utils/hashing-methods.js`);
 const perms = require(`${__dirname}/utils/permission-methods.js`);
-const routes = require(`${__dirname}/utils/routing-methods.js`);
+// const routes = require(`${__dirname}/utils/routing-methods.js`);
 const emailer = require(`${__dirname}/utils/tempkey-email-methods.js`);
 const users = require(`${__dirname}/utils/user-crud-methods.js`);
 
 
 module.exports = function (app, dtb) {
 
+
+    // directory redirect
     app.get('/auth', (req, res) => {
         try {
-            if (isLoggedIn(req.session, res)) {
-                res.redirect('/account/home');
+            if (perms.isLoggedIn(req.session, res)) {
+                res.redirect(login_redirect);
             }
         } catch (err) {
             console.log(err.message);
@@ -53,19 +56,12 @@ module.exports = function (app, dtb) {
         try {
 
             var args = {
-                'create_params': {
-                    'email': req.body.email,
-                    'password': req.body.password,
-                    'salt': process.env.AUTH_SALT,
-                    'perms': {
-                        'user': true,
-                    },
-                    'created_at': `${new Date}`,
-                    'created_by': 'Self Signup',
-                }
+                'email': req.body.email,
+                'password': req.body.password,
+                'created_by': 'Self Signup',
             };
 
-            ugle_auth.createUser(dtb, args, (err) => {
+            users.createUser(dtb, args, (err) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=signup-failed');
@@ -99,15 +95,11 @@ module.exports = function (app, dtb) {
         try {
 
             var args = {
-                'login_params': {
-                    'email': req.body.email,
-                    'password': req.body.password,
-                    'salt': process.env.AUTH_SALT,
-                },
-                'session': req.session
+                'email': req.body.email,
+                'password': req.body.password,
             };
 
-            ugle_auth.loginUser(dtb, args, (err, session) => {
+            auth.login(dtb, args, (err, session) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=login-failed');
@@ -138,11 +130,8 @@ module.exports = function (app, dtb) {
     });
     app.post('/auth/logout', (req, res) => {
         try {
-            var args = {
-                'session': req.session
-            };
 
-            ugle_auth.logoutUser(args, (err, session) => {
+            auth.logout(req.session, (err, session) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=logout-failed');
@@ -178,14 +167,12 @@ module.exports = function (app, dtb) {
 
             var args = {
                 'recipient': req.body.email,
-                'sender': process.env.EMAIL_SENDER,
-                'domain': process.env.EMAIL_DOMAIN,
-                'token': process.env.EMAIL_TOKEN,
-                'text': 'Requested Password Reset Link',
-                'html': `<h4>Reset Password Link</h4><p>Please click the link below to change your password.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/change-password?email=${req.body.email}&tempkey=">Change my Password</a>`
+                'subject': 'Requested Password Reset Link',
+                'text': `=== Reset Password Link === Please copy and paste this link into your browser to reset your password: ${process.env.WEBAPP_DOMAIN}/auth/reset-password?email=${req.body.email}&tempkey=`,
+                'html': `<h4>Reset Password Link</h4><p>Please click the link below to reset your password.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/reset-password?email=${req.body.email}&tempkey=">Change my Password</a>`
             };
 
-            ugle_auth.sendTempkeyEmail(dtb, args, (err) => {
+            emailer.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=email-failed');
@@ -201,10 +188,11 @@ module.exports = function (app, dtb) {
 
     });
 
-    // change password
-    app.get('/auth/change-password', (req, res) => {
+
+    // reset password
+    app.get('/auth/reset-password', (req, res) => {
         try {
-            res.render('auth/change-password', {
+            res.render('auth/reset-password', {
                 query: req.query,
                 session: req.session
             });
@@ -213,22 +201,21 @@ module.exports = function (app, dtb) {
             res.redirect('/?msg=server-error');
         }
     });
-    app.post('/auth/change-password', (req, res) => {
+    app.post('/auth/reset-password', (req, res) => {
         try {
 
             var args = {
                 'email': req.query.email,
                 'tempkey': req.query.tempkey,
-                'password': req.body.password,
-                'salt': process.env.AUTH_SALT
+                'password': req.body.password
             };
 
-            ugle_auth.changePassword(dtb, args, (err) => {
+            users.changePassword(dtb, args, (err) => {
                 if (err) {
                     console.log(err.message);
-                    res.redirect('/auth/login?msg=change-password-failed');
+                    res.redirect('/auth/login?msg=reset-password-failed');
                 } else {
-                    res.redirect('/auth/login?msg=change-password-successful');
+                    res.redirect('/auth/login?msg=reset-password-successful');
                 }
             });
 
@@ -241,13 +228,20 @@ module.exports = function (app, dtb) {
 
 
 
-    // verify account
+
+    // change password, logged in users only
+    // TODO
+
+
+
+
+    // verify account, logged in users only
     app.get('/auth/verify', (req, res) => {
-        res.redirect('/auth/verify-request');
+        res.redirect('/auth/request-verification');
     });
-    app.get('/auth/verify-request', (req, res) => {
+    app.get('/auth/request-verification', (req, res) => {
         try {
-            res.render('auth/verify-request', {
+            res.render('auth/request-verification', {
                 query: req.query,
                 session: req.session
             });
@@ -256,19 +250,17 @@ module.exports = function (app, dtb) {
             res.redirect('/?msg=server-error');
         }
     });
-    app.post('/auth/verify-request', (req, res) => {
+    app.post('/auth/request-verification', (req, res) => {
         try {
 
             var args = {
                 'recipient': req.session.email,
-                'sender': process.env.EMAIL_SENDER,
-                'domain': process.env.EMAIL_DOMAIN,
-                'token': process.env.EMAIL_TOKEN,
-                'text': 'Requested Account Verification Link',
-                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify-confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
+                'subject': 'Requested Account Verification Link',
+                'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
+                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
             };
 
-            ugle_auth.sendTempkeyEmail(dtb, args, (err) => {
+            emailer.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=email-failed');
@@ -283,23 +275,24 @@ module.exports = function (app, dtb) {
         }
 
     });
-
-    app.get('/auth/verify-confirm', (req, res) => {
+    app.get('/auth/confirm-verification', (req, res) => {
         try {
 
-            var args = {
-                'email': req.query.email,
-                'tempkey': req.query.tempkey,
-            };
+            if (perms.isLoggedIn(req.session, res)) {
+                var args = {
+                    'email': req.session.email,
+                    'tempkey': req.query.tempkey,
+                };
 
-            ugle_auth.verifyUser(dtb, args, (err) => {
-                if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=verification-failed');
-                } else {
-                    res.redirect('/auth/login?msg=verification-successful');
-                }
-            });
+                emailer.verifyUser(dtb, args, (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        res.redirect('/auth/login?msg=verification-failed');
+                    } else {
+                        res.redirect('/auth/login?msg=verification-successful');
+                    }
+                });
+            }
 
         } catch (err) {
             console.log(err.message);
@@ -307,6 +300,22 @@ module.exports = function (app, dtb) {
         }
 
     });
+
+
+
+
+    // delete account, logged in users only
+    // TODO
+
+
+
+
+    // lock account, admins only
+    // TODO
+
+
+    // unlock account, admins only
+    // TODO
 
 
 };
