@@ -11,7 +11,7 @@ module.exports = {
     ...auth,
     ...config,
     ...perms,
-    ...routes,
+    routes,
     ...emailer,
     ...users
 };
