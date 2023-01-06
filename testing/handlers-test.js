@@ -20,7 +20,7 @@ var err_count = 0;
 (async () => {
     return new Promise((resolve) => {
 
-        ugle_auth.initDtb(`${__dirname}/test.db`, (err, dtb) => {
+        ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
             if (err) {
                 console.debug(`[ ] UNEXPECTED FAIL | new sqlite3.Database | ${err.message}`);
                 err_count++;

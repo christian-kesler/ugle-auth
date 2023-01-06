@@ -11,7 +11,7 @@ const session = require('express-session');
 
 
 const ugle_auth = require(`${__dirname}/../index.js`);
-ugle_auth.initDtb(`${__dirname}/test.db`, (err, dtb) => {
+ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
         console.error(err.message);
     } else {
