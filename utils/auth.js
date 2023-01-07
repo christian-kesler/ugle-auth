@@ -26,6 +26,53 @@ module.exports = {
                         }
                         global.lockout_policy = 4
                         global.login_redirect = '/account/home'
+
+                        dtb.exec(
+                            `CREATE TABLE IF NOT EXISTS auth(
+                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                            'email' VARCHAR(255) UNIQUE,
+                            
+                            'hash' VARCHAR(255),
+                            'status' VARCHAR(255),
+                            'perms' TEXT,
+            
+                            'tempkey' VARCHAR(255),
+                            'tempkey_datetime' DATETIME,
+                            'failed_login_attempts' INTEGER,
+            
+                            'created_at' DATETIME,
+                            'created_by' VARCHAR(255)
+                            );`
+                        );
+
+                        dtb.exec(
+                            `CREATE TABLE IF NOT EXISTS auth_archive(
+                            'id' INTEGER,
+                            'email' VARCHAR(255),
+                                
+                            'status' VARCHAR(255),
+                            'perms' TEXT,
+
+                            'created_at' DATETIME,
+                            'created_by' VARCHAR(255),
+
+                            'archived_at' DATETIME
+                            );`
+                        );
+
+                        dtb.exec(
+                            `CREATE TABLE IF NOT EXISTS auth_log(
+                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                            'action' VARCHAR(255),
+                            'recipient' VARCHAR(255),
+                            'data' TEXT,
+            
+                            'performed_at' DATETIME,
+                            'performed_by' VARCHAR(255)
+                            );`
+                        );
+
                         callback(null, dtb);
                         resolve();
                     }
@@ -677,9 +724,9 @@ module.exports = {
                         'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
-                } else if (args.created_by === undefined || args.created_by === null || typeof args.created_by != 'string') {
+                } else if (args.created_by === undefined || args.created_by === null || typeof Number(args.created_by) != 'number') {
                     callback({
-                        'message': `invalid args.created_by | args.created_by must be string, received '${args.created_by} ${typeof args.created_by}'`
+                        'message': `invalid args.created_by | args.created_by must be number, received '${Number(args.created_by)} ${typeof Number(args.created_by)}'`
                     });
                     resolve();
                 } else {
@@ -689,7 +736,7 @@ module.exports = {
                         hash(args.password),
                         JSON.stringify(default_perms),
                         `${new Date}`,
-                        args.created_by,
+                        Number(args.created_by),
                         'unverified'
                     ], (err) => {
                         if (err) {
@@ -985,20 +1032,43 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run(`DELETE FROM auth WHERE email = ?;`, [
+                    dtb.all('SELECT * FROM auth WHERE email = ?;', [
                         args.email
-                    ], function (err) {
+                    ], function (err, rows) {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else if (this.changes == 0) {
+                        } else if (rows.length == 0) {
                             callback({
-                                'message': `Row(s) affected: ${this.changes}`
+                                'message': 'entry not found'
                             });
                             resolve();
                         } else {
-                            callback(null);
-                            resolve();
+
+                            dtb.run('INSERT INTO auth_archive(id, email, status, perms, created_at, created_by, archived_at) VALUES(?,?,?,?,?,?,?);', [
+                                rows[0].id,
+                                rows[0].email,
+                                rows[0].status,
+                                rows[0].perms,
+                                rows[0].created_at,
+                                rows[0].created_by,
+                                `${new Date}`,
+                            ], function (err) {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else if (this.changes == 0) {
+                                    callback({
+                                        'message': `Row(s) affected: ${this.changes}`
+                                    });
+                                    resolve();
+                                } else {
+
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
                         }
                     });
 

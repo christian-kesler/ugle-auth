@@ -15,6 +15,7 @@
 */
 
 const auth = require(`${__dirname}/auth.js`);
+const log = require(`${__dirname}/log.js`)
 
 
 module.exports = function (app, dtb) {
@@ -27,7 +28,7 @@ module.exports = function (app, dtb) {
                 res.redirect(login_redirect);
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -43,30 +44,39 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/signup', (req, res) => {
+        action = 'signup'
+
         try {
 
             var args = {
                 'email': req.body.email,
                 'password': req.body.password,
-                'created_by': 'Self Signup',
+                'created_by': 0,
             };
 
             auth.createUser(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=signup-failed');
                 } else {
+                    log(dtb, {
+                        'action': action,
+                        'recipient': 0,
+                        'data': '',
+                        'performed_by': (req.session.id || 0),
+                    })
+
                     res.redirect('/auth/login');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -82,11 +92,13 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/login', (req, res) => {
+        action = 'login'
+
         try {
 
             var args = {
@@ -96,16 +108,24 @@ module.exports = function (app, dtb) {
 
             auth.login(dtb, args, (err, session) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=login-failed');
                 } else {
                     req.session = session;
+
+                    log(dtb, {
+                        'action': action,
+                        'recipient': req.session.id,
+                        'data': '',
+                        'performed_by': req.session.id,
+                    })
+
                     res.redirect('/account/home');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -119,25 +139,34 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/logout', (req, res) => {
+        action = 'logout'
+
         try {
 
             auth.logout(req.session, (err, session) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=logout-failed');
                 } else {
+                    log(dtb, {
+                        'action': action,
+                        'recipient': req.session.id,
+                        'data': '',
+                        'performed_by': req.session.id,
+                    })
+
                     req.session = session;
                     res.redirect('/auth/login?msg=logout-successful');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -153,11 +182,13 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/forgot-password', (req, res) => {
+        action = 'forgot-password'
+
         try {
 
             var args = {
@@ -169,15 +200,29 @@ module.exports = function (app, dtb) {
 
             auth.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=email-failed');
                 } else {
+
+                    auth.readUser(dtb, req.body.email, (err, user) => {
+                        if (err) {
+                            console.error(err.message)
+                        } else {
+                            log(dtb, {
+                                'action': action,
+                                'recipient': user.id,
+                                'data': '',
+                                'performed_by': (req.session.id || 0),
+                            })
+                        }
+                    })
+
                     res.redirect('/auth/login?msg=email-sent');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
 
@@ -192,11 +237,13 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/reset-password', (req, res) => {
+        action = 'reset-password'
+
         try {
 
             var args = {
@@ -207,15 +254,29 @@ module.exports = function (app, dtb) {
 
             auth.resetPassword(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=reset-password-failed');
                 } else {
+
+                    auth.readUser(dtb, req.query.email, (err, user) => {
+                        if (err) {
+                            console.error(err.message)
+                        } else {
+                            log(dtb, {
+                                'action': action,
+                                'recipient': user.id,
+                                'data': '',
+                                'performed_by': (req.session.id || 0),
+                            })
+                        }
+                    })
+
                     res.redirect('/auth/login?msg=reset-password-successful');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -224,19 +285,25 @@ module.exports = function (app, dtb) {
 
 
     // refresh session, logged in users only
-    app.get('/auth/change-password', (req, res) => {
+    app.get('/auth/refresh-session', (req, res) => {
+        action = 'refresh-session'
+
         try {
             if (auth.isLoggedIn(req.session, res)) {
 
-
-                res.render('auth/change-password', {
-                    query: req.query,
-                    session: req.session
-                });
+                auth.refreshSession(dtb, req.session, (err, session) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+                        req.session = session
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
+                })
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -256,11 +323,13 @@ module.exports = function (app, dtb) {
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/change-password', (req, res) => {
+        action = 'refresh-session'
+
         try {
             if (auth.isLoggedIn(req.session, res)) {
 
@@ -271,16 +340,24 @@ module.exports = function (app, dtb) {
 
                 auth.changePassword(dtb, args, (err) => {
                     if (err) {
-                        console.log(err.message);
-                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
-                        res.redirect(`${login_redirect}?msg=change-password-successful`);
+
+                        log(dtb, {
+                            'action': action,
+                            'recipient': req.session.id,
+                            'data': '',
+                            'performed_by': req.session.id,
+                        })
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
                 });
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -299,11 +376,13 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/request-verification', (req, res) => {
+        action = 'request-verification'
+
         try {
 
             var args = {
@@ -315,20 +394,30 @@ module.exports = function (app, dtb) {
 
             auth.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                     res.redirect('/auth/login?msg=email-failed');
                 } else {
+
+                    log(dtb, {
+                        'action': action,
+                        'recipient': req.session.id,
+                        'data': '',
+                        'performed_by': req.session.id,
+                    })
+
                     res.redirect('/auth/login?msg=email-sent');
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
 
     });
     app.get('/auth/confirm-verification', (req, res) => {
+        action = 'confirm-verification'
+
         try {
 
             if (auth.isLoggedIn(req.session, res)) {
@@ -339,7 +428,7 @@ module.exports = function (app, dtb) {
 
                 auth.verifyUser(dtb, args, (err) => {
                     if (err) {
-                        console.log(err.message);
+                        console.error(err.message);
                         res.redirect('/auth/login?msg=verification-failed');
                     } else {
                         res.redirect('/auth/login?msg=verification-successful');
@@ -348,7 +437,7 @@ module.exports = function (app, dtb) {
             }
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
 
@@ -369,11 +458,13 @@ module.exports = function (app, dtb) {
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/delete-account', (req, res) => {
+        action = 'delete-account'
+
         try {
             if (auth.isLoggedIn(req.session, res)) {
 
@@ -384,18 +475,25 @@ module.exports = function (app, dtb) {
 
                 auth.changePassword(dtb, args, (err) => {
                     if (err) {
-                        console.log(err.message);
-                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
 
                         auth.logout(req.session, (err, session) => {
                             if (err) {
-                                console.log(err.message);
-                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                                console.error(err.message);
+                                res.redirect(`${login_redirect}?msg=${action}-failed`);
                             } else {
 
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': req.session.id,
+                                    'data': '',
+                                    'performed_by': req.session.id,
+                                })
+
                                 req.session = session
-                                res.redirect(`${login_redirect}?msg=logout-successful`);
+                                res.redirect(`${login_redirect}?msg=${action}-successful`);
 
                             }
                         })
@@ -405,7 +503,7 @@ module.exports = function (app, dtb) {
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -425,38 +523,43 @@ module.exports = function (app, dtb) {
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/lock-account', (req, res) => {
+        action = 'lock-account'
+
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
                 auth.lockAccount(dtb, req.body.email, (err) => {
                     if (err) {
-                        console.log(err.message);
-                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
 
-                        auth.logout(req.session, (err, session) => {
+                        auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.log(err.message);
-                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                                console.error(err.message)
                             } else {
-
-                                req.session = session
-                                res.redirect(`${login_redirect}?msg=logout-successful`);
-
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': '',
+                                    'performed_by': req.session.id,
+                                })
                             }
                         })
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
 
                     }
                 });
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -474,38 +577,44 @@ module.exports = function (app, dtb) {
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/unlock-account', (req, res) => {
+        action = 'unlock-account'
+
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
                 auth.unlockAccount(dtb, req.body.email, (err) => {
                     if (err) {
-                        console.log(err.message);
-                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
 
-                        auth.logout(req.session, (err, session) => {
+
+                        auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.log(err.message);
-                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                                console.error(err.message)
                             } else {
-
-                                req.session = session
-                                res.redirect(`${login_redirect}?msg=logout-successful`);
-
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': '',
+                                    'performed_by': req.session.id,
+                                })
                             }
                         })
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
 
                     }
                 });
 
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
