@@ -10,8 +10,6 @@ module.exports = {
 
 
     login: async (dtb, args, callback) => {
-        // await tryCreateTable(dtb);
-
         return new Promise((resolve) => {
             try {
 

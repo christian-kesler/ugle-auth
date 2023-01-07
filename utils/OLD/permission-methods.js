@@ -50,13 +50,20 @@ module.exports = {
                     return false
                 } else {
 
-                    if (session.perms[perm] != true) {
+                    if (perm === undefined || perm === null || typeof perm != 'string') {
+                        console.error(`invalid perm | perm must be string, received '${perm} ${typeof perm}'`)
                         res.redirect(`${login_redirect}?msg=permission-denied`)
                         return false
                     } else {
-                        return true
-                    }
 
+                        if (session.perms[perm] != true) {
+                            res.redirect(`${login_redirect}?msg=permission-denied`)
+                            return false
+                        } else {
+                            return true
+                        }
+
+                    }
                 }
 
             }

@@ -210,7 +210,7 @@ module.exports = function (app, dtb) {
                 'password': req.body.password
             };
 
-            users.changePassword(dtb, args, (err) => {
+            users.resetPassword(dtb, args, (err) => {
                 if (err) {
                     console.log(err.message);
                     res.redirect('/auth/login?msg=reset-password-failed');
@@ -230,7 +230,46 @@ module.exports = function (app, dtb) {
 
 
     // change password, logged in users only
-    // TODO
+    /* TODO */
+    app.get('/auth/change-password', (req, res) => {
+        try {
+            if (perms.isLoggedIn(req.session, res)) {
+
+                res.render('auth/change-password', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/change-password', (req, res) => {
+        try {
+            if (perms.isLoggedIn(req.session, res)) {
+
+                var args = {
+                    'email': req.session.email,
+                    'password': req.body.password
+                };
+
+                users.changePassword(dtb, args, (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                    } else {
+                        res.redirect(`${login_redirect}?msg=change-password-successful`);
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
 
 
 
@@ -305,17 +344,157 @@ module.exports = function (app, dtb) {
 
 
     // delete account, logged in users only
-    // TODO
+    app.get('/auth/delete-account', (req, res) => {
+        try {
+            if (perms.isLoggedIn(req.session, res)) {
+
+                res.render('auth/delete-account', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/delete-account', (req, res) => {
+        try {
+            if (perms.isLoggedIn(req.session, res)) {
+
+                var args = {
+                    'email': req.session.email,
+                    'password': req.body.password
+                };
+
+                users.changePassword(dtb, args, (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                    } else {
+
+                        auth.logout(req.session, (err, session) => {
+                            if (err) {
+                                console.log(err.message);
+                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                            } else {
+
+                                req.session = session
+                                res.redirect(`${login_redirect}?msg=logout-successful`);
+
+                            }
+                        })
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
 
 
 
 
     // lock account, admins only
-    // TODO
+    app.get('/auth/lock-account', (req, res) => {
+        try {
+            if (perms.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/lock-account', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/lock-account', (req, res) => {
+        try {
+            if (perms.hasPermission(req.session, res, 'admin')) {
+
+                users.lockAccount(dtb, req.body.email, (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                    } else {
+
+                        auth.logout(req.session, (err, session) => {
+                            if (err) {
+                                console.log(err.message);
+                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                            } else {
+
+                                req.session = session
+                                res.redirect(`${login_redirect}?msg=logout-successful`);
+
+                            }
+                        })
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
 
 
     // unlock account, admins only
-    // TODO
+    app.get('/auth/unlock-account', (req, res) => {
+        try {
+            if (perms.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/unlock-account', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/unlock-account', (req, res) => {
+        try {
+            if (perms.hasPermission(req.session, res, 'admin')) {
+
+                users.unlockAccount(dtb, req.body.email, (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        res.redirect(`${login_redirect}?msg=change-password-failed`);
+                    } else {
+
+                        auth.logout(req.session, (err, session) => {
+                            if (err) {
+                                console.log(err.message);
+                                res.redirect(`${login_redirect}?msg=logout-failed`);
+                            } else {
+
+                                req.session = session
+                                res.redirect(`${login_redirect}?msg=logout-successful`);
+
+                            }
+                        })
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.log(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
 
 
 };

@@ -335,51 +335,37 @@ module.exports = {
     },
 
 
-    deleteUser: async (dtb, args, callback) => {
+    // 2.0 conventions
+    deleteUser: async (dtb, email, callback) => {
         await tryCreateTable(dtb);
 
         return new Promise((resolve) => {
             try {
 
-                if (
-                    args.email === undefined
-                ) {
+                if (email === undefined || email === null || typeof email != 'string') {
                     callback({
-                        'message': 'missing args | email is undefined'
+                        'message': `invalid email | email must be string, received '${email} ${typeof email}'`
                     });
                     resolve();
-
                 } else {
 
-                    dtb.run(`DELETE FROM auth WHERE email = ?;`, [args.email], async function (err) {
+                    dtb.run(`DELETE FROM auth WHERE email = ?;`, [
+                        args.email
+                    ], function (err) {
                         if (err) {
-
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-
-                            callback(
-                                {
-                                    'message': `Row(s) affected: ${this.changes}`
-                                },
-                                {
-                                    'count': this.changes,
-                                    'message': `Row(s) affected: ${this.changes}`
-                                }
-                            );
+                            callback({
+                                'message': `Row(s) affected: ${this.changes}`
+                            });
                             resolve();
                         } else {
-
-                            callback(
-                                null,
-                                {
-                                    'count': this.changes,
-                                    'message': `Row(s) affected: ${this.changes}`
-                                }
-                            );
+                            callback(null);
                             resolve();
                         }
                     });
+
                 }
 
             } catch (err) {
@@ -419,5 +405,146 @@ module.exports = {
         });
     },
 
+
+    // 2.0 conventions
+    changePassword: (dtb, args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (args === undefined || args === null || typeof args != 'object') {
+                    callback({
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
+                    });
+                    resolve();
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+                    callback({
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+                    callback({
+                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run(`UPDATE auth SET hash = ? WHERE email = ?;`, [
+                        hash(args.password),
+                        args.email
+                    ], function (err) {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+                            callback({
+                                'message': `Row(s) affected: ${this.changes}`
+                            });
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
+                        }
+                    });
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    lockAccount: (dtb, email, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (email === undefined || email === null || typeof email != 'string') {
+                    callback({
+                        'message': `invalid email | email must be string, received '${email} ${typeof email}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run(`UPDATE auth SET locked = ? WHERE email = ?;`, [
+                        1,
+                        email
+                    ], function (err) {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+                            callback({
+                                'message': `Row(s) affected: ${this.changes}`
+                            });
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
+                        }
+                    });
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    unlockAccount: (dtb, email, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (email === undefined || email === null || typeof email != 'string') {
+                    callback({
+                        'message': `invalid email | email must be string, received '${email} ${typeof email}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run(`UPDATE auth SET locked = ? WHERE email = ?;`, [
+                        0,
+                        email
+                    ], function (err) {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+                            callback({
+                                'message': `Row(s) affected: ${this.changes}`
+                            });
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
+                        }
+                    });
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
 
 }
