@@ -1,8 +1,3 @@
-// login, logout, refreshSession, 
-
-
-
-
 const { hash } = require(`${__dirname}/hashing.js`)
 const { tempkey } = require(`${__dirname}/hashing.js`)
 

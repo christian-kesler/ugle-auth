@@ -620,4 +620,124 @@ module.exports = function (app, dtb) {
     });
 
 
+
+
+    // add permission, admins only
+    app.get('/auth/add-permission', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/add-permission', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/add-permission', (req, res) => {
+        action = 'add-permission'
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                args = {
+                    'email': req.query.email,
+                    'permission': req.query.permission
+                }
+
+                auth.addPermission(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+
+                        auth.readUser(dtb, req.query.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message)
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': req.query.permission,
+                                    'performed_by': req.session.id,
+                                })
+                            }
+                        })
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+    // remove permission, admins only
+    app.get('/auth/remove-permission', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/remove-permission', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/remove-permission', (req, res) => {
+        action = 'remove-permission'
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                args = {
+                    'email': req.query.email,
+                    'permission': req.query.permission
+                }
+
+                auth.removePermission(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+
+                        auth.readUser(dtb, req.query.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message)
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': req.query.permission,
+                                    'performed_by': req.session.id,
+                                })
+                            }
+                        })
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
 };
