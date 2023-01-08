@@ -1,19 +1,3 @@
-// routes, useDefaultViews
-/* 
-    auth, redirects to 
-    signup, 
-    login,
-    logout, 
-    forgotPassword
-    resetPassword
-    refreshSession, for signed in users
-    changePassword, for signed in users
-    verifyAccount, for signed in users
-    deleteAccount, for signed in users
-    lockAccount, for admins only
-    unlockAccount, for admins only
-*/
-
 const auth = require(`${__dirname}/auth.js`);
 const log = require(`${__dirname}/log.js`)
 

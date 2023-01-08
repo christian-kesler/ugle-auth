@@ -6,24 +6,33 @@ module.exports = {
 
 
     /* BEGIN CONFIG METHODS */
+    // 2.0 conventions
     connectToDatabase: (path, callback) => {
         return new Promise((resolve) => {
             try {
 
-                const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
-                    if (err) {
-                        callback(err);
-                        resolve();
-                    } else {
-                        global.default_perms = {
-                            'admin': false,
-                            'user': true
-                        }
-                        global.lockout_policy = 4
-                        global.login_redirect = '/account/home'
+                if (path === undefined || path === null || typeof path != 'string') {
+                    callback({
+                        'message': `invalid args | path must be string, received '${path} ${typeof path}'`
+                    });
+                    resolve();
+                } else {
 
-                        dtb.exec(
-                            `CREATE TABLE IF NOT EXISTS auth(
+                    const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else {
+
+                            global.default_perms = {
+                                'admin': false,
+                                'user': true
+                            }
+                            global.lockout_policy = 4
+                            global.login_redirect = '/account/home'
+
+                            dtb.exec(
+                                `CREATE TABLE IF NOT EXISTS auth(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
                             'email' VARCHAR(255) UNIQUE,
                             
@@ -38,10 +47,10 @@ module.exports = {
                             'created_at' DATETIME,
                             'created_by' VARCHAR(255)
                             );`
-                        );
+                            );
 
-                        dtb.exec(
-                            `CREATE TABLE IF NOT EXISTS auth_archive(
+                            dtb.exec(
+                                `CREATE TABLE IF NOT EXISTS auth_archive(
                             'id' INTEGER,
                             'email' VARCHAR(255),
                                 
@@ -53,10 +62,10 @@ module.exports = {
 
                             'archived_at' DATETIME
                             );`
-                        );
+                            );
 
-                        dtb.exec(
-                            `CREATE TABLE IF NOT EXISTS auth_log(
+                            dtb.exec(
+                                `CREATE TABLE IF NOT EXISTS auth_log(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
 
                             'action' VARCHAR(255),
@@ -66,12 +75,14 @@ module.exports = {
                             'performed_at' DATETIME,
                             'performed_by' VARCHAR(255)
                             );`
-                        );
+                            );
 
-                        callback(null, dtb);
-                        resolve();
-                    }
-                });
+                            callback(null, dtb);
+                            resolve();
+                        }
+                    });
+
+                }
 
             } catch (err) {
                 try {
@@ -85,13 +96,31 @@ module.exports = {
     },
 
 
+    // 2.0 conventions
     defaultPerms: (perms, callback) => {
         return new Promise((resolve) => {
             try {
 
-                global.default_perms = perms
-                callback(null)
-                resolve()
+                // TODO implement this object validation standard package wide
+                if (perms === undefined || perms === null || typeof perms != 'object' || Object.keys(perms).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | perms must be non-empty object, received ${typeof perms} ${JSON.stringify(perms)} with length ${Object.keys(perms).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | perms must be non-empty object, received ${typeof perms} ${JSON.stringify(perms)}`
+                        });
+                        resolve();
+                    }
+                } else {
+
+                    global.default_perms = perms
+                    callback(null)
+                    resolve()
+
+                }
 
             } catch (err) {
                 try {
@@ -106,16 +135,22 @@ module.exports = {
     },
 
 
+    // 2.0 conventions
     lockoutPolicy: (attempts, callback) => {
         return new Promise((resolve) => {
             try {
 
-                if (typeof Number(attempts) != 'number') {
-                    callback(`arg1 must be number, received ${typeof Number(attempts)} ${attempts}`)
-                    resolve()
+                if (attempts === undefined || attempts === null || typeof Number(attempts) != 'number') {
+                    callback({
+                        'message': `invalid args | url must be string, received '${Number(attempts)} ${typeof Number(attempts)}'`
+                    });
+                    resolve();
                 } else {
+
                     global.lockout_policy = Number(attempts)
+                    callback(null)
                     resolve()
+
                 }
 
             } catch (err) {
@@ -131,16 +166,22 @@ module.exports = {
     },
 
 
+    // 2.0 conventions
     loginRedirect: (url, callback) => {
         return new Promise((resolve) => {
             try {
 
-                if (typeof url != 'string') {
-                    callback(`arg1 must be string, received ${typeof url} ${url}`)
-                    resolve()
+                if (url === undefined || url === null || typeof url != 'string') {
+                    callback({
+                        'message': `invalid args | url must be string, received '${url} ${typeof url}'`
+                    });
+                    resolve();
                 } else {
+
                     global.login_redirect = url
+                    callback(null)
                     resolve()
+
                 }
 
             } catch (err) {
@@ -164,6 +205,7 @@ module.exports = {
 
 
     /* BEGIN PERMISSION METHODS */
+    // 2.0 conventions
     isLoggedIn: (session, res) => {
         try {
 
@@ -195,6 +237,7 @@ module.exports = {
     },
 
 
+    // 2.0 conventions
     hasPermission: (session, res, perm) => {
         try {
 
@@ -243,279 +286,43 @@ module.exports = {
 
 
 
-    /* BEGIN TEMPKEY EMAIL METHODS */
-    sendTempkeyEmail: async (dtb, args, callback) => {
-        // args = {
-        //     recipient:user_email,
-        //     subject
-        //     text:text
-        //     html:html
-        // }
-
-        return new Promise((resolve) => {
-            try {
-
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
-                } else if (args.recipient === undefined || args.recipient === null || typeof args.recipient != 'string') {
-                    callback({
-                        'message': `invalid args.recipient | args.recipient must be string, received '${args.recipient} ${typeof args.recipient}'`
-                    });
-                    resolve();
-                } else if (args.subject === undefined || args.subject === null || typeof args.subject != 'string') {
-                    callback({
-                        'message': `invalid args.subject | args.subject must be string, received '${args.subject} ${typeof args.subject}'`
-                    });
-                    resolve();
-                } else if (args.text === undefined || args.text === null || typeof args.text != 'string') {
-                    callback({
-                        'message': `invalid args.text | args.text must be string, received '${args.text} ${typeof args.text}'`
-                    });
-                    resolve();
-                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
-                    callback({
-                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
-                    });
-                    resolve();
-
-
-                } else {
-
-                    dtb.run('UPDATE auth SET tempkey = ? WHERE email = ?;', [
-                        tempkey(),
-                        args.recipient,
-                    ], function (err) {
-                        if (err) {
-                            callback(err);
-                            resolve();
-                        } else if (this.changes == 0) {
-                            callback(
-                                {
-                                    'message': `Credentials failed for ${args.recipient} | Row(s) affected: ${this.changes}`
-                                }
-                            );
-                            resolve();
-                        } else {
-                            dtb.all('SELECT tempkey FROM auth WHERE email = ?;', [
-                                args.recipient,
-                            ], (err, data) => {
-                                if (err) {
-                                    callback(err);
-                                    resolve();
-                                } else {
-
-                                    var transporter = nodemailer.createTransport({
-                                        service: process.env.EMAIL_DOMAIN,
-                                        auth: {
-                                            user: process.env.EMAIL_SENDER,
-                                            pass: process.env.EMAIL_TOKEN
-                                        }
-                                    });
-
-                                    var mailOptions = {
-                                        from: process.env.EMAIL_SENDER,
-                                        to: args.recipient,
-                                        subject: args.subject,
-
-                                        text: args.text.replace('tempkey=', `tempkey=${data[0].tempkey}`),
-                                        html: args.html.replace('tempkey=', `tempkey=${data[0].tempkey}`),
-                                    };
-
-                                    transporter.sendMail(mailOptions, (err, info) => {
-                                        if (err) {
-                                            callback(err);
-                                            resolve();
-                                        } else {
-                                            callback(null, info);
-                                            resolve();
-                                        }
-                                    });
-
-                                }
-                            });
-
-                        }
-                    });
-                }
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-
-
-    verifyUser: async (dtb, args, callback) => {
-        // args = {
-        //     email:email,
-        //     tempkey:tempkey
-        // }
-
-        return new Promise((resolve) => {
-            try {
-
-                // input screening
-                if (args === undefined) {
-                    callback({
-                        message: 'args is undefined'
-                    });
-                    resolve();
-                } else if (typeof args != 'object') {
-                    callback({
-                        message: `args must be object, received "${typeof args}"`
-                    });
-                    resolve();
-
-
-                } else if (args.email === undefined) {
-                    callback({
-                        message: 'args.email is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.email != 'string') {
-                    callback({
-                        message: `args.email must be string, received "${typeof args.email}"`
-                    });
-                    resolve();
-
-
-                } else if (args.tempkey === undefined) {
-                    callback({
-                        message: 'args.tempkey is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.tempkey != 'string') {
-                    callback({
-                        message: `args.tempkey must be string, received "${typeof args.tempkey}"`
-                    });
-                    resolve();
-
-
-                } else {
-
-                    dtb.run('UPDATE auth SET status = "verified", tempkey = NULL WHERE email = ? AND tempkey = ?;', [
-                        args.email,
-                        args.tempkey
-                    ], async function (err) {
-                        if (err) {
-
-                            callback(err);
-                            resolve();
-                        } else if (this.changes == 0) {
-
-                            callback(
-                                {
-                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
-                                }
-                            );
-                            resolve();
-                        } else {
-
-                            callback(null);
-                            resolve();
-                        }
-                    });
-
-                }
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-
-
-    resetPassword: async (dtb, args, callback) => {
-        // args = {
-        //     email:email,
-        //     password:password,
-        //     tempkey:tempkey,
-        // }
-
-        return new Promise((resolve) => {
-            try {
-
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
-                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
-                    callback({
-                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
-                    });
-                    resolve();
-                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
-                    callback({
-                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
-                    });
-                    resolve();
-                } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
-                    callback({
-                        'message': `invalid args.tempkey | args.tempkey must be string, received '${args.tempkey} ${typeof args.tempkey}'`
-                    });
-                    resolve();
-                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
-                    callback({
-                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
-                    });
-                    resolve();
-
-                } else {
-
-                    dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
-                        hash(args.password),
-                        args.email,
-                        args.tempkey
-                    ], async function (err) {
-                        if (err) {
-                            callback(err);
-                            resolve();
-                        } else if (this.changes == 0) {
-                            callback(
-                                {
-                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
-                                }
-                            );
-                            resolve();
-                        } else {
-                            callback(null);
-                            resolve();
-                        }
-                    });
-
-                }
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-    /* END TEMPKEY EMAIL METHODS */
-
-
-
-
-
-
-
-
     /* BEGIN SESSION MANAGEMENT METHODS */
+    // 2.0 conventions
+    logout: (session, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (session === undefined || session === null || typeof session != 'object') {
+                    callback({
+                        'message': `invalid session | session must be object, received '${session} ${typeof session}'`
+                    });
+                    resolve();
+                } else {
+
+                    session.valid = false;
+                    session.email = null;
+                    session.id = null;
+                    session.perms = null;
+                    session.status = null;
+
+                    callback(null, session);
+                    resolve();
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
     login: (dtb, args, callback) => {
         return new Promise((resolve) => {
             try {
@@ -610,40 +417,7 @@ module.exports = {
     },
 
 
-    logout: (session, callback) => {
-        return new Promise((resolve) => {
-            try {
-
-                if (session === undefined || session === null || typeof session != 'object') {
-                    callback({
-                        'message': `invalid session | session must be object, received '${session} ${typeof session}'`
-                    });
-                    resolve();
-                } else {
-
-                    session.valid = false;
-                    session.email = null;
-                    session.id = null;
-                    session.perms = null;
-                    session.status = null;
-
-                    callback(null, session);
-                    resolve();
-
-                }
-
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-
-
+    // 2.0 conventions
     refreshSession: (dtb, session, callback) => {
         return new Promise((resolve) => {
             try {
@@ -699,7 +473,242 @@ module.exports = {
 
 
 
+    /* BEGIN TEMPKEY EMAIL METHODS */
+    // 2.0 convenntions
+    sendTempkeyEmail: async (dtb, args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (args === undefined || args === null || typeof args != 'object') {
+                    callback({
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
+                    });
+                    resolve();
+                } else if (args.recipient === undefined || args.recipient === null || typeof args.recipient != 'string') {
+                    callback({
+                        'message': `invalid args.recipient | args.recipient must be string, received '${args.recipient} ${typeof args.recipient}'`
+                    });
+                    resolve();
+                } else if (args.subject === undefined || args.subject === null || typeof args.subject != 'string') {
+                    callback({
+                        'message': `invalid args.subject | args.subject must be string, received '${args.subject} ${typeof args.subject}'`
+                    });
+                    resolve();
+                } else if (args.text === undefined || args.text === null || typeof args.text != 'string') {
+                    callback({
+                        'message': `invalid args.text | args.text must be string, received '${args.text} ${typeof args.text}'`
+                    });
+                    resolve();
+                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
+                    callback({
+                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run('UPDATE auth SET tempkey = ? WHERE email = ?;', [
+                        tempkey(),
+                        args.recipient,
+                    ], function (err) {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+                            callback(
+                                {
+                                    'message': `Credentials failed for ${args.recipient} | Row(s) affected: ${this.changes}`
+                                }
+                            );
+                            resolve();
+                        } else {
+                            dtb.all('SELECT tempkey FROM auth WHERE email = ?;', [
+                                args.recipient,
+                            ], (err, data) => {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else {
+
+                                    var transporter = nodemailer.createTransport({
+                                        service: process.env.EMAIL_DOMAIN,
+                                        auth: {
+                                            user: process.env.EMAIL_SENDER,
+                                            pass: process.env.EMAIL_TOKEN
+                                        }
+                                    });
+
+                                    var mailOptions = {
+                                        from: process.env.EMAIL_SENDER,
+                                        to: args.recipient,
+                                        subject: args.subject,
+
+                                        text: args.text.replace('tempkey=', `tempkey=${data[0].tempkey}`),
+                                        html: args.html.replace('tempkey=', `tempkey=${data[0].tempkey}`),
+                                    };
+
+                                    transporter.sendMail(mailOptions, (err, info) => {
+                                        if (err) {
+                                            callback(err);
+                                            resolve();
+                                        } else {
+                                            callback(null, info);
+                                            resolve();
+                                        }
+                                    });
+
+                                }
+                            });
+
+                        }
+                    });
+                }
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    verifyUser: async (dtb, args, callback) => {
+
+        return new Promise((resolve) => {
+            try {
+
+                if (args === undefined || args === null || typeof args != 'object') {
+                    callback({
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
+                    });
+                    resolve();
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+                    callback({
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
+                    callback({
+                        'message': `invalid args.tempkey | args.tempkey must be number, received '${args.tempkey} ${typeof args.tempkey}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run('UPDATE auth SET status = "verified", tempkey = NULL WHERE email = ? AND tempkey = ?;', [
+                        args.email,
+                        args.tempkey
+                    ], async function (err) {
+                        if (err) {
+
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+
+                            callback(
+                                {
+                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                }
+                            );
+                            resolve();
+                        } else {
+
+                            callback(null);
+                            resolve();
+                        }
+                    });
+
+                }
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    resetPassword: async (dtb, args, callback) => {
+
+        return new Promise((resolve) => {
+            try {
+
+                if (args === undefined || args === null || typeof args != 'object') {
+                    callback({
+                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
+                    });
+                    resolve();
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+                    callback({
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+                    callback({
+                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                    });
+                    resolve();
+                } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
+                    callback({
+                        'message': `invalid args.tempkey | args.tempkey must be string, received '${args.tempkey} ${typeof args.tempkey}'`
+                    });
+                    resolve();
+                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
+                    callback({
+                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
+                        hash(args.password),
+                        args.email,
+                        args.tempkey
+                    ], async function (err) {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (this.changes == 0) {
+                            callback(
+                                {
+                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                }
+                            );
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
+                        }
+                    });
+
+                }
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+    /* END TEMPKEY EMAIL METHODS */
+
+
+
+
+
+
+
+
     /* BEGIN USER MANAGEMENT METHODS */
+    // 2.0 conventions
     createUser: (dtb, args, callback) => {
         return new Promise((resolve) => {
             try {
@@ -756,253 +765,80 @@ module.exports = {
     },
 
 
-    readUser: (dtb, args, callback) => {
+    // 2.0 conventions
+    readUser: (dtb, email, callback) => {
         return new Promise((resolve) => {
             try {
 
-                tryCreateTable(dtb);
-
-                if (args.email === undefined) {
+                if (email === undefined || email === null || typeof email != 'string') {
                     callback({
-                        'message': 'missing args | args.email is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.email != 'string') {
-                    callback({
-                        'message': 'missing args | args.email is undefined'
-                    });
-                    resolve();
-
-
-                } else {
-
-                    dtb.all(
-                        `SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;`,
-                        [args.email],
-                        (err, rows) => {
-                            if (err) {
-
-                                callback(err);
-                                resolve();
-
-                            } else if (rows.length == 0) {
-
-                                callback({
-                                    'message': 'entry not found'
-                                });
-                                resolve();
-
-                            } else {
-
-                                callback(null, rows[0]);
-                                resolve();
-
-                            }
-                        }
-                    );
-                }
-
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-
-
-    readUsers: (dtb, args, callback) => {
-        return new Promise((resolve) => {
-            try {
-
-                tryCreateTable(dtb);
-
-                if (args.email === undefined) {
-                    callback({
-                        'message': 'missing args | args.email is undefined'
-                    });
-                    resolve();
-                } else if (typeof args.email != 'string') {
-                    callback({
-                        'message': 'missing args | args.email is undefined'
-                    });
-                    resolve();
-
-
-                } else {
-
-                    dtb.all(
-                        `SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;`,
-                        [args.email],
-                        (err, rows) => {
-                            if (err) {
-
-                                callback(err);
-                                resolve();
-
-                            } else if (rows.length == 0) {
-
-                                callback({
-                                    'message': 'entry not found'
-                                });
-                                resolve();
-
-                            } else {
-
-                                callback(null, rows);
-                                resolve();
-
-                            }
-                        }
-                    );
-                }
-
-            } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
-            }
-        });
-    },
-
-
-    updateUser: (dtb, args, callback) => {
-        return new Promise((resolve) => {
-            try {
-
-                if (!allValuesAreStringsOrBools(args)) {
-                    callback({
-                        'message': 'non-string values detected'
+                        'message': `invalid email | email must be string, received '${email} ${typeof email}'`
                     });
                     resolve();
                 } else {
 
-                    if (args.update_field === undefined) {
-                        callback({
-                            'message': 'missing args | update_field is undefined'
-                        });
-                        resolve();
-                    } else if (args.update_params === undefined) {
-                        callback({
-                            'message': 'missing args | update_params is undefined'
-                        });
-                        resolve();
-                    } else if (args.update_params.data === undefined) {
-                        callback({
-                            'message': 'missing args | update_params.data is undefined'
-                        });
-                        resolve();
-                    } else if (args.email === undefined) {
-                        callback({
-                            'message': 'missing args | email is undefined'
-                        });
-                        resolve();
-                    } else {
-
-                        var execute = false;
-
-                        if (args.update_field == 'status' || args.update_field == 'email' || args.update_field == 'perms' || args.update_field == 'tempkey_datetime' || args.update_field == 'failed_login_attempts') {
-                            if (args.update_field == 'perms') {
-                                if (typeof args.update_params.data != 'object') {
-
-                                    callback({
-                                        'message': 'missing args | perms must be object'
-                                    });
-                                    resolve();
-
-                                } else {
-
-                                    try {
-                                        args.update_params.data = JSON.stringify(args.update_params.data);
-
-                                        execute = true;
-                                    } catch (err) {
-
-                                        callback(err);
-                                        resolve();
-                                    }
-                                }
-                            } else {
-                                execute = true;
-                            }
-
-                            if (execute) {
-                                dtb.run(`UPDATE auth SET ${args.update_field} = ? WHERE email = ?;`, [args.update_params.data, args.email], async function (err) {
-                                    if (err) {
-
-                                        callback(err);
-                                        resolve();
-                                    } else if (this.changes == 0) {
-
-                                        callback(
-                                            {
-                                                'message': `Row(s) affected: ${this.changes}`
-                                            },
-                                            {
-                                                'count': this.changes,
-                                                'message': `Row(s) affected: ${this.changes}`
-                                            }
-                                        );
-                                        resolve();
-                                    } else {
-
-                                        if (args.update_field == 'hash') {
-                                            dtb.run(`UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;`, [args.email], async function (err) {
-                                                if (err) {
-
-                                                    callback(err);
-                                                    resolve();
-                                                } else if (this.changes == 0) {
-
-                                                    callback(
-                                                        {
-                                                            'message': `Row(s) affected: ${this.changes}`
-                                                        },
-                                                        {
-                                                            'count': this.changes,
-                                                            'message': `Row(s) affected: ${this.changes}`
-                                                        }
-                                                    );
-                                                    resolve();
-                                                } else {
-
-                                                    callback(
-                                                        null,
-                                                        {
-                                                            'count': this.changes,
-                                                            'message': `Row(s) affected: ${this.changes}`
-                                                        }
-                                                    );
-                                                    resolve();
-                                                }
-                                            });
-                                        } else {
-                                            callback(
-                                                null,
-                                                {
-                                                    'count': this.changes,
-                                                    'message': `Row(s) affected: ${this.changes}`
-                                                }
-                                            );
-                                            resolve();
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
+                    dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;', [
+                        email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
                             callback({
-                                'message': 'missing args | update_field is invalid'
+                                'message': 'entry not found'
                             });
                             resolve();
+                        } else {
+                            callback(null, rows[0]);
+                            resolve();
                         }
-                    }
+                    });
+
                 }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    readUsers: (dtb, email, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (email === undefined || email === null || typeof email != 'string') {
+                    callback({
+                        'message': `invalid email | email must be string, received '${email} ${typeof email}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;', [
+                        email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
+                            callback({
+                                'message': 'entries not found'
+                            });
+                            resolve();
+                        } else {
+                            callback(null, rows);
+                            resolve();
+                        }
+                    });
+
+                }
+
             } catch (err) {
                 try {
                     callback(err);
@@ -1086,7 +922,7 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth;', [], (err, rows) => {
+                dtb.all('SELECT id, status, email, perms, created_at, created_by FROM auth;', [], (err, rows) => {
                     if (err) {
                         callback(err);
                         resolve();
@@ -1130,7 +966,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run(`UPDATE auth SET hash = ? WHERE email = ?;`, [
+                    dtb.run('UPDATE auth SET hash = ? WHERE email = ?;', [
                         hash(args.password),
                         args.email
                     ], function (err) {
@@ -1182,7 +1018,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run(`UPDATE auth SET locked = ? WHERE email = ?;`, [
+                    dtb.run('UPDATE auth SET locked = ? WHERE email = ?;', [
                         1,
                         email
                     ], function (err) {
@@ -1226,7 +1062,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run(`UPDATE auth SET locked = ? WHERE email = ?;`, [
+                    dtb.run('UPDATE auth SET locked = ? WHERE email = ?;', [
                         0,
                         email
                     ], function (err) {
