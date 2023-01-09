@@ -1,5 +1,8 @@
 const { hash } = require(`${__dirname}/hashing.js`)
 const { tempkey } = require(`${__dirname}/hashing.js`)
+const sqlite3 = require('sqlite3');
+
+
 
 
 module.exports = {
@@ -140,9 +143,11 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (attempts === undefined || attempts === null || typeof Number(attempts) != 'number') {
+                // TODO make the number validation match this example throughout the file
+                attempts = Number(attempts)
+                if (attempts == undefined || attempts == null || isNaN(attempts) || attempts <= 0) {
                     callback({
-                        'message': `invalid args | url must be string, received '${Number(attempts)} ${typeof Number(attempts)}'`
+                        'message': `invalid args | attempts must be number greater than zero, received '${attempts} ${typeof attempts}'`
                     });
                     resolve();
                 } else {
@@ -209,11 +214,11 @@ module.exports = {
     isLoggedIn: (session, res) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object') {
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
                 res.redirect('/auth/login?msg=invalid-session')
                 return false
-            } else if (res === undefined || res === null || typeof res != 'object') {
-                console.error(`arg2 must be response object, received ${typeof res}`)
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
                 return false
             } else {
 
@@ -230,6 +235,7 @@ module.exports = {
                 res.redirect('/auth/login?msg=invalid-session')
                 return false
             } catch (err) {
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.redirect}`)
                 return false
             }
         }
@@ -241,10 +247,14 @@ module.exports = {
     hasPermission: (session, res, perm) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object') {
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
                 res.redirect('/auth/login?msg=invalid-session')
                 return false
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
+                return false
             } else {
+
 
                 if (session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session')
@@ -273,6 +283,7 @@ module.exports = {
                 res.redirect(`${login_redirect}?msg=permission-denied`)
                 return false
             } catch (err) {
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res}`)
                 return false
             }
         }
@@ -292,11 +303,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (session === undefined || session === null || typeof session != 'object') {
-                    callback({
-                        'message': `invalid session | session must be object, received '${session} ${typeof session}'`
-                    });
-                    resolve();
+                if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | session must be non-empty object, received ${typeof session} ${JSON.stringify(session)} with length ${Object.keys(session).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | session must be non-empty object, received ${typeof session} ${JSON.stringify(session)}`
+                        });
+                        resolve();
+                    }
                 } else {
 
                     session.valid = false;
@@ -327,11 +345,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
@@ -422,11 +447,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (session === undefined || session === null || typeof session != 'object') {
-                    callback({
-                        'message': `invalid session | session must be object, received '${session} ${typeof session}'`
-                    });
-                    resolve();
+                if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | session must be non-empty object, received ${typeof session} ${JSON.stringify(session)} with length ${Object.keys(session).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | session must be non-empty object, received ${typeof session} ${JSON.stringify(session)}`
+                        });
+                        resolve();
+                    }
                 } else {
 
                     dtb.all('SELECT * FROM auth WHERE email = ?;', [
@@ -479,11 +511,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.recipient === undefined || args.recipient === null || typeof args.recipient != 'string') {
                     callback({
                         'message': `invalid args.recipient | args.recipient must be string, received '${args.recipient} ${typeof args.recipient}'`
@@ -580,11 +619,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
@@ -639,11 +685,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
@@ -713,11 +766,19 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                args.created_by = Number(args.created_by)
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
@@ -728,9 +789,9 @@ module.exports = {
                         'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
-                } else if (args.created_by === undefined || args.created_by === null || typeof Number(args.created_by) != 'number') {
+                } else if (args.created_by == undefined || args.created_by == null || isNaN(args.created_by) || args.created_by < 0) {
                     callback({
-                        'message': `invalid args.created_by | args.created_by must be number, received '${Number(args.created_by)} ${typeof Number(args.created_by)}'`
+                        'message': `invalid args.created_by | args.created_by must be non-negative number, received '${args.created_by} ${typeof args.created_by}'`
                     });
                     resolve();
                 } else {
@@ -949,11 +1010,18 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                if (args === undefined || args === null || typeof args != 'object') {
-                    callback({
-                        'message': `invalid args | args must be object, received '${args} ${typeof args}'`
-                    });
-                    resolve();
+                if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
                 } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
                     callback({
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
