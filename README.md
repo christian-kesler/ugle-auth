@@ -8,7 +8,7 @@ An authentication system for NodeJS web apps using sqlite
 ## Quickstart
 
 Create a .env file in the following format and substitute with your information:
-```
+```javascript
 EMAIL_SENDER = "myawesomecompany@gmail.com"
 EMAIL_DOMAIN = "gmail"
 EMAIL_TOKEN = "abcdefghijklmnop"
@@ -19,7 +19,7 @@ WEBAPP_DOMAIN = "https://myawesomecompany.com"
 ```
 
 Then use the following code in your main.js or index.js file.  It will connect to a .db file at the path provided and setup all the routes needed to handle server authentication.
-```
+```javascript
 const ugle_auth = require('ugle-auth');
 
 ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
@@ -50,7 +50,7 @@ I've taken steps to make this package secure, including account lcokout protocol
 
 The hashing algorithm used is below, and relies on the built-in crypto package for NodeJS:
 
-```
+```javascript
 pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
 ```
 
@@ -70,7 +70,7 @@ If a login attempt makes it through all input validation AND finds a valid email
 
 ### Installation
 
-```
+```javascript
 npm install ugle-auth
 ```
 
@@ -80,7 +80,7 @@ You will probably be able to use this package with older or newer versions than 
 
 If you are using the preset routing function:
 
-```
+```javascript
 "dependencies": {
     "nodemailer": "^6.8.0",
     "sqlite3": "^5.1.2"
@@ -92,7 +92,7 @@ If you are using the preset routing function:
 
 If you are using custom routing and just want the authentication functions:
 
-```
+```javascript
 "dependencies": {
     "nodemailer": "6.8.0",
     "sqlite3": "5.1.2"
@@ -105,13 +105,13 @@ If you are using custom routing and just want the authentication functions:
 
 IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
 
-```
+```javascript
 const ugle_auth = require('ugle-auth');
 ```
 
 ### Function Examples
 
-```
+```javascript
 
 // CONNECT to a database file
 await ugle_auth.initDtb('./database.db', (err, dtb) => {
