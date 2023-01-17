@@ -1,6 +1,7 @@
 const { hash } = require(`${__dirname}/hashing.js`)
 const { tempkey } = require(`${__dirname}/hashing.js`)
 const sqlite3 = require('sqlite3');
+const bcrypt = require('bcrypt');
 
 
 
@@ -341,10 +342,109 @@ module.exports = {
 
 
     // 2.0 conventions
+    // login: (dtb, args, callback) => {
+    //     return new Promise((resolve) => {
+    //         try {
+
+    //             if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+    //                 try {
+    //                     callback({
+    //                         'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+    //                     });
+    //                     resolve();
+    //                 } catch (err) {
+    //                     callback({
+    //                         'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+    //                     });
+    //                     resolve();
+    //                 }
+    //             } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+    //                 callback({
+    //                     'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+    //                 });
+    //                 resolve();
+    //             } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+    //                 callback({
+    //                     'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+    //                 });
+    //                 resolve();
+    //             } else {
+
+    //                 dtb.all('SELECT * FROM auth WHERE email = ?;', [
+    //                     args.email
+    //                 ], (err, rows) => {
+    //                     if (err) {
+    //                         callback(err);
+    //                         resolve();
+    //                     } else if (rows.length == 0) {
+    //                         callback({
+    //                             'message': 'Credentials failed'
+    //                         });
+    //                         resolve();
+    //                     } else {
+
+    //                         if (rows[0].failed_login_attempts >= lockout_policy) {
+    //                             callback({
+    //                                 'message': 'too many failed login attempts, contact your administrator to unlock your account'
+    //                             });
+    //                             resolve();
+    //                         } else if (hash(args.password) != rows[0].hash) {
+    //                             dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
+    //                                 (rows[0].failed_login_attempts + 1),
+    //                                 args.email
+    //                             ], async function (err) {
+    //                                 if (err) {
+    //                                     callback({
+    //                                         'message': `Credentials failed | ${err.message}`
+    //                                     });
+    //                                     resolve();
+    //                                 } else if (this.changes == 0) {
+    //                                     callback(
+    //                                         {
+    //                                             'message': `Credentials failed | Row(s) affected: ${this.changes}`
+    //                                         }
+    //                                     );
+    //                                     resolve();
+    //                                 } else {
+    //                                     callback({
+    //                                         'message': 'Credentials failed | login attempts incremented'
+    //                                     });
+    //                                     resolve();
+    //                                 }
+    //                             });
+    //                         } else {
+    //                             // args.session.email = rows[0].email;
+    //                             // args.session.id = rows[0].id;
+    //                             // args.session.perms = JSON.parse(rows[0].perms);
+    //                             // args.session.valid = true;
+    //                             // args.session.status = rows[0].status;
+
+    //                             callback(null, {
+    //                                 email: rows[0].email,
+    //                                 id: rows[0].id,
+    //                                 perms: JSON.parse(rows[0].perms),
+    //                                 valid: true,
+    //                                 status: rows[0].status,
+    //                             });
+    //                             resolve();
+    //                         }
+    //                     }
+    //                 });
+    //             }
+    //         } catch (err) {
+    //             try {
+    //                 callback(err);
+    //                 resolve();
+    //             } catch (err) {
+    //                 resolve();
+    //             }
+    //         }
+    //     });
+    // },
+
     login: (dtb, args, callback) => {
         return new Promise((resolve) => {
             try {
-
                 if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
                     try {
                         callback({
@@ -368,7 +468,6 @@ module.exports = {
                     });
                     resolve();
                 } else {
-
                     dtb.all('SELECT * FROM auth WHERE email = ?;', [
                         args.email
                     ], (err, rows) => {
@@ -381,62 +480,72 @@ module.exports = {
                             });
                             resolve();
                         } else {
-
                             if (rows[0].failed_login_attempts >= lockout_policy) {
                                 callback({
                                     'message': 'too many failed login attempts, contact your administrator to unlock your account'
                                 });
                                 resolve();
-                            } else if (hash(args.password) != rows[0].hash) {
-                                dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
-                                    (rows[0].failed_login_attempts + 1),
-                                    args.email
-                                ], async function (err) {
+                            } else {
+                                // Compare the hashed password from the database with the hashed password from the user input
+                                bcrypt.compare(args.password, rows[0].hash, (err, result) => {
                                     if (err) {
                                         callback({
                                             'message': `Credentials failed | ${err.message}`
                                         });
                                         resolve();
-                                    } else if (this.changes == 0) {
-                                        callback(
-                                            {
-                                                'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                    }
+                                    if (!result) {
+                                        dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
+                                            (rows[0].failed_login_attempts + 1),
+                                            args.email
+                                        ], (err) => {
+                                            if (err) {
+                                                callback({
+                                                    'message': `Credentials failed | ${err.message}`
+                                                });
+                                                resolve();
+                                            } else {
+                                                callback({
+                                                    'message': 'Credentials failed | login attempts incremented'
+                                                });
+                                                resolve();
                                             }
-                                        );
-                                        resolve();
-                                    } else {
-                                        callback({
-                                            'message': 'Credentials failed | login attempts incremented'
                                         });
-                                        resolve();
+                                    } else {
+                                        // reset the failed login attempts
+                                        dtb.run('UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;', [
+                                            args.email
+                                        ], (err) => {
+                                            if (err) {
+                                                callback({
+                                                    'message': `Credentials success | failed to reset login attempts | ${err.message}`
+                                                });
+                                                resolve();
+                                            } else {
+                                                // args.session.email = rows[0].email;
+                                                // args.session.id = rows[0].id;
+                                                // args.session.valid = true;
+                                                callback({
+                                                    'message': 'Credentials success | login attempts reset',
+                                                    'data': {
+                                                        'email': rows[0].email,
+                                                        'id': rows[0].id
+                                                    }
+                                                });
+                                                resolve();
+                                            }
+                                        });
                                     }
                                 });
-                            } else {
-                                // args.session.email = rows[0].email;
-                                // args.session.id = rows[0].id;
-                                // args.session.perms = JSON.parse(rows[0].perms);
-                                // args.session.valid = true;
-                                // args.session.status = rows[0].status;
-
-                                callback(null, {
-                                    email: rows[0].email,
-                                    id: rows[0].id,
-                                    perms: JSON.parse(rows[0].perms),
-                                    valid: true,
-                                    status: rows[0].status,
-                                });
-                                resolve();
                             }
                         }
                     });
                 }
             } catch (err) {
-                try {
-                    callback(err);
-                    resolve();
-                } catch (err) {
-                    resolve();
-                }
+                callback({
+                    'message': `Error | ${err.message}`
+                });
+                resolve();
             }
         });
     },
