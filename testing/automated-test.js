@@ -184,18 +184,18 @@ object_args = [
             }
         }
 
-
         for (const session_key in session_template) {
+
             session_args = {
                 'valid': true
             }
+
             if (i > 1) {
                 session_args[session_key] = single_args[i]
             } else if (i == 1) {
                 session_args.valid = false
             }
 
-            // console.log(session_args, res_template)
             if (await testing(session_args, res_template)) {
                 if (i > 0) {
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
@@ -214,11 +214,13 @@ object_args = [
         }
 
         for (const res_key in res_template) {
+
             res_args = {
                 'redirect': (url) => {
-                    console.log(url)
+                    // console.log(url)
                 }
             }
+
             if (i > 1) {
                 res_args[res_key] = single_args[i]
             }
@@ -285,6 +287,8 @@ object_args = [
 
 
 
+
+    // TODO repair create user tests
 
     global.session = {};
 

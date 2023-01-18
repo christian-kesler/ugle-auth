@@ -105,7 +105,6 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                // TODO implement this object validation standard package wide
                 if (perms === undefined || perms === null || typeof perms != 'object' || Object.keys(perms).length == 0) {
                     try {
                         callback({
@@ -144,7 +143,6 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                // TODO make the number validation match this example throughout the file
                 attempts = Number(attempts)
                 if (attempts == undefined || attempts == null || isNaN(attempts) || attempts <= 0) {
                     callback({
@@ -220,6 +218,9 @@ module.exports = {
                 return false
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
+                return false
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`)
                 return false
             } else {
 
