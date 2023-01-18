@@ -255,8 +255,10 @@ module.exports = {
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
                 return false
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`)
+                return false
             } else {
-
 
                 if (session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session')
@@ -285,7 +287,7 @@ module.exports = {
                 res.redirect(`${login_redirect}?msg=permission-denied`)
                 return false
             } catch (err) {
-                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res}`)
+                console.error(err.message)
                 return false
             }
         }
