@@ -22,7 +22,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
+                    const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, async (err) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -35,7 +35,7 @@ module.exports = {
                             global.lockout_policy = 4
                             global.login_redirect = '/account/home'
 
-                            dtb.exec(
+                            await dtb.exec(
                                 `CREATE TABLE IF NOT EXISTS auth(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
                             'email' VARCHAR(255) UNIQUE,
@@ -53,7 +53,7 @@ module.exports = {
                             );`
                             );
 
-                            dtb.exec(
+                            await dtb.exec(
                                 `CREATE TABLE IF NOT EXISTS auth_archive(
                             'id' INTEGER,
                             'email' VARCHAR(255),
@@ -68,7 +68,7 @@ module.exports = {
                             );`
                             );
 
-                            dtb.exec(
+                            await dtb.exec(
                                 `CREATE TABLE IF NOT EXISTS auth_log(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
 

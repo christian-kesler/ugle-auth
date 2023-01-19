@@ -68,116 +68,118 @@ object_args = [
 
 (async () => {
 
+
+    // ================================================================
+    // connectToDatabase
+    single_args[0] = `${__dirname}/database.db`;
+    single_args[1] = `${__dirname}/fakepath/database.db`;
+    testing = ugle_auth.connectToDatabase;
+    for (let i = single_args.length - 1; i >= 0; i--) {
+        await testing(single_args[i], (err, dtb) => {
+            if (i == 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    dtb.exec('DROP TABLE IF EXISTS auth;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_log;');
+                    global.dtb = dtb;
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    dtb.exec('DROP TABLE IF EXISTS auth;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_log;');
+                    global.dtb = dtb;
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    err_count++;
+                }
+            }
+
+        });
+    }
+    // connectToDatabase
+    // ================================================================
+
+
+    await dtb.exec(
+        `CREATE TABLE IF NOT EXISTS auth(
+    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+    'email' VARCHAR(255) UNIQUE,
+    
+    'hash' VARCHAR(255),
+    'status' VARCHAR(255),
+    'perms' TEXT,
+
+    'tempkey' VARCHAR(255),
+    'tempkey_datetime' DATETIME,
+    'failed_login_attempts' INTEGER,
+
+    'created_at' DATETIME,
+    'created_by' VARCHAR(255)
+    );`
+    );
+
+
     ugle_auth.loginRedirect('/auth/login');
 
-    // TODO logout
+    await ugle_auth.createUser(dtb, {
+        'email': 'uglesoft@gmail.com',
+        'password': 'password',
+        'created_by': 87
+    }, (err) => {
+        console.log(err)
+    })
+
+
+
+
+    // TODO refreshSession
     // ================================================================
-    // hasPermission
-    single_args[0] = 'user';
-    single_args[1] = 'admin';
-    testing = ugle_auth.hasPermission;
+    // refreshSession
+    single_args[0] = {
+        'email': 'uglesoft@gmail.com',
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    single_args[1] = {
+        'email': 'uglesoft@gmail.com',
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    testing = ugle_auth.refreshSession;
+    // TODO figure out why this loop only iterates once
     for (let i = 0; i < single_args.length; i++) {
-
-        session_template = {
-            'valid': true,
-            'perms': {
-                'admin': false,
-                'user': true
-            }
-        }
-
-        res_template = {
-            'redirect': (url) => {
-                // console.log(url)
-            }
-        }
-
-        for (const session_key in session_template) {
-
-            session_args = {
-                'valid': true,
-                'perms': {
-                    'admin': false,
-                    'user': true
-                }
-            }
-
-            if (i > 1) {
-                session_args[session_key] = single_args[i]
-            } else if (i == 1) {
-                session_args.valid = false
-            }
-
-            // console.log();
-            // console.log(session_args, res_template, single_args[i]);
-            if (await testing(session_args, res_template, single_args[i])) {
-                if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+        await testing(dtb, single_args[i], (err, session) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
                 }
             } else {
-                if (i > 0) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
                     err_count++;
                 }
             }
-        }
 
-        for (const res_key in res_template) {
-
-            res_args = {
-                'redirect': (url) => {
-                    // console.log(url)
-                }
-            }
-
-            if (i > 1) {
-                res_args[res_key] = single_args[i]
-            }
-
-            // console.log();
-            // console.log(session_template, res_args, single_args[i]);
-            if (await testing(session_template, res_args, single_args[i])) {
-                if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
-                    err_count++;
-                } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
-                }
-            } else {
-                if (i > 0) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
-                } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
-                    err_count++;
-                }
-            }
-        }
-
-        // console.log();
-        // console.log(session_template, res_template, single_args[i]);
-        if (await testing(session_template, res_template, single_args[i])) {
-            if (i > 0) {
-                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
-                err_count++;
-            } else {
-                console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
-            }
-        } else {
-            if (i > 0) {
-                console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
-            } else {
-                console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
-                err_count++;
-            }
-        }
-
+        });
     }
-    // hasPermission
+    // refreshSession
     // ================================================================
 
     console.debug();

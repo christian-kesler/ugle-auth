@@ -396,6 +396,46 @@ object_args = [
 
 
 
+    // ================================================================
+    // logout
+    single_args[0] = {
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    single_args[1] = {
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    testing = ugle_auth.logout;
+    for (let i = 0; i < single_args.length; i++) {
+        await testing(single_args[i], (err, session) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+
+        });
+    }
+    // logout
+    // ================================================================
+
 
 
     console.debug();
