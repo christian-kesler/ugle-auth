@@ -150,7 +150,7 @@ object_args = [
         }
     };
     single_args[1] = {
-        'email': 'uglesoft@gmail.com',
+        'email': 'christian.j.kesler@gmail.com',
         'valid': true,
         'perms': {
             'admin': false,
@@ -160,8 +160,8 @@ object_args = [
     testing = ugle_auth.refreshSession;
     // TODO figure out why this loop only iterates once
     for (let i = 0; i < single_args.length; i++) {
-        await testing(dtb, single_args[i], (err, session) => {
-            if (i <= 1) {
+        await testing(dtb, single_args[i], async (err, session) => {
+            if (i <= 0) {
                 if (err) {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
@@ -176,7 +176,6 @@ object_args = [
                     err_count++;
                 }
             }
-
         });
     }
     // refreshSession

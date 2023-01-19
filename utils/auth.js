@@ -2,6 +2,7 @@ const { hash } = require(`${__dirname}/hashing.js`)
 const { tempkey } = require(`${__dirname}/hashing.js`)
 const sqlite3 = require('sqlite3');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 
 
 
@@ -20,72 +21,80 @@ module.exports = {
                         'message': `invalid args | path must be string, received '${path} ${typeof path}'`
                     });
                     resolve();
+
+                } else if (!fs.existsSync(path)) {
+                    callback({
+                        'message': `invalid args | path provided does not exist '${path} ${typeof path}'`
+                    });
+                    resolve();
                 } else {
 
                     const dtb = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, async (err) => {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else {
+                        }
+                    })
 
-                            global.default_perms = {
-                                'admin': false,
-                                'user': true
-                            }
-                            global.lockout_policy = 4
-                            global.login_redirect = '/account/home'
+                    global.default_perms = {
+                        'admin': false,
+                        'user': true
+                    }
+                    global.lockout_policy = 4;
+                    global.login_redirect = '/account/home';
 
-                            await dtb.exec(
-                                `CREATE TABLE IF NOT EXISTS auth(
+                    dtb.exec('DROP TABLE IF EXISTS auth;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    dtb.exec('DROP TABLE IF EXISTS auth_log;');
+
+                    dtb.exec(
+                        `CREATE TABLE IF NOT EXISTS auth(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
                             'email' VARCHAR(255) UNIQUE,
                             
                             'hash' VARCHAR(255),
                             'status' VARCHAR(255),
                             'perms' TEXT,
-            
+                            
                             'tempkey' VARCHAR(255),
                             'tempkey_datetime' DATETIME,
                             'failed_login_attempts' INTEGER,
-            
+                            
                             'created_at' DATETIME,
                             'created_by' VARCHAR(255)
-                            );`
-                            );
+                        );`
+                    );
 
-                            await dtb.exec(
-                                `CREATE TABLE IF NOT EXISTS auth_archive(
+                    dtb.exec(
+                        `CREATE TABLE IF NOT EXISTS auth_archive(
                             'id' INTEGER,
                             'email' VARCHAR(255),
-                                
+                        
                             'status' VARCHAR(255),
                             'perms' TEXT,
 
                             'created_at' DATETIME,
                             'created_by' VARCHAR(255),
-
+                            
                             'archived_at' DATETIME
-                            );`
-                            );
+                        );`
+                    );
 
-                            await dtb.exec(
-                                `CREATE TABLE IF NOT EXISTS auth_log(
+                    dtb.exec(
+                        `CREATE TABLE IF NOT EXISTS auth_log(
                             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-
+                            
                             'action' VARCHAR(255),
                             'recipient' VARCHAR(255),
                             'data' TEXT,
-            
+    
                             'performed_at' DATETIME,
                             'performed_by' VARCHAR(255)
-                            );`
-                            );
+                        );`
+                    );
 
-                            callback(null, dtb);
-                            resolve();
-                        }
-                    });
-
+                    callback(null, dtb);
+                    resolve();
                 }
 
             } catch (err) {
@@ -93,12 +102,83 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
+                    console.log(err)
                     resolve();
                 }
             }
         });
     },
 
+
+    // 2.0 conventions
+    formatDatabase: (dtb, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                dtb.exec('DROP TABLE IF EXISTS auth;');
+                dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                dtb.exec('DROP TABLE IF EXISTS auth_log;');
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth(
+                        'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                        'email' VARCHAR(255) UNIQUE,
+                        
+                        'hash' VARCHAR(255),
+                        'status' VARCHAR(255),
+                        'perms' TEXT,
+                        
+                        'tempkey' VARCHAR(255),
+                        'tempkey_datetime' DATETIME,
+                        'failed_login_attempts' INTEGER,
+                        
+                        'created_at' DATETIME,
+                        'created_by' VARCHAR(255)
+                    );`
+                );
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth_archive(
+                        'id' INTEGER,
+                        'email' VARCHAR(255),
+                    
+                        'status' VARCHAR(255),
+                        'perms' TEXT,
+
+                        'created_at' DATETIME,
+                        'created_by' VARCHAR(255),
+                        
+                        'archived_at' DATETIME
+                    );`
+                );
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth_log(
+                        'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                        
+                        'action' VARCHAR(255),
+                        'recipient' VARCHAR(255),
+                        'data' TEXT,
+
+                        'performed_at' DATETIME,
+                        'performed_by' VARCHAR(255)
+                    );`
+                );
+
+                callback(null, dtb);
+                resolve();
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    console.log(err)
+                    resolve();
+                }
+            }
+        });
+    },
 
     // 2.0 conventions
     defaultPerms: (perms, callback) => {
@@ -571,6 +651,11 @@ module.exports = {
                         });
                         resolve();
                     }
+                } else if (session.email === undefined || session.email === null || typeof session.email != 'string') {
+                    callback({
+                        'message': `invalid session.email | session.email must be string, received '${session.email} ${typeof session.email}'`
+                    });
+                    resolve();
                 } else {
 
                     dtb.all('SELECT * FROM auth WHERE email = ?;', [
@@ -593,6 +678,7 @@ module.exports = {
                                 valid: true,
                                 status: rows[0].status,
                             });
+                            resolve();
 
                         }
                     })
