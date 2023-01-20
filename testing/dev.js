@@ -141,8 +141,8 @@ object_args = [
     // TODO login
     // ================================================================
     // login
-    single_args[0] = 'user';
-    single_args[1] = 'admin';
+    single_args[0] = '';
+    single_args[1] = '';
     testing = ugle_auth.login;
     for (let i = 0; i < single_args.length; i++) {
 
@@ -158,7 +158,7 @@ object_args = [
                 'password': 'password'
             }
 
-            if (i > 1) {
+            if (i > 0) {
                 login_args[key] = single_args[i]
             }
 

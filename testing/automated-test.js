@@ -491,6 +491,56 @@ object_args = [
     })
 
 
+
+
+    // ================================================================
+    // login
+    single_args[0] = '';
+    single_args[1] = '';
+    testing = ugle_auth.login;
+    for (let i = 0; i < single_args.length; i++) {
+
+        args_template = {
+            'email': '',
+            'password': ''
+        }
+
+        for (const key in args_template) {
+
+            login_args = {
+                'email': 'uglesoft@gmail.com',
+                'password': 'password'
+            }
+
+            if (i > 0) {
+                login_args[key] = single_args[i]
+            }
+
+            await testing(dtb, login_args, async (err, session) => {
+                if (i <= 0) {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+    }
+    // login
+    // ================================================================
+
+
+
+
     // ================================================================
     // refreshSession
     single_args[0] = {

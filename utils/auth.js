@@ -180,6 +180,7 @@ module.exports = {
         });
     },
 
+
     // 2.0 conventions
     defaultPerms: (perms, callback) => {
         return new Promise((resolve) => {
@@ -608,12 +609,12 @@ module.exports = {
                                                 // args.session.email = rows[0].email;
                                                 // args.session.id = rows[0].id;
                                                 // args.session.valid = true;
-                                                callback({
-                                                    'message': 'Credentials success | login attempts reset',
-                                                    'data': {
-                                                        'email': rows[0].email,
-                                                        'id': rows[0].id
-                                                    }
+                                                callback(null, {
+                                                    email: rows[0].email,
+                                                    id: rows[0].id,
+                                                    perms: JSON.parse(rows[0].perms),
+                                                    valid: true,
+                                                    status: rows[0].status,
                                                 });
                                                 resolve();
                                             }
