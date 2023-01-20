@@ -138,48 +138,52 @@ object_args = [
 
 
 
-    // TODO refreshSession
+    // TODO login
     // ================================================================
-    // refreshSession
-    single_args[0] = {
-        'email': 'uglesoft@gmail.com',
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    single_args[1] = {
-        'email': 'christian.j.kesler@gmail.com',
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    testing = ugle_auth.refreshSession;
-    // TODO figure out why this loop only iterates once
+    // login
+    single_args[0] = 'user';
+    single_args[1] = 'admin';
+    testing = ugle_auth.login;
     for (let i = 0; i < single_args.length; i++) {
-        await testing(dtb, single_args[i], async (err, session) => {
-            if (i <= 0) {
-                if (err) {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                } else {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
+
+        args_template = {
+            'email': '',
+            'password': ''
+        }
+
+        for (const key in args_template) {
+
+            login_args = {
+                'email': 'uglesoft@gmail.com',
+                'password': 'password'
             }
-        });
+
+            if (i > 1) {
+                login_args[key] = single_args[i]
+            }
+
+            await testing(dtb, login_args, async (err, session) => {
+                if (i <= 0) {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                        err_count++;
+                    }
+                }
+            });
+        }
     }
-    // refreshSession
+    // login
     // ================================================================
+
 
     console.debug();
     console.debug();

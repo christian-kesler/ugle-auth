@@ -994,22 +994,30 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
-                        args.email,
-                        hash(args.password),
-                        JSON.stringify(default_perms),
-                        `${new Date}`,
-                        Number(args.created_by),
-                        'unverified'
-                    ], (err) => {
+                    bcrypt.hash(args.password, 16, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
                         } else {
-                            callback(null);
-                            resolve();
+                            dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
+                                args.email,
+                                hash,
+                                JSON.stringify(default_perms),
+                                `${new Date}`,
+                                Number(args.created_by),
+                                'unverified'
+                            ], (err) => {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
                         }
                     });
+
                 }
 
             } catch (err) {
