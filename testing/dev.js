@@ -8,7 +8,7 @@ const ugle_auth = require(`${__dirname}/../index.js`);
 
 
 /* 
-    The console output will begin with [X] EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
+    The console output will begin with [X]   EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
  
     If the package is functioning as it should, the entirety of the terminal output from this program will begin with [X].
 */
@@ -81,7 +81,7 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
                     dtb.exec('DROP TABLE IF EXISTS auth;');
                     dtb.exec('DROP TABLE IF EXISTS auth_archive;');
                     dtb.exec('DROP TABLE IF EXISTS auth_log;');
@@ -89,7 +89,7 @@ object_args = [
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     dtb.exec('DROP TABLE IF EXISTS auth;');
                     dtb.exec('DROP TABLE IF EXISTS auth_archive;');
@@ -127,62 +127,71 @@ object_args = [
 
     ugle_auth.loginRedirect('/auth/login');
 
-    await ugle_auth.createUser(dtb, {
+
+    args = {
         'email': 'uglesoft@gmail.com',
         'password': 'password',
-        'created_by': 87
-    }, (err) => {
+        'created_by': 0
+    }
+    await ugle_auth.createUser(dtb, args, (err) => {
         console.log(err)
     })
 
 
-
-
-    // TODO sendTempkeyEmail
+    // TODO deleteUser
     // ================================================================
-    // login
-    single_args[0] = '';
-    single_args[1] = '';
-    testing = ugle_auth.login;
+    // deleteUser
+    single_args[0] = 'uglesoft@gmail.com';
+    single_args[1] = 'uglesoft@yahoo.com';
+    testing = ugle_auth.deleteUser;
     for (let i = 0; i < single_args.length; i++) {
 
-        args_template = {
-            'email': '',
-            'password': ''
-        }
-
-        for (const key in args_template) {
-
-            login_args = {
-                'email': 'uglesoft@gmail.com',
-                'password': 'password'
-            }
-
-            if (i > 0) {
-                login_args[key] = single_args[i]
-            }
-
-            await testing(dtb, login_args, async (err, session) => {
-                if (i <= 0) {
-                    if (err) {
-                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                        err_count++;
-                    } else {
-                        console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                    }
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
                 } else {
-                    if (err) {
-                        console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                    } else {
-                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                        err_count++;
-                    }
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
                 }
-            });
-        }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // dtb testing
+        await testing(single_args[i], single_args[0], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, single_args[0], single_args[i]);
+
+
     }
-    // login
+    // deleteUser
     // ================================================================
+
+
+
+    ugle_auth.allUsers(dtb, (err, data) => {
+        console.log(data)
+    })
+
+
 
 
     console.debug();

@@ -8,7 +8,7 @@ const ugle_auth = require(`${__dirname}/../index.js`);
 
 
 /* 
-    The console output will begin with [X] EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
+    The console output will begin with [X]   EXPECTED if the behavior is expected and [ ] UNEXPECTED if the behavior is unexpected.
  
     If the package is functioning as it should, the entirety of the terminal output from this program will begin with [X].
 */
@@ -36,41 +36,15 @@ single_args = [
     () => { console.log('an example function') }
 ];
 
-object_args = [
-    // valid of correct type | blank
-    {},
-    // invalid of correct type | blank
-    {},
-    // empty string
-    {
-        'sample': 'badstring',
-    },
-    // integer
-    {
-        'sample': 8,
-    },
-    // object
-    {
-        'sample': {},
-    },
-    // array
-    {
-        'sample': [],
-    },
-    // null
-    {
-        'sample': null,
-    },
-    // undefined
-    {
-        'sample': undefined,
-    },
-];
+
 
 
 (async () => {
 
 
+
+
+    /* BEGIN CONFIG METHODS */
     // ================================================================
     // connectToDatabase
     single_args[0] = `${__dirname}/database.db`;
@@ -83,7 +57,7 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_log;');
@@ -91,7 +65,7 @@ object_args = [
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
@@ -106,8 +80,6 @@ object_args = [
     }
     // connectToDatabase
     // ================================================================
-
-
 
 
     // ================================================================
@@ -124,7 +96,7 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_log;');
@@ -132,7 +104,7 @@ object_args = [
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
@@ -147,8 +119,6 @@ object_args = [
     }
     // formatDatabase
     // ================================================================
-
-
 
 
     // ================================================================
@@ -166,11 +136,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(default_perms)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(default_perms)}`);
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(default_perms)}`);
                     err_count++;
@@ -181,8 +151,6 @@ object_args = [
     }
     // defaultPerms
     // ================================================================
-
-
 
 
     // ================================================================
@@ -197,11 +165,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(lockout_policy)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(lockout_policy)}`);
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(lockout_policy)}`);
                     err_count++;
@@ -212,8 +180,6 @@ object_args = [
     }
     // lockoutPolicy
     // ================================================================
-
-
 
 
     // ================================================================
@@ -228,11 +194,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(login_redirect)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(login_redirect)}`);
                 }
             } else {
                 if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(login_redirect)}`);
                     err_count++;
@@ -243,10 +209,337 @@ object_args = [
     }
     // loginRedirect
     // ================================================================
+    /* END CONFIG METHODS */
 
 
 
 
+
+
+
+    /* BEGIN USER MANAGEMENT METHODS */
+    // ================================================================
+    // createUser
+    single_args[0] = dtb;
+    single_args[1] = '';
+    testing = ugle_auth.createUser;
+    for (let i = 0; i < single_args.length; i++) {
+
+        // args testing
+        template = {
+            'email': 'asuperfakeemail@yahoo.com',
+            'password': 'password',
+            'created_by': 0
+        }
+
+        for (const key in template) {
+            args = {
+                'email': 'asuperfakeemail@yahoo.com',
+                'password': 'password',
+                'created_by': 0
+            }
+
+            if (i > 0) {
+                args[key] = single_args[i]
+            } else if (key == 'email') {
+                args.email = 'uglesoft@gmail.com'
+            } else if (key == 'password') {
+                args.email = 'christian.j.kesler@gmail.com'
+            } else if (key == 'created_by') {
+                args.email = 'erudtionalism@gmail.com'
+            }
+
+            await testing(dtb, args, async (err) => {
+                if (i <= 0) {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+
+
+        // dtb testing
+        await testing(single_args[i], template, async (err) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, args, single_args[i]);
+
+
+    }
+    // createUser
+    // ================================================================
+
+
+    // ================================================================
+    // readUser
+    single_args[0] = 'uglesoft@gmail.com';
+    single_args[1] = 'uglesoft@yahoo.com';
+    testing = ugle_auth.readUser;
+    for (let i = 0; i < single_args.length; i++) {
+
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // dtb testing
+        await testing(single_args[i], single_args[0], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, single_args[0], single_args[i]);
+
+
+    }
+    // readUser
+    // ================================================================
+
+
+    // ================================================================
+    // readUsers
+    single_args[0] = 'uglesoft@gmail.com';
+    single_args[1] = 'uglesoft@yahoo.com';
+    testing = ugle_auth.readUsers;
+    for (let i = 0; i < single_args.length; i++) {
+
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // dtb testing
+        await testing(single_args[i], single_args[0], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, single_args[0], single_args[i]);
+
+
+    }
+    // readUsers
+    // ================================================================
+
+
+    /* END USER MANAGEMENT METHODS */
+
+
+
+
+
+
+
+
+    /* BEGIN SESSION MANAGEMENT METHODS */
+    // ================================================================
+    // login
+    single_args[0] = '';
+    single_args[1] = '';
+    testing = ugle_auth.login;
+    for (let i = 0; i < single_args.length; i++) {
+
+        args_template = {
+            'email': '',
+            'password': ''
+        }
+
+        for (const key in args_template) {
+
+            login_args = {
+                'email': 'uglesoft@gmail.com',
+                'password': 'password'
+            }
+
+            if (i > 0) {
+                login_args[key] = single_args[i]
+            }
+
+            await testing(dtb, login_args, async (err, session) => {
+                if (i <= 0) {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+    }
+    // login
+    // ================================================================
+
+
+    // ================================================================
+    // refreshSession
+    single_args[0] = {
+        'email': 'uglesoft@gmail.com',
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    single_args[1] = {
+        'email': 'christian.j.kesler@gmail.com',
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    testing = ugle_auth.refreshSession;
+    // TODO figure out why this loop only iterates once
+    for (let i = 0; i < single_args.length; i++) {
+        await testing(dtb, single_args[i], async (err, session) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+        });
+    }
+    // refreshSession
+    // ================================================================
+
+
+    // ================================================================
+    // logout
+    single_args[0] = {
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    single_args[1] = {
+        'valid': true,
+        'perms': {
+            'admin': false,
+            'user': true
+        }
+    };
+    testing = ugle_auth.logout;
+    for (let i = 0; i < single_args.length; i++) {
+        await testing(single_args[i], (err, session) => {
+            if (i <= 1) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    err_count++;
+                }
+            }
+
+        });
+    }
+    // logout
+    // ================================================================
+    /* END SESSION MANAGEMENT METHODS */
+
+
+
+
+
+
+
+
+    /* BEGIN PERMISSION METHODS */
     // ================================================================
     // isLoggedIn
     testing = ugle_auth.isLoggedIn;
@@ -279,11 +572,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
                 }
             } else {
                 if (i > 0) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
                     err_count++;
@@ -309,11 +602,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
                 }
             } else {
                 if (i > 1) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
                     err_count++;
@@ -323,8 +616,6 @@ object_args = [
     }
     // isLoggedIn
     // ================================================================
-
-
 
 
     // ================================================================
@@ -371,11 +662,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
                 }
             } else {
                 if (i > 0) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
                     err_count++;
@@ -402,11 +693,11 @@ object_args = [
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                     err_count++;
                 } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
                 }
             } else {
                 if (i > 0) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
                     err_count++;
@@ -421,11 +712,11 @@ object_args = [
                 console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                 err_count++;
             } else {
-                console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}]`);
+                console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
             }
         } else {
             if (i > 0) {
-                console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}]`);
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
             } else {
                 console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
                 err_count++;
@@ -435,153 +726,11 @@ object_args = [
     }
     // hasPermission
     // ================================================================
+    /* END PERMISSION METHODS */
 
 
 
 
-    // ================================================================
-    // logout
-    single_args[0] = {
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    single_args[1] = {
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    testing = ugle_auth.logout;
-    for (let i = 0; i < single_args.length; i++) {
-        await testing(single_args[i], (err, session) => {
-            if (i <= 1) {
-                if (err) {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                } else {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-
-        });
-    }
-    // logout
-    // ================================================================
-
-
-
-
-    await ugle_auth.createUser(dtb, {
-        'email': 'uglesoft@gmail.com',
-        'password': 'password',
-        'created_by': 87
-    }, (err) => {
-        // console.log(err)
-    })
-
-
-
-
-    // ================================================================
-    // login
-    single_args[0] = '';
-    single_args[1] = '';
-    testing = ugle_auth.login;
-    for (let i = 0; i < single_args.length; i++) {
-
-        args_template = {
-            'email': '',
-            'password': ''
-        }
-
-        for (const key in args_template) {
-
-            login_args = {
-                'email': 'uglesoft@gmail.com',
-                'password': 'password'
-            }
-
-            if (i > 0) {
-                login_args[key] = single_args[i]
-            }
-
-            await testing(dtb, login_args, async (err, session) => {
-                if (i <= 0) {
-                    if (err) {
-                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                        err_count++;
-                    } else {
-                        console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                    }
-                } else {
-                    if (err) {
-                        console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                    } else {
-                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                        err_count++;
-                    }
-                }
-            });
-        }
-    }
-    // login
-    // ================================================================
-
-
-
-
-    // ================================================================
-    // refreshSession
-    single_args[0] = {
-        'email': 'uglesoft@gmail.com',
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    single_args[1] = {
-        'email': 'christian.j.kesler@gmail.com',
-        'valid': true,
-        'perms': {
-            'admin': false,
-            'user': true
-        }
-    };
-    testing = ugle_auth.refreshSession;
-    // TODO figure out why this loop only iterates once
-    for (let i = 0; i < single_args.length; i++) {
-        await testing(dtb, single_args[i], async (err, session) => {
-            if (i <= 0) {
-                if (err) {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                    err_count++;
-                } else {
-                    console.debug(`[X] EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                }
-            } else {
-                if (err) {
-                    console.debug(`[X] EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-                } else {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
-                    err_count++;
-                }
-            }
-        });
-    }
-    // refreshSession
-    // ================================================================
 
 
 
