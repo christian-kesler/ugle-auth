@@ -12,6 +12,10 @@ function isValidEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
 }
+function isValidPassword(password) {
+    var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,32})/;
+    return re.test(password);
+}
 
 module.exports = {
 
@@ -49,55 +53,55 @@ module.exports = {
                     global.lockout_policy = 4;
                     global.login_redirect = '/account/home';
 
-                    dtb.exec('DROP TABLE IF EXISTS auth;');
-                    dtb.exec('DROP TABLE IF EXISTS auth_archive;');
-                    dtb.exec('DROP TABLE IF EXISTS auth_log;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_log;');
 
-                    dtb.exec(
-                        `CREATE TABLE IF NOT EXISTS auth(
-                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-                            'email' VARCHAR(255) UNIQUE,
-                            
-                            'hash' VARCHAR(255),
-                            'status' VARCHAR(255),
-                            'perms' TEXT,
-                            
-                            'tempkey' VARCHAR(255),
-                            'tempkey_datetime' DATETIME,
-                            'failed_login_attempts' INTEGER,
-                            
-                            'created_at' DATETIME,
-                            'created_by' VARCHAR(255)
-                        );`
-                    );
+                    // dtb.exec(
+                    //     `CREATE TABLE IF NOT EXISTS auth(
+                    //         'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                    //         'email' VARCHAR(255) UNIQUE,
 
-                    dtb.exec(
-                        `CREATE TABLE IF NOT EXISTS auth_archive(
-                            'id' INTEGER,
-                            'email' VARCHAR(255),
-                        
-                            'status' VARCHAR(255),
-                            'perms' TEXT,
+                    //         'hash' VARCHAR(255),
+                    //         'status' VARCHAR(255),
+                    //         'perms' TEXT,
 
-                            'created_at' DATETIME,
-                            'created_by' VARCHAR(255),
-                            
-                            'archived_at' DATETIME
-                        );`
-                    );
+                    //         'tempkey' VARCHAR(255),
+                    //         'tempkey_datetime' DATETIME,
+                    //         'failed_login_attempts' INTEGER,
 
-                    dtb.exec(
-                        `CREATE TABLE IF NOT EXISTS auth_log(
-                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-                            
-                            'action' VARCHAR(255),
-                            'recipient' VARCHAR(255),
-                            'data' TEXT,
-    
-                            'performed_at' DATETIME,
-                            'performed_by' VARCHAR(255)
-                        );`
-                    );
+                    //         'created_at' DATETIME,
+                    //         'created_by' VARCHAR(255)
+                    //     );`
+                    // );
+
+                    // dtb.exec(
+                    //     `CREATE TABLE IF NOT EXISTS auth_archive(
+                    //         'id' INTEGER,
+                    //         'email' VARCHAR(255),
+
+                    //         'status' VARCHAR(255),
+                    //         'perms' TEXT,
+
+                    //         'created_at' DATETIME,
+                    //         'created_by' VARCHAR(255),
+
+                    //         'archived_at' DATETIME
+                    //     );`
+                    // );
+
+                    // dtb.exec(
+                    //     `CREATE TABLE IF NOT EXISTS auth_log(
+                    //         'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    //         'action' VARCHAR(255),
+                    //         'recipient' VARCHAR(255),
+                    //         'data' TEXT,
+
+                    //         'performed_at' DATETIME,
+                    //         'performed_by' VARCHAR(255)
+                    //     );`
+                    // );
 
                     callback(null, dtb);
                     resolve();
@@ -133,6 +137,7 @@ module.exports = {
                         'hash' VARCHAR(255),
                         'status' VARCHAR(255),
                         'perms' TEXT,
+                        'locked' INTEGER,
                         
                         'tempkey' VARCHAR(255),
                         'tempkey_datetime' DATETIME,
@@ -349,9 +354,9 @@ module.exports = {
                         'message': `invalid args.email | args.email must be valid email string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '') {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
                     callback({
-                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                        'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
                 } else if (Number(args.created_by) == undefined || Number(args.created_by) == null || isNaN(Number(args.created_by)) || Number(args.created_by) < 0) {
@@ -440,7 +445,21 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;', [
+                    dtb.all(
+                        `SELECT
+                            id,
+                            email,
+                            
+                            status,
+                            perms,
+                            locked,
+
+                            tempkey_datetime,
+                            failed_login_attempts,
+                            
+                            created_at,
+                            created_by
+                        FROM auth WHERE email = ?;`, [
                         email
                     ], (err, rows) => {
                         if (err) {
@@ -512,7 +531,21 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.all('SELECT id, status, email, perms, tempkey_datetime, failed_login_attempts, created_at, created_by FROM auth WHERE email = ?;', [
+                    dtb.all(
+                        `SELECT
+                            id,
+                            email,
+                            
+                            status,
+                            perms,
+                            locked,
+                            
+                            tempkey_datetime,
+                            failed_login_attempts,
+                            
+                            created_at,
+                            created_by
+                        FROM auth WHERE email = ?;`, [
                         email
                     ], (err, rows) => {
                         if (err) {
@@ -671,7 +704,21 @@ module.exports = {
                     });
                     resolve();
                 } else {
-                    dtb.all('SELECT id, status, email, perms, created_at, created_by FROM auth;', [], (err, rows) => {
+                    dtb.all(
+                        `SELECT
+                            id,
+                            email,
+                            
+                            status,
+                            perms,
+                            locked,
+                            
+                            tempkey_datetime,
+                            failed_login_attempts,
+                            
+                            created_at,
+                            created_by
+                        FROM auth;`, [], (err, rows) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -746,31 +793,39 @@ module.exports = {
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
                     callback({
-                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                        'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
                 } else {
 
-                    dtb.run('UPDATE auth SET hash = ? WHERE email = ?;', [
-                        hash(args.password),
-                        args.email
-                    ], function (err) {
+                    bcrypt.hash(args.password, 16, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else if (this.changes == 0) {
-                            callback({
-                                'message': `Row(s) affected: ${this.changes}`
-                            });
-                            resolve();
                         } else {
-                            callback(null);
-                            resolve();
-                        }
-                    });
 
+                            dtb.run('UPDATE auth SET hash = ? WHERE email = ?;', [
+                                hash,
+                                args.email
+                            ], function (err) {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else if (this.changes == 0) {
+                                    callback({
+                                        'message': `Row(s) affected: ${this.changes}`
+                                    });
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
+                        }
+                    })
                 }
 
             } catch (err) {
@@ -846,9 +901,9 @@ module.exports = {
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
                     callback({
-                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                        'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
                 } else {
@@ -1632,9 +1687,9 @@ module.exports = {
                         'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
                     });
                     resolve();
-                } else if (args.password === undefined || args.password === null || typeof args.password != 'string') {
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
                     callback({
-                        'message': `invalid args.password | args.password must be string, received '${args.password} ${typeof args.password}'`
+                        'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
                 } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
@@ -1649,27 +1704,35 @@ module.exports = {
                     resolve();
                 } else {
 
-                    dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
-                        hash(args.password),
-                        args.email,
-                        args.tempkey
-                    ], async function (err) {
+                    bcrypt.hash(args.password, 16, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else if (this.changes == 0) {
-                            callback(
-                                {
-                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
-                                }
-                            );
-                            resolve();
                         } else {
-                            callback(null);
-                            resolve();
-                        }
-                    });
 
+                            dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
+                                hash,
+                                args.email,
+                                args.tempkey
+                            ], async function (err) {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else if (this.changes == 0) {
+                                    callback(
+                                        {
+                                            'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                        }
+                                    );
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
+                        }
+                    })
                 }
             } catch (err) {
                 try {

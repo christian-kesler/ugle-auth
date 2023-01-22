@@ -106,31 +106,15 @@ object_args = [
     // ================================================================
 
 
-    await dtb.exec(
-        `CREATE TABLE IF NOT EXISTS auth(
-    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-    'email' VARCHAR(255) UNIQUE,
-    
-    'hash' VARCHAR(255),
-    'status' VARCHAR(255),
-    'perms' TEXT,
-
-    'tempkey' VARCHAR(255),
-    'tempkey_datetime' DATETIME,
-    'failed_login_attempts' INTEGER,
-
-    'created_at' DATETIME,
-    'created_by' VARCHAR(255)
-    );`
-    );
-
-
+    await ugle_auth.formatDatabase(dtb, (err) => {
+        console.log(err)
+    })
     ugle_auth.loginRedirect('/auth/login');
 
 
     args = {
         'email': 'uglesoft@gmail.com',
-        'password': 'password',
+        'password': 'aG00dPa$$w0rd',
         'created_by': 0
     }
     await ugle_auth.createUser(dtb, args, (err) => {
@@ -138,12 +122,12 @@ object_args = [
     })
 
 
-    // TODO deleteUser
+    // TODO lockAccount
     // ================================================================
-    // deleteUser
+    // lockAccount
     single_args[0] = 'uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
-    testing = ugle_auth.deleteUser;
+    testing = ugle_auth.lockAccount;
     for (let i = 0; i < single_args.length; i++) {
 
         // args testing
@@ -182,12 +166,12 @@ object_args = [
 
 
     }
-    // deleteUser
+    // lockAccount
     // ================================================================
 
 
 
-    ugle_auth.allUsers(dtb, (err, data) => {
+    await ugle_auth.allUsers(dtb, (err, data) => {
         console.log(data)
     })
 
