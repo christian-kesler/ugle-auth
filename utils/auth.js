@@ -1,4 +1,3 @@
-const { hash } = require(`${__dirname}/hashing.js`)
 const { tempkey } = require(`${__dirname}/hashing.js`)
 const sqlite3 = require('sqlite3');
 const bcrypt = require('bcrypt');
@@ -966,7 +965,7 @@ module.exports = {
                                                 // args.session.valid = true;
                                                 callback(null, {
                                                     email: rows[0].email,
-                                                    id: rows[0].id,
+                                                    user_id: rows[0].id,
                                                     perms: JSON.parse(rows[0].perms),
                                                     valid: true,
                                                     status: rows[0].status,
@@ -1364,6 +1363,234 @@ module.exports = {
 
                 }
 
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    addPermission: (dtb, args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                // callback validation
+                if (callback == undefined || callback == null || typeof callback != 'function') {
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    resolve();
+
+
+                    // database validation
+                } else if (dtb === undefined || dtb === null || typeof dtb != 'object') {
+                    callback({
+                        'message': `invalid dtb | dtb must be object, received ${typeof dtb} ${JSON.stringify(dtb)}`
+                    });
+                    resolve();
+                } else if (dtb.exec === undefined || dtb.exec === null || typeof dtb.exec != 'function') {
+                    callback({
+                        'message': `invalid dtb.exec | dtb.exec must be function, received ${typeof dtb.exec} ${JSON.stringify(dtb.exec)}`
+                    });
+                    resolve();
+                } else if (dtb.run === undefined || dtb.run === null || typeof dtb.run != 'function') {
+                    callback({
+                        'message': `invalid dtb.run | dtb.run must be function, received ${typeof dtb.run} ${JSON.stringify(dtb.run)}`
+                    });
+                    resolve();
+                } else if (dtb.all === undefined || dtb.all === null || typeof dtb.all != 'function') {
+                    callback({
+                        'message': `invalid dtb.all | dtb.all must be function, received ${typeof dtb.all} ${JSON.stringify(dtb.all)}`
+                    });
+                    resolve();
+
+                    // args validation
+                } else if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
+
+                    // args details
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+                    callback({
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.permission === undefined || args.permission === null || typeof args.permission != 'string' || args.permission == '') {
+                    callback({
+                        'message': `invalid args.permission | args.permission must be string, received '${args.permission} ${typeof args.permission}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.all('SELECT perms FROM auth WHERE email = ?;', [
+                        args.email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
+                            callback({
+                                'message': 'entry not found'
+                            });
+                            resolve();
+                        } else {
+
+                            try {
+                                perms = JSON.decode(rows[0].perms)
+                            } catch (err) {
+                                perms = {}
+                            }
+
+                            perms[args.permission] = true;
+
+                            dtb.run('UPDATE auth SET perms = ? WHERE email = ?;', [
+                                JSON.stringify(perms),
+                                args.email
+                            ], function (err) {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else if (this.changes == 0) {
+                                    callback({
+                                        'message': `Row(s) affected: ${this.changes}`
+                                    });
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
+                        }
+                    })
+                }
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
+    removePermission: (dtb, args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                // callback validation
+                if (callback == undefined || callback == null || typeof callback != 'function') {
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    resolve();
+
+
+                    // database validation
+                } else if (dtb === undefined || dtb === null || typeof dtb != 'object') {
+                    callback({
+                        'message': `invalid dtb | dtb must be object, received ${typeof dtb} ${JSON.stringify(dtb)}`
+                    });
+                    resolve();
+                } else if (dtb.exec === undefined || dtb.exec === null || typeof dtb.exec != 'function') {
+                    callback({
+                        'message': `invalid dtb.exec | dtb.exec must be function, received ${typeof dtb.exec} ${JSON.stringify(dtb.exec)}`
+                    });
+                    resolve();
+                } else if (dtb.run === undefined || dtb.run === null || typeof dtb.run != 'function') {
+                    callback({
+                        'message': `invalid dtb.run | dtb.run must be function, received ${typeof dtb.run} ${JSON.stringify(dtb.run)}`
+                    });
+                    resolve();
+                } else if (dtb.all === undefined || dtb.all === null || typeof dtb.all != 'function') {
+                    callback({
+                        'message': `invalid dtb.all | dtb.all must be function, received ${typeof dtb.all} ${JSON.stringify(dtb.all)}`
+                    });
+                    resolve();
+
+                    // args validation
+                } else if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
+
+                    // args details
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string') {
+                    callback({
+                        'message': `invalid args.email | args.email must be string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.permission === undefined || args.permission === null || typeof args.permission != 'string' || args.permission == '') {
+                    callback({
+                        'message': `invalid args.permission | args.permission must be string, received '${args.permission} ${typeof args.permission}'`
+                    });
+                    resolve();
+                } else {
+
+                    dtb.all('SELECT perms FROM auth WHERE email = ?;', [
+                        args.email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
+                            callback({
+                                'message': 'entry not found'
+                            });
+                            resolve();
+                        } else {
+
+                            try {
+                                perms = JSON.decode(rows[0].perms)
+                            } catch (err) {
+                                perms = {}
+                            }
+
+                            perms[args.permission] = false;
+
+                            dtb.run('UPDATE auth SET perms = ? WHERE email = ?;', [
+                                JSON.stringify(perms),
+                                args.email
+                            ], function (err) {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else if (this.changes == 0) {
+                                    callback({
+                                        'message': `Row(s) affected: ${this.changes}`
+                                    });
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
+                        }
+                    })
+                }
             } catch (err) {
                 try {
                     callback(err);

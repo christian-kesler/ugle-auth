@@ -973,6 +973,171 @@ single_args = [
     }
     // hasPermission
     // ================================================================
+
+
+    // ================================================================
+    // addPermission
+    single_args[0] = dtb;
+    single_args[1] = '';
+    testing = ugle_auth.addPermission;
+    for (let i = 0; i < single_args.length; i++) {
+
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // subargs testing
+        template = {
+            'email': 'uglesoft@gmail.com',
+            'permission': 'developer',
+        }
+        for (const key in template) {
+            args = {
+                'email': 'uglesoft@gmail.com',
+                'permission': 'developer',
+            }
+
+            if (i > 0) {
+                args[key] = single_args[i]
+            }
+
+            await testing(dtb, args, async (err, session) => {
+                if (i <= 0 || args.permission == 'badstring') {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+
+
+        // dtb testing
+        await testing(single_args[i], template, async (err) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, args, single_args[i]);
+
+
+    }
+    // addPermission
+    // ================================================================
+
+
+
+    // ================================================================
+    // removePermission
+    single_args[0] = dtb;
+    single_args[1] = '';
+    testing = ugle_auth.removePermission;
+    for (let i = 0; i < single_args.length; i++) {
+
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // subargs testing
+        template = {
+            'email': 'uglesoft@gmail.com',
+            'permission': 'developer',
+        }
+        for (const key in template) {
+            args = {
+                'email': 'uglesoft@gmail.com',
+                'permission': 'developer',
+            }
+
+            if (i > 0) {
+                args[key] = single_args[i]
+            }
+
+            await testing(dtb, args, async (err, session) => {
+                if (i <= 0 || args.permission == 'badstring') {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+
+
+        // dtb testing
+        await testing(single_args[i], template, async (err) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, args, single_args[i]);
+
+
+    }
+    // removePermission
+    // ================================================================
     /* END PERMISSION METHODS */
 
 

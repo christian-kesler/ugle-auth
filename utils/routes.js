@@ -46,13 +46,13 @@ module.exports = function (app, dtb) {
             auth.createUser(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect('/auth/login?msg=signup-failed');
+                    res.redirect(`/auth/signup?msg=${err.message}`);
                 } else {
                     log(dtb, {
                         'action': action,
                         'recipient': 0,
                         'data': '',
-                        'performed_by': (req.session.id || 0),
+                        'performed_by': (req.session.user_id || 0),
                     })
 
                     res.redirect('/auth/login');
@@ -95,13 +95,15 @@ module.exports = function (app, dtb) {
                     console.error(err.message);
                     res.redirect('/auth/login?msg=login-failed');
                 } else {
-                    req.session = session;
+                    Object.assign(req.session, session);
+
+                    // req.session = { ...req.session, ...session };
 
                     log(dtb, {
                         'action': action,
-                        'recipient': req.session.id,
+                        'recipient': req.session.user_id,
                         'data': '',
-                        'performed_by': req.session.id,
+                        'performed_by': req.session.user_id,
                     })
 
                     res.redirect('/account/home');
@@ -139,9 +141,9 @@ module.exports = function (app, dtb) {
                 } else {
                     log(dtb, {
                         'action': action,
-                        'recipient': req.session.id,
+                        'recipient': req.session.user_id,
                         'data': '',
-                        'performed_by': req.session.id,
+                        'performed_by': req.session.user_id,
                     })
 
                     req.session = session;
@@ -196,7 +198,7 @@ module.exports = function (app, dtb) {
                                 'action': action,
                                 'recipient': user.id,
                                 'data': '',
-                                'performed_by': (req.session.id || 0),
+                                'performed_by': (req.session.user_id || 0),
                             })
                         }
                     })
@@ -250,7 +252,7 @@ module.exports = function (app, dtb) {
                                 'action': action,
                                 'recipient': user.id,
                                 'data': '',
-                                'performed_by': (req.session.id || 0),
+                                'performed_by': (req.session.user_id || 0),
                             })
                         }
                     })
@@ -330,9 +332,9 @@ module.exports = function (app, dtb) {
 
                         log(dtb, {
                             'action': action,
-                            'recipient': req.session.id,
+                            'recipient': req.session.user_id,
                             'data': '',
-                            'performed_by': req.session.id,
+                            'performed_by': req.session.user_id,
                         })
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
@@ -384,9 +386,9 @@ module.exports = function (app, dtb) {
 
                     log(dtb, {
                         'action': action,
-                        'recipient': req.session.id,
+                        'recipient': req.session.user_id,
                         'data': '',
-                        'performed_by': req.session.id,
+                        'performed_by': req.session.user_id,
                     })
 
                     res.redirect('/auth/login?msg=email-sent');
@@ -471,9 +473,9 @@ module.exports = function (app, dtb) {
 
                                 log(dtb, {
                                     'action': action,
-                                    'recipient': req.session.id,
+                                    'recipient': req.session.user_id,
                                     'data': '',
-                                    'performed_by': req.session.id,
+                                    'performed_by': req.session.user_id,
                                 })
 
                                 req.session = session
@@ -531,7 +533,7 @@ module.exports = function (app, dtb) {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': '',
-                                    'performed_by': req.session.id,
+                                    'performed_by': req.session.user_id,
                                 })
                             }
                         })
@@ -586,7 +588,7 @@ module.exports = function (app, dtb) {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': '',
-                                    'performed_by': req.session.id,
+                                    'performed_by': req.session.user_id,
                                 })
                             }
                         })
@@ -647,7 +649,7 @@ module.exports = function (app, dtb) {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': req.query.permission,
-                                    'performed_by': req.session.id,
+                                    'performed_by': req.session.user_id,
                                 })
                             }
                         })
@@ -706,7 +708,7 @@ module.exports = function (app, dtb) {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': req.query.permission,
-                                    'performed_by': req.session.id,
+                                    'performed_by': req.session.user_id,
                                 })
                             }
                         })

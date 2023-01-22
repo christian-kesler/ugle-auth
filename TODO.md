@@ -1,3 +1,1 @@
-conduct automated testing
-develop test server and improved example views
-conduct manual testing
+expand manual testing and confirm that route function is comprehensive

@@ -94,7 +94,23 @@ if(session.email){
                 </div>
                 <div class="card-body">
                     <a class="btn btn-primary <%=verify_class%>" href="/auth/verify">Verify Account</a>
-                    <a class="btn btn-primary" href="/auth/forgot-password">Change Password</a>
+                    <a class="btn btn-primary" href="/auth/signup">Signup</a>
+                    <a class="btn btn-primary" href="/auth/login">Login</a>
+                    <a class="btn btn-primary" href="/auth/logout">Logout</a>
+                    <hr>
+                    <a class="btn btn-primary" href="/auth/forgot-password">Forgot Password</a>
+                    <a class="btn btn-primary" href="/auth/reset-password">Reset Password</a>
+                    <a class="btn btn-primary" href="/auth/refresh-session">Refresh Session</a>
+                    <a class="btn btn-primary" href="/auth/change-password">Change Password</a>
+                    <hr>
+                    <a class="btn btn-primary  <%=verify_class%>" href="/auth/verify">Verify</a>
+                    <a class="btn btn-primary" href="/auth/request-verification">Request Verification</a>
+                    <a class="btn btn-primary" href="/auth/confirm-verification">Confirm Verification</a>
+                    <a class="btn btn-primary" href="/auth/delete-account">Delete Account</a>
+                    <a class="btn btn-primary" href="/auth/lock-account">Lock Account</a>
+                    <a class="btn btn-primary" href="/auth/unlock-account">Unlock Account</a>
+                    <a class="btn btn-primary" href="/auth/add-permission">Add Permission</a>
+                    <a class="btn btn-primary" href="/auth/remove-permission">Remove Permission</a>
                 </div>
 
                 <%

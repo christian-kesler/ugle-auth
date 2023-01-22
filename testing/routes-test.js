@@ -4,25 +4,31 @@ dotenv.config();
 
 
 
-const express = require('express');
-const session = require('express-session');
-
-
-
-
 const ugle_auth = require(`${__dirname}/../index.js`);
-ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
+ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
         console.error(err.message);
     } else {
-        dtb.exec('DROP TABLE IF EXISTS auth;');
+
+
+        // formatting database
+        ugle_auth.formatDatabase(dtb, (err) => {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.info('database formatted')
+            }
+
+        })
 
 
         // initialization
+        const express = require('express');
         const app = express();
 
 
         // configuration
+        const session = require('express-session');
         app.use(
             session({
                 cookie: {
@@ -50,8 +56,9 @@ ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
 
 
 
-
+        // preset routing - this is what the test is for
         ugle_auth.routes(app, dtb);
+
 
         // custom routing
         app.get('/', (req, res) => {
@@ -83,6 +90,7 @@ ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
                 }
             });
         });
+
 
         // listening on development port
         app.listen(3000);
