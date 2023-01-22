@@ -66,6 +66,28 @@ object_args = [
 ];
 
 
+function callback(err, data, function_name, pass_threshold) {
+    if (i <= pass_threshold) {
+        if (err) {
+            console.debug(`[ ] UNEXPECTED FAIL | ${function_name}[${i}] | ${err.message}`);
+            err_count++;
+        } else {
+            console.debug(`[X]   EXPECTED PASS | ${function_name}[${i}] | ${JSON.stringify(data)}`);
+        }
+    } else {
+        if (err) {
+            console.debug(`[X]   EXPECTED FAIL | ${function_name}[${i}] | ${err.message}`);
+        } else {
+            console.debug(`[ ] UNEXPECTED PASS | ${function_name}[${i}] | ${JSON.stringify(data)}`);
+            err_count++;
+        }
+    }
+
+}
+
+
+
+
 (async () => {
 
 
@@ -124,49 +146,36 @@ object_args = [
 
     // TODO lockAccount
     // ================================================================
-    // lockAccount
-    single_args[0] = 'uglesoft@gmail.com';
-    single_args[1] = 'uglesoft@yahoo.com';
-    testing = ugle_auth.lockAccount;
+    // logout
+    single_args[0] = {
+        'email': 'someuser@outlook.com',
+    };
+    single_args[1] = '';
+    testing = ugle_auth.logout;
     for (let i = 0; i < single_args.length; i++) {
-
-        // args testing
-        await testing(dtb, single_args[i], async (err, data) => {
+        await testing(single_args[i], (err, session) => {
             if (i <= 0) {
                 if (err) {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
                 }
             } else {
                 if (err) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(session)}`);
                     err_count++;
                 }
             }
+
         });
 
-
-        // dtb testing
-        await testing(single_args[i], single_args[0], async (err, data) => {
-            if (err) {
-                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
-            } else {
-                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
-                err_count++;
-            }
-        });
-
-
-        // callback testing
-        await testing(dtb, single_args[0], single_args[i]);
-
+        await testing(single_args[0], single_args[i]);
 
     }
-    // lockAccount
+    // logout
     // ================================================================
 
 

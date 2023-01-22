@@ -1091,21 +1091,7 @@ module.exports = {
                     console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
                     resolve();
 
-                    // args validation
-                } else if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
-                    try {
-                        callback({
-                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
-                        });
-                        resolve();
-                    } catch (err) {
-                        callback({
-                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
-                        });
-                        resolve();
-                    }
-
-                    // args details
+                    // session validation
                 } else if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
                     try {
                         callback({
