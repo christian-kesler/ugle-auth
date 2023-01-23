@@ -352,15 +352,16 @@ module.exports = function (app, dtb) {
 
 
     // verify account, logged in users only
-    app.get('/auth/verify', (req, res) => {
-        res.redirect('/auth/request-verification');
-    });
     app.get('/auth/request-verification', (req, res) => {
         try {
-            res.render('auth/request-verification', {
-                query: req.query,
-                session: req.session
-            });
+            if (auth.isLoggedIn(req.session, res)) {
+
+                res.render('auth/request-verification', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
         } catch (err) {
             console.error(err.message);
             res.redirect('/?msg=server-error');
