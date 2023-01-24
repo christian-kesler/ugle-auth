@@ -91,6 +91,28 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
             });
         });
 
+        app.get('/debug/archive', (req, res) => {
+            dtb.all('SELECT * FROM auth_archive;', [], (err, data) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    res.send(data);
+                    res.end();
+                }
+            });
+        });
+
+        app.get('/debug/log', (req, res) => {
+            dtb.all('SELECT * FROM auth_log;', [], (err, data) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    res.send(data);
+                    res.end();
+                }
+            });
+        });
+
 
         // listening on development port
         app.listen(3000);

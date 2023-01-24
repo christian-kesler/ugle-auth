@@ -2,6 +2,7 @@ const { tempkey } = require(`${__dirname}/hashing.js`)
 const sqlite3 = require('sqlite3');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 // TODO verify console output on invalid callback
 // 
 
@@ -648,8 +649,25 @@ module.exports = {
                                     resolve();
                                 } else {
 
-                                    callback(null);
-                                    resolve();
+                                    dtb.run('DELETE FROM auth WHERE email = ?;', [
+                                        email
+                                    ], function (err) {
+                                        if (err) {
+                                            callback(err);
+                                            resolve();
+                                        } else if (this.changes == 0) {
+                                            callback({
+                                                'message': `Row(s) affected: ${this.changes}`
+                                            });
+                                            resolve();
+                                        } else {
+
+                                            callback(null);
+                                            resolve();
+
+                                        }
+                                    })
+
                                 }
                             });
 
@@ -960,9 +978,6 @@ module.exports = {
                                                 });
                                                 resolve();
                                             } else {
-                                                // args.session.email = rows[0].email;
-                                                // args.session.id = rows[0].id;
-                                                // args.session.valid = true;
                                                 callback(null, {
                                                     email: rows[0].email,
                                                     user_id: rows[0].id,
@@ -1057,11 +1072,20 @@ module.exports = {
 
                             callback(null, {
                                 email: rows[0].email,
-                                id: rows[0].id,
+                                user_id: rows[0].id,
                                 perms: JSON.parse(rows[0].perms),
                                 valid: true,
                                 status: rows[0].status,
                             });
+
+
+                            // session.email = rows[0].email;
+                            // session.user_id = rows[0].id;
+                            // session.perms = JSON.parse(rows[0].perms);
+                            // session.valid = true;
+                            // session.status = rows[0].status;
+
+                            // callback(null, session);
                             resolve();
 
                         }
@@ -1104,14 +1128,21 @@ module.exports = {
                         resolve();
                     }
                 } else {
+                    callback(null, {
+                        email: null,
+                        user_id: null,
+                        perms: null,
+                        valid: false,
+                        status: null,
+                    });
 
-                    session.valid = false;
-                    session.email = null;
-                    session.id = null;
-                    session.perms = null;
-                    session.status = null;
+                    // session.valid = false;
+                    // session.email = null;
+                    // session.user_id = null;
+                    // session.perms = null;
+                    // session.status = null;
 
-                    callback(null, session);
+                    // callback(null, session);
                     resolve();
 
                 }
@@ -1908,11 +1939,6 @@ module.exports = {
                 } else if (args.tempkey === undefined || args.tempkey === null || typeof args.tempkey != 'string') {
                     callback({
                         'message': `invalid args.tempkey | args.tempkey must be string, received '${args.tempkey} ${typeof args.tempkey}'`
-                    });
-                    resolve();
-                } else if (args.html === undefined || args.html === null || typeof args.html != 'string') {
-                    callback({
-                        'message': `invalid args.html | args.html must be string, received '${args.html} ${typeof args.html}'`
                     });
                     resolve();
                 } else {

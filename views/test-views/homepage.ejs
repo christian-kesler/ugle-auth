@@ -71,6 +71,9 @@
 </head>
 
 <body class="bg-white text-center">
+    <%- include('./../auth/layout/messages' ) %>
+
+
     <div class="row">
         <div class="col align-self-center">
             <div class="card">
@@ -86,6 +89,8 @@
                     </p>
                     <a class="btn btn-dark" target="_blank" href="/debug/session">Debug Session</a>
                     <a class="btn btn-dark" target="_blank" href="/debug/auth">Debug Auth</a>
+                    <a class="btn btn-dark" target="_blank" href="/debug/archive">Debug Archive</a>
+                    <a class="btn btn-dark" target="_blank" href="/debug/log">Debug Log</a>
                     <hr>
                     <p>Session Agnostic</p>
                     <a class="btn btn-primary" href="/auth/signup">Signup</a>
@@ -94,20 +99,82 @@
                     <a class="btn btn-primary" href="/auth/reset-password">Reset Password</a>
                     <hr>
                     <p>Logged in Users only</p>
-                    <a class="btn btn-success" href="/auth">Auth</a>
-                    <a class="btn btn-success" href="/auth/logout">Logout</a>
-                    <a class="btn btn-success" href="/auth/refresh-session">Refresh Session</a>
-                    <a class="btn btn-success" href="/auth/change-password">Change Password</a>
-                    <a class="btn btn-success" href="/auth/request-verification">Request Verification</a>
-                    <a class="btn btn-success" href="/auth/confirm-verification">Confirm Verification</a>
-                    <a class="btn btn-success" href="/auth/delete-account">Delete Account</a>
+                    <%
+                    if(session.valid) {
+                        session_class = ''
+                    } else {
+                        session_class = 'disabled'
+                    }
+                    %>
+                    <a class="btn btn-success <%-session_class%>" href="/auth">Auth</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/logout">Logout</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/refresh-session">Refresh Session</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/change-password">Change Password</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/request-verification">Request Verification</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/confirm-verification">Confirm Verification</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/delete-account">Delete Account</a>
                     <hr>
                     <p>Admins Only</p>
-                    <a class="btn btn-warning" href="/auth/lock-account">Lock Account</a>
-                    <a class="btn btn-warning" href="/auth/unlock-account">Unlock Account</a>
-                    <a class="btn btn-warning" href="/auth/add-permission">Add Permission</a>
-                    <a class="btn btn-warning" href="/auth/remove-permission">Remove Permission</a>
+                    <%
+                    try{
+                        if(session.perms.admin) {
+                            session_class = ''
+                        } else {
+                            session_class = 'disabled'
+                        }
+                    } catch (err) {
+                        session_class = 'disabled'
+                    }
+                    %>
+                    <a class="btn btn-warning <%-session_class%>" href="/auth/lock-account">Lock Account</a>
+                    <a class="btn btn-warning <%-session_class%>" href="/auth/unlock-account">Unlock Account</a>
+                    <a class="btn btn-warning <%-session_class%>" href="/auth/add-permission">Add Permission</a>
+                    <a class="btn btn-warning <%-session_class%>" href="/auth/remove-permission">Remove Permission</a>
 
+                    <hr>
+                    <p>Message Testing</p>
+                    <%
+                    actions = [
+                        'server-error',
+                        'signup-successful',
+                        'signup-failed',
+                        'login-successful',
+                        'login-failed',
+                        'signup-successful',
+                        'signup-failed',
+                        'forgot-password-successful',
+                        'forgot-password-failed',
+                        'reset-password-successful',
+                        'reset-password-failed',
+                        'refresh-session-successful',
+                        'refresh-session-failed',
+                        'change-password-successful',
+                        'change-password-failed',
+                        'request-verification-successful',
+                        'request-verification-failed',
+                        'confirm-verification-successful',
+                        'confirm-verification-failed',
+                        'delete-account-successful',
+                        'delete-account-failed',
+                        'lock-account-successful',
+                        'lock-account-failed',
+                        'unlock-account-successful',
+                        'unlock-account-failed',
+                        'add-permission-successful',
+                        'add-permission-failed',
+                        'remove-permission-successful',
+                        'remove-permission-failed',
+                    ];
+
+                    actions.forEach((action) => {
+                    %>
+
+                    <a class="btn btn-info" href="/?msg=<%=action%>"><%=action%></a>
+
+
+                    <%
+                    })
+                    %>
                 </div>
             </div>
         </div>

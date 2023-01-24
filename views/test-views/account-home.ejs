@@ -93,33 +93,53 @@ if(session.email){
                     </p>
                 </div>
                 <div class="card-body">
+                    <p>Debugging</p>
+                    <p class="text-muted">
+                        (debugging links are added by the test script, they are not part of ugle-auth's routing function)
+                    </p>
+                    <a class="btn btn-dark" target="_blank" href="/debug/session">Debug Session</a>
+                    <a class="btn btn-dark" target="_blank" href="/debug/auth">Debug Auth</a>
+                    <a class="btn btn-dark" target="_blank" href="/debug/archive">Debug Archive</a>
+                    <a class="btn btn-dark" target="_blank" href="/debug/log">Debug Log</a>
+                    <hr>
+                    <p>Session Agnostic</p>
                     <a class="btn btn-primary" href="/auth/signup">Signup</a>
                     <a class="btn btn-primary" href="/auth/login">Login</a>
-                    <a class="btn btn-primary" href="/auth/logout">Logout</a>
-                    <hr>
                     <a class="btn btn-primary" href="/auth/forgot-password">Forgot Password</a>
                     <a class="btn btn-primary" href="/auth/reset-password">Reset Password</a>
-                    <a class="btn btn-primary" href="/auth/refresh-session">Refresh Session</a>
-                    <a class="btn btn-primary" href="/auth/change-password">Change Password</a>
                     <hr>
-                    <a class="btn btn-primary  <%=verify_class%>" href="/auth/verify">Verify</a>
-                    <a class="btn btn-primary" href="/auth/request-verification">Request Verification</a>
-                    <a class="btn btn-primary" href="/auth/confirm-verification">Confirm Verification</a>
-                    <a class="btn btn-primary" href="/auth/delete-account">Delete Account</a>
-                    <a class="btn btn-primary" href="/auth/lock-account">Lock Account</a>
-                    <a class="btn btn-primary" href="/auth/unlock-account">Unlock Account</a>
-                    <a class="btn btn-primary" href="/auth/add-permission">Add Permission</a>
-                    <a class="btn btn-primary" href="/auth/remove-permission">Remove Permission</a>
-                </div>
+                    <p>Logged in Users only</p>
+                    <%
+                    if(!session.valid) {
+                        session_class = 'disabled'
+                    } else {
+                        session_class = ''
+                    }
+                    %>
+                    <a class="btn btn-success <%-session_class%>" href="/auth">Auth</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/logout">Logout</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/refresh-session">Refresh Session</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/change-password">Change Password</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/request-verification">Request Verification</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/confirm-verification">Confirm Verification</a>
+                    <a class="btn btn-success <%-session_class%>" href="/auth/delete-account">Delete Account</a>
+                    <hr>
+                    <p>Admins Only</p>
+                    <a class="btn btn-warning" href="/auth/lock-account">Lock Account</a>
+                    <a class="btn btn-warning" href="/auth/unlock-account">Unlock Account</a>
+                    <a class="btn btn-warning" href="/auth/add-permission">Add Permission</a>
+                    <a class="btn btn-warning" href="/auth/remove-permission">Remove Permission</a>
 
+                </div>
                 <%
 } else {
 %>
-                <div class="card-header">
-                    <p>Looks like you haven't logged in yet, try clicking the link below to do so</p>
+                <div class=" card-header">
+                    <p>Looks like you haven't logged in yet, try clicking the link below to do so, or go to the homepage</p>
                 </div>
                 <div class="card-body">
                     <a class="btn btn-primary" href="/auth/login">Login</a>
+                    <a class="btn btn-primary" href="/">Homepage</a>
                 </div>
                 <%
 }

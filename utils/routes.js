@@ -93,7 +93,7 @@ module.exports = function (app, dtb) {
             auth.login(dtb, args, (err, session) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect('/auth/login?msg=login-failed');
+                    res.redirect(`${login_redirect}?msg=${action}-failed`);
                 } else {
                     Object.assign(req.session, session);
 
@@ -137,7 +137,7 @@ module.exports = function (app, dtb) {
             auth.logout(req.session, (err, session) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect('/auth/login?msg=logout-failed');
+                    res.redirect(`${login_redirect}?msg=${action}-failed`);
                 } else {
                     log(dtb, {
                         'action': action,
@@ -145,9 +145,10 @@ module.exports = function (app, dtb) {
                         'data': '',
                         'performed_by': req.session.user_id,
                     })
+                    Object.assign(req.session, session);
 
-                    req.session = session;
-                    res.redirect('/auth/login?msg=logout-successful');
+                    // req.session = session;
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
@@ -187,7 +188,7 @@ module.exports = function (app, dtb) {
             auth.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect('/auth/login?msg=email-failed');
+                    res.redirect(`${login_redirect}?msg=${action}-failed`);
                 } else {
 
                     auth.readUser(dtb, req.body.email, (err, user) => {
@@ -203,7 +204,7 @@ module.exports = function (app, dtb) {
                         }
                     })
 
-                    res.redirect('/auth/login?msg=email-sent');
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
@@ -241,7 +242,7 @@ module.exports = function (app, dtb) {
             auth.resetPassword(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect('/auth/login?msg=reset-password-failed');
+                    res.redirect(`${login_redirect}?msg=${action}-failed`);
                 } else {
 
                     auth.readUser(dtb, req.query.email, (err, user) => {
@@ -257,7 +258,7 @@ module.exports = function (app, dtb) {
                         }
                     })
 
-                    res.redirect('/auth/login?msg=reset-password-successful');
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
@@ -282,7 +283,9 @@ module.exports = function (app, dtb) {
                         console.error(err.message);
                         res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
-                        req.session = session
+                        Object.assign(req.session, session);
+
+                        // req.session = session
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
                 })
@@ -314,7 +317,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/change-password', (req, res) => {
-        action = 'refresh-session'
+        action = 'change-password'
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -371,31 +374,33 @@ module.exports = function (app, dtb) {
         action = 'request-verification'
 
         try {
+            if (auth.isLoggedIn(req.session, res)) {
 
-            var args = {
-                'recipient': req.session.email,
-                'subject': 'Requested Account Verification Link',
-                'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
-                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
-            };
+                var args = {
+                    'recipient': req.session.email,
+                    'subject': 'Requested Account Verification Link',
+                    'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
+                    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
+                };
 
-            auth.sendTempkeyEmail(dtb, args, (err) => {
-                if (err) {
-                    console.error(err.message);
-                    res.redirect('/auth/login?msg=email-failed');
-                } else {
+                auth.sendTempkeyEmail(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
 
-                    log(dtb, {
-                        'action': action,
-                        'recipient': req.session.user_id,
-                        'data': '',
-                        'performed_by': req.session.user_id,
-                    })
+                        log(dtb, {
+                            'action': action,
+                            'recipient': req.session.user_id,
+                            'data': '',
+                            'performed_by': req.session.user_id,
+                        })
 
-                    res.redirect('/auth/login?msg=email-sent');
-                }
-            });
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
+                });
 
+            }
         } catch (err) {
             console.error(err.message);
             res.redirect('/?msg=server-error');
@@ -406,8 +411,8 @@ module.exports = function (app, dtb) {
         action = 'confirm-verification'
 
         try {
-
             if (auth.isLoggedIn(req.session, res)) {
+
                 var args = {
                     'email': req.session.email,
                     'tempkey': req.query.tempkey,
@@ -416,13 +421,13 @@ module.exports = function (app, dtb) {
                 auth.verifyUser(dtb, args, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect('/auth/login?msg=verification-failed');
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
-                        res.redirect('/auth/login?msg=verification-successful');
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
                 });
-            }
 
+            }
         } catch (err) {
             console.error(err.message);
             res.redirect('/?msg=server-error');
@@ -455,12 +460,7 @@ module.exports = function (app, dtb) {
         try {
             if (auth.isLoggedIn(req.session, res)) {
 
-                var args = {
-                    'email': req.session.email,
-                    'password': req.body.password
-                };
-
-                auth.changePassword(dtb, args, (err) => {
+                auth.deleteUser(dtb, req.session.email, (err) => {
                     if (err) {
                         console.error(err.message);
                         res.redirect(`${login_redirect}?msg=${action}-failed`);
@@ -478,8 +478,9 @@ module.exports = function (app, dtb) {
                                     'data': '',
                                     'performed_by': req.session.user_id,
                                 })
+                                Object.assign(req.session, session);
 
-                                req.session = session
+                                // req.session = session
                                 res.redirect(`${login_redirect}?msg=${action}-successful`);
 
                             }
