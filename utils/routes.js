@@ -517,7 +517,7 @@ module.exports = function (app, dtb) {
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
-                res.render('auth/lock-account', {
+                res.render('auth/admin/lock-account', {
                     query: req.query,
                     session: req.session
                 });
@@ -571,7 +571,7 @@ module.exports = function (app, dtb) {
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
-                res.render('auth/unlock-account', {
+                res.render('auth/admin/unlock-account', {
                     query: req.query,
                     session: req.session
                 });
@@ -628,7 +628,7 @@ module.exports = function (app, dtb) {
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
-                res.render('auth/add-permission', {
+                res.render('auth/admin/add-permission', {
                     query: req.query,
                     session: req.session
                 });
@@ -646,8 +646,8 @@ module.exports = function (app, dtb) {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
                 args = {
-                    'email': req.query.email,
-                    'permission': req.query.permission
+                    'email': req.body.email,
+                    'permission': req.body.permission.toLowerCase()
                 }
 
                 auth.addPermission(dtb, args, (err) => {
@@ -656,14 +656,14 @@ module.exports = function (app, dtb) {
                         res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
-                        auth.readUser(dtb, req.query.email, (err, user) => {
+                        auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
                                 console.error(err.message)
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
-                                    'data': req.query.permission,
+                                    'data': req.body.permission.toLowerCase(),
                                     'performed_by': req.session.user_id,
                                 })
                             }
@@ -687,7 +687,7 @@ module.exports = function (app, dtb) {
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
-                res.render('auth/remove-permission', {
+                res.render('auth/admin/remove-permission', {
                     query: req.query,
                     session: req.session
                 });
@@ -705,8 +705,8 @@ module.exports = function (app, dtb) {
             if (auth.hasPermission(req.session, res, 'admin')) {
 
                 args = {
-                    'email': req.query.email,
-                    'permission': req.query.permission
+                    'email': req.body.email,
+                    'permission': req.body.permission.toLowerCase()
                 }
 
                 auth.removePermission(dtb, args, (err) => {
@@ -715,14 +715,14 @@ module.exports = function (app, dtb) {
                         res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
-                        auth.readUser(dtb, req.query.email, (err, user) => {
+                        auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
                                 console.error(err.message)
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
-                                    'data': req.query.permission,
+                                    'data': req.body.permission.toLowerCase(),
                                     'performed_by': req.session.user_id,
                                 })
                             }

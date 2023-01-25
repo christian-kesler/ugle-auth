@@ -302,6 +302,116 @@ module.exports = {
 
     /* BEGIN USER MANAGEMENT METHODS */
     // 2.0 conventions
+    createAdmin: (dtb, args, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                // callback validation
+                if (callback == undefined || callback == null || typeof callback != 'function') {
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    resolve();
+
+
+                    // database validation
+                } else if (dtb === undefined || dtb === null || typeof dtb != 'object') {
+                    callback({
+                        'message': `invalid dtb | dtb must be object, received ${typeof dtb} ${JSON.stringify(dtb)}`
+                    });
+                    resolve();
+                } else if (dtb.exec === undefined || dtb.exec === null || typeof dtb.exec != 'function') {
+                    callback({
+                        'message': `invalid dtb.exec | dtb.exec must be function, received ${typeof dtb.exec} ${JSON.stringify(dtb.exec)}`
+                    });
+                    resolve();
+                } else if (dtb.run === undefined || dtb.run === null || typeof dtb.run != 'function') {
+                    callback({
+                        'message': `invalid dtb.run | dtb.run must be function, received ${typeof dtb.run} ${JSON.stringify(dtb.run)}`
+                    });
+                    resolve();
+                } else if (dtb.all === undefined || dtb.all === null || typeof dtb.all != 'function') {
+                    callback({
+                        'message': `invalid dtb.all | dtb.all must be function, received ${typeof dtb.all} ${JSON.stringify(dtb.all)}`
+                    });
+                    resolve();
+
+                    // args validation
+                } else if (args === undefined || args === null || typeof args != 'object' || Object.keys(args).length == 0) {
+                    try {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)} with length ${Object.keys(args).length}`
+                        });
+                        resolve();
+                    } catch (err) {
+                        callback({
+                            'message': `invalid args | args must be non-empty object, received ${typeof args} ${JSON.stringify(args)}`
+                        });
+                        resolve();
+                    }
+
+                    // args details
+                } else if (args.email === undefined || args.email === null || typeof args.email != 'string' || args.email == '' || !isValidEmail(args.email)) {
+                    callback({
+                        'message': `invalid args.email | args.email must be valid email string, received '${args.email} ${typeof args.email}'`
+                    });
+                    resolve();
+                } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
+                    callback({
+                        'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
+                    });
+                    resolve();
+                } else if (Number(args.created_by) == undefined || Number(args.created_by) == null || isNaN(Number(args.created_by)) || Number(args.created_by) < 0) {
+                    callback({
+                        'message': `invalid args.created_by | args.created_by must be non-negative number, received '${Number(args.created_by)} ${typeof Number(args.created_by)}'`
+                    });
+                    resolve();
+                } else {
+
+                    bcrypt.hash(args.password, 16, (err, hash) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else {
+
+                            perms = {}
+
+                            Object.assign(perms, default_perms);
+
+                            perms['admin'] = true
+
+                            dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
+                                args.email,
+                                hash,
+                                JSON.stringify(perms),
+                                `${new Date}`,
+                                Number(args.created_by),
+                                'unverified'
+                            ], (err) => {
+                                if (err) {
+                                    callback(err);
+                                    resolve();
+                                } else {
+                                    callback(null);
+                                    resolve();
+                                }
+                            });
+
+                        }
+                    });
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+        });
+    },
+
+
     createUser: (dtb, args, callback) => {
         return new Promise((resolve) => {
             try {

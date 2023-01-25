@@ -217,6 +217,97 @@ single_args = [
 
     /* BEGIN USER MANAGEMENT METHODS */
     // ================================================================
+    // createAdmin
+    single_args[0] = dtb;
+    single_args[1] = '';
+    testing = ugle_auth.createAdmin;
+    for (let i = 0; i < single_args.length; i++) {
+
+
+        // args testing
+        await testing(dtb, single_args[i], async (err, data) => {
+            if (err) {
+                console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+            } else {
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                err_count++;
+            }
+        });
+
+
+        // subargs testing
+        template = {
+            'email': 'asuperfakeemail@yahoo.com',
+            'password': 'aG00dPa$$word',
+            'created_by': 0
+        }
+        for (const key in template) {
+            args = {
+                'email': 'asuperfakeemail@yahoo.com',
+                'password': 'aG00dPa$$word',
+                'created_by': 0
+            }
+
+            if (i > 0) {
+                args[key] = single_args[i]
+            } else if (key == 'email') {
+                args.email = 'uglesoft@gmail.com'
+            } else if (key == 'password') {
+                args.email = 'christian.j.kesler@gmail.com'
+            } else if (key == 'created_by') {
+                args.email = 'erudtionalism@gmail.com'
+            }
+
+            await testing(dtb, args, async (err) => {
+                if (i <= 0) {
+                    if (err) {
+                        console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                        err_count++;
+                    } else {
+                        console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                    }
+                } else {
+                    if (err) {
+                        console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    } else {
+                        console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                        err_count++;
+                    }
+                }
+            });
+        }
+
+
+        // dtb testing
+        await testing(single_args[i], template, async (err) => {
+            if (i <= 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        });
+
+
+        // callback testing
+        await testing(dtb, args, single_args[i]);
+
+
+    }
+    // createAdmin
+    // ================================================================
+
+
+    // ================================================================
     // createUser
     single_args[0] = dtb;
     single_args[1] = '';

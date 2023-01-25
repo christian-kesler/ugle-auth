@@ -1,0 +1,15 @@
+<%- include('./../layout/auth_begin' ) %>
+
+
+<h1 class="h3 mb-3 font-weight-normal">Admin - Lock Account</h1>
+
+<%- include('./../layout/messages') %>
+
+<input type="email" name="email" class="form-control" placeholder="Email" required="" autofocus="" value="<%= query.email || '' %>">
+
+<button class="btn btn-lg btn-warning btn-block" type="submit">Submit</button>
+
+<!-- Don't have an account? <a href="/auth/signup">Sign up here</a> -->
+
+
+<%- include('./../layout/auth_end' ) %>

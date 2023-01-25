@@ -22,6 +22,21 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
         })
 
 
+        // creating default admin account
+        args = {
+            'email': process.env.ADMIN_EMAIL,
+            'password': process.env.ADMIN_PASSWORD,
+            'created_by': 0
+        }
+        ugle_auth.createAdmin(dtb, args, (err) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                console.info('default admin created')
+            }
+        })
+
+
         // initialization
         const express = require('express');
         const app = express();

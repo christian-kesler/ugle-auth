@@ -1,1 +1,1 @@
-expand manual testing and confirm that route function is comprehensive
+ascertain why the add permission function overrides all permissions instead of adding an attribute to the existing object
