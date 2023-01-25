@@ -34,7 +34,7 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
                 cookie: {
                     // httpOnly: true,
                     // secure: true,
-                    sameSite: true,
+                    // sameSite: true,
                     maxAge: 500 * 60 * 1000,
                     // expires: 5 * 60 * 1000,
                 },

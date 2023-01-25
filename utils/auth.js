@@ -1644,7 +1644,7 @@ module.exports = {
     /* BEGIN TEMPKEY EMAIL METHODS */
     // 2.0 convenntions
     sendTempkeyEmail: async (dtb, args, callback) => {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             try {
 
                 // callback validation
@@ -1713,7 +1713,7 @@ module.exports = {
                 } else {
 
                     dtb.run('UPDATE auth SET tempkey = ? WHERE email = ?;', [
-                        tempkey(),
+                        await tempkey(),
                         args.recipient,
                     ], function (err) {
                         if (err) {

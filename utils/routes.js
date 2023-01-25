@@ -46,7 +46,7 @@ module.exports = function (app, dtb) {
             auth.createUser(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`/auth/signup?msg=${err.message}`);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
                     log(dtb, {
                         'action': action,
@@ -55,7 +55,8 @@ module.exports = function (app, dtb) {
                         'performed_by': (req.session.user_id || 0),
                     })
 
-                    res.redirect('/auth/login');
+                    res.redirect(`/auth/login?msg=${action}-successful`);
+
                 }
             });
 
@@ -93,7 +94,7 @@ module.exports = function (app, dtb) {
             auth.login(dtb, args, (err, session) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
                     Object.assign(req.session, session);
 
@@ -106,7 +107,7 @@ module.exports = function (app, dtb) {
                         'performed_by': req.session.user_id,
                     })
 
-                    res.redirect('/account/home');
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
@@ -137,7 +138,7 @@ module.exports = function (app, dtb) {
             auth.logout(req.session, (err, session) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
                     log(dtb, {
                         'action': action,
@@ -188,7 +189,7 @@ module.exports = function (app, dtb) {
             auth.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
 
                     auth.readUser(dtb, req.body.email, (err, user) => {
@@ -204,7 +205,7 @@ module.exports = function (app, dtb) {
                         }
                     })
 
-                    res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    res.redirect(`/auth/login?msg=${action}-successful`);
                 }
             });
 
@@ -242,7 +243,7 @@ module.exports = function (app, dtb) {
             auth.resetPassword(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
 
                     auth.readUser(dtb, req.query.email, (err, user) => {
@@ -258,7 +259,7 @@ module.exports = function (app, dtb) {
                         }
                     })
 
-                    res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    res.redirect(`/auth/login?msg=${action}-successful`);
                 }
             });
 
@@ -330,7 +331,7 @@ module.exports = function (app, dtb) {
                 auth.changePassword(dtb, args, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
                         log(dtb, {
@@ -423,7 +424,19 @@ module.exports = function (app, dtb) {
                         console.error(err.message);
                         res.redirect(`${login_redirect}?msg=${action}-failed`);
                     } else {
-                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                        auth.refreshSession(dtb, req.session, (err, session) => {
+                            if (err) {
+                                console.error(err.message);
+                                res.redirect(`${login_redirect}?msg=${action}-failed`);
+                            } else {
+                                Object.assign(req.session, session);
+
+                                // req.session = session
+                                res.redirect(`${login_redirect}?msg=${action}-successful`);
+                            }
+                        })
+
                     }
                 });
 
@@ -524,7 +537,7 @@ module.exports = function (app, dtb) {
                 auth.lockAccount(dtb, req.body.email, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
                         auth.readUser(dtb, req.body.email, (err, user) => {
@@ -578,7 +591,7 @@ module.exports = function (app, dtb) {
                 auth.unlockAccount(dtb, req.body.email, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
 
@@ -640,7 +653,7 @@ module.exports = function (app, dtb) {
                 auth.addPermission(dtb, args, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
                         auth.readUser(dtb, req.query.email, (err, user) => {
@@ -699,7 +712,7 @@ module.exports = function (app, dtb) {
                 auth.removePermission(dtb, args, (err) => {
                     if (err) {
                         console.error(err.message);
-                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
                     } else {
 
                         auth.readUser(dtb, req.query.email, (err, user) => {
