@@ -33,7 +33,7 @@ single_args = [
     // undefined
     undefined,
     // function
-    () => { console.log('an example function') }
+    () => { console.log('an example function'); }
 ];
 
 
@@ -240,22 +240,22 @@ single_args = [
             'email': 'admin@yahoo.com',
             'password': 'aG00dPa$$word',
             'created_by': 0
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin@yahoo.com',
                 'password': 'aG00dPa$$word',
                 'created_by': 0
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             } else if (key == 'email') {
-                args.email = 'admin.uglesoft@gmail.com'
+                args.email = 'admin.uglesoft@gmail.com';
             } else if (key == 'password') {
-                args.email = 'chrisjkesler.admin@gmail.com'
+                args.email = 'chrisjkesler.admin@gmail.com';
             } else if (key == 'created_by') {
-                args.email = 'erudtionalism.admin@gmail.com'
+                args.email = 'erudtionalism.admin@gmail.com';
             }
 
             await testing(dtb, args, async (err) => {
@@ -331,22 +331,22 @@ single_args = [
             'email': 'user@yahoo.com',
             'password': 'aG00dPa$$word',
             'created_by': 0
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'user@yahoo.com',
                 'password': 'aG00dPa$$word',
                 'created_by': 0
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             } else if (key == 'email') {
-                args.email = 'user.uglesoft@gmail.com'
+                args.email = 'user.uglesoft@gmail.com';
             } else if (key == 'password') {
-                args.email = 'chrisjkesler.user@gmail.com'
+                args.email = 'chrisjkesler.user@gmail.com';
             } else if (key == 'created_by') {
-                args.email = 'erudtionalism.user@gmail.com'
+                args.email = 'erudtionalism.user@gmail.com';
             }
 
             await testing(dtb, args, async (err) => {
@@ -601,25 +601,25 @@ single_args = [
         template = {
             'email': 'admin.uglesoft@gmail.com',
             'password': 'aBetterpassword0!',
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin.uglesoft@gmail.com',
                 'password': 'abadpassword',
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             } else if (key == 'email') {
-                args.email = 'admin.uglesoft@gmail.com'
-                args.password = 'aBetterpassword0!'
+                args.email = 'admin.uglesoft@gmail.com';
+                args.password = 'aBetterpassword0!';
             } else if (key == 'password') {
-                args.email = 'admin.uglesoft@gmail.com'
-                args.password = 'aMuchBetterpassword0!'
+                args.email = 'admin.uglesoft@gmail.com';
+                args.password = 'aMuchBetterpassword0!';
             }
 
             await testing(dtb, args, async (err) => {
-                console.log(args)
+                console.log(args);
                 if (i <= 0) {
                     if (err) {
                         console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
@@ -698,15 +698,15 @@ single_args = [
         template = {
             'email': 'admin.uglesoft@gmail.com',
             'password': 'aBetterpassword0!',
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin.uglesoft@gmail.com',
                 'password': 'aBetterpassword0!',
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             }
 
             await testing(dtb, args, async (err, session) => {
@@ -780,14 +780,14 @@ single_args = [
         // subargs testing
         template = {
             'email': 'admin.uglesoft@gmail.com',
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin.uglesoft@gmail.com',
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             }
 
             await testing(dtb, args, async (err, session) => {
@@ -892,24 +892,24 @@ single_args = [
 
         session_template = {
             'valid': true
-        }
+        };
 
         res_template = {
             'redirect': (url) => {
-                console.log(url)
+                console.log(url);
             }
-        }
+        };
 
         for (const session_key in session_template) {
 
             session_args = {
                 'valid': true
-            }
+            };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i]
+                session_args[session_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false
+                session_args.valid = false;
             }
 
             if (await testing(session_args, res_template)) {
@@ -933,17 +933,17 @@ single_args = [
 
             res_args = {
                 'redirect': (url) => {
-                    console.log(url)
+                    console.log(url);
                 }
-            }
+            };
 
             if (i > 1) {
-                res_args[res_key] = single_args[i]
+                res_args[res_key] = single_args[i];
             }
 
             if (await testing(session_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(session_template, JSON.stringify(res_args), i)
+                    console.log(session_template, JSON.stringify(res_args), i);
                     console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
                     err_count++;
                 } else {
@@ -976,13 +976,13 @@ single_args = [
                 'admin': false,
                 'user': true
             }
-        }
+        };
 
         res_template = {
             'redirect': (url) => {
-                console.log(url)
+                console.log(url);
             }
-        }
+        };
 
         for (const session_key in session_template) {
 
@@ -992,12 +992,12 @@ single_args = [
                     'admin': false,
                     'user': true
                 }
-            }
+            };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i]
+                session_args[session_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false
+                session_args.valid = false;
             }
 
             if (await testing(session_args, res_template, single_args[i])) {
@@ -1021,12 +1021,12 @@ single_args = [
 
             res_args = {
                 'redirect': (url) => {
-                    console.log(url)
+                    console.log(url);
                 }
-            }
+            };
 
             if (i > 1) {
-                res_args[res_key] = single_args[i]
+                res_args[res_key] = single_args[i];
             }
 
             if (await testing(session_template, res_args, single_args[i])) {
@@ -1089,15 +1089,15 @@ single_args = [
         template = {
             'email': 'admin.uglesoft@gmail.com',
             'permission': 'developer',
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin.uglesoft@gmail.com',
                 'permission': 'developer',
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             }
 
             await testing(dtb, args, async (err, session) => {
@@ -1172,15 +1172,15 @@ single_args = [
         template = {
             'email': 'admin.uglesoft@gmail.com',
             'permission': 'developer',
-        }
+        };
         for (const key in template) {
             args = {
                 'email': 'admin.uglesoft@gmail.com',
                 'permission': 'developer',
-            }
+            };
 
             if (i > 0) {
-                args[key] = single_args[i]
+                args[key] = single_args[i];
             }
 
             await testing(dtb, args, async (err, session) => {

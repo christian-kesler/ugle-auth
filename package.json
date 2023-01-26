@@ -4,7 +4,7 @@
   "description": "An authentication system for NodeJS web apps using sqlite",
   "main": "index.js",
   "scripts": {
-    "test": "node test-scripts/handlers-test.js && node test-scripts/routes-test.js ",
+    "test": "clear && node testing/automated-test.js && node testing/example-functions.js && node testing/routes-test.js",
     "lint": "node node_modules/eslint/bin/eslint.js  .",
     "lintfix": "node node_modules/eslint/bin/eslint.js  . --fix"
   },

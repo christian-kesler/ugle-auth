@@ -1,4 +1,4 @@
-const { tempkey } = require(`${__dirname}/hashing.js`)
+const { tempkey } = require(`${__dirname}/hashing.js`);
 const sqlite3 = require('sqlite3');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
@@ -46,12 +46,12 @@ module.exports = {
                             callback(err);
                             resolve();
                         }
-                    })
+                    });
 
                     global.default_perms = {
                         'admin': false,
                         'user': true
-                    }
+                    };
                     global.lockout_policy = 4;
                     global.login_redirect = '/account/home';
 
@@ -114,7 +114,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    console.log(err)
+                    console.log(err);
                     resolve();
                 }
             }
@@ -186,7 +186,7 @@ module.exports = {
                     callback(err);
                     resolve();
                 } catch (err) {
-                    console.log(err)
+                    console.log(err);
                     resolve();
                 }
             }
@@ -213,9 +213,9 @@ module.exports = {
                     }
                 } else {
 
-                    global.default_perms = perms
-                    callback(null)
-                    resolve()
+                    global.default_perms = perms;
+                    callback(null);
+                    resolve();
 
                 }
 
@@ -228,7 +228,7 @@ module.exports = {
                 }
             }
 
-        })
+        });
     },
 
 
@@ -237,7 +237,7 @@ module.exports = {
         return new Promise((resolve) => {
             try {
 
-                attempts = Number(attempts)
+                attempts = Number(attempts);
                 if (attempts == undefined || attempts == null || isNaN(attempts) || attempts <= 0) {
                     callback({
                         'message': `invalid args | attempts must be number greater than zero, received '${attempts} ${typeof attempts}'`
@@ -245,9 +245,9 @@ module.exports = {
                     resolve();
                 } else {
 
-                    global.lockout_policy = Number(attempts)
-                    callback(null)
-                    resolve()
+                    global.lockout_policy = Number(attempts);
+                    callback(null);
+                    resolve();
 
                 }
 
@@ -260,7 +260,7 @@ module.exports = {
                 }
             }
 
-        })
+        });
     },
 
 
@@ -276,9 +276,9 @@ module.exports = {
                     resolve();
                 } else {
 
-                    global.login_redirect = url
-                    callback(null)
-                    resolve()
+                    global.login_redirect = url;
+                    callback(null);
+                    resolve();
 
                 }
 
@@ -291,7 +291,7 @@ module.exports = {
                 }
             }
 
-        })
+        });
     },
     /* END CONFIG METHODS */
 
@@ -310,7 +310,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -374,11 +374,11 @@ module.exports = {
                             resolve();
                         } else {
 
-                            perms = {}
+                            perms = {};
 
                             Object.assign(perms, default_perms);
 
-                            perms['admin'] = true
+                            perms['admin'] = true;
 
                             dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
                                 args.email,
@@ -422,7 +422,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -526,7 +526,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -575,21 +575,21 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth WHERE email = ?;`, [
-                        email
-                    ], (err, rows) => {
-                        if (err) {
-                            callback(err);
-                            resolve();
-                        } else if (rows.length == 0) {
-                            callback({
-                                'message': 'entry not found'
-                            });
-                            resolve();
-                        } else {
-                            callback(null, rows[0]);
-                            resolve();
-                        }
-                    });
+                            email
+                        ], (err, rows) => {
+                            if (err) {
+                                callback(err);
+                                resolve();
+                            } else if (rows.length == 0) {
+                                callback({
+                                    'message': 'entry not found'
+                                });
+                                resolve();
+                            } else {
+                                callback(null, rows[0]);
+                                resolve();
+                            }
+                        });
 
                 }
 
@@ -612,7 +612,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -661,21 +661,21 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth WHERE email = ?;`, [
-                        email
-                    ], (err, rows) => {
-                        if (err) {
-                            callback(err);
-                            resolve();
-                        } else if (rows.length == 0) {
-                            callback({
-                                'message': 'entries not found'
-                            });
-                            resolve();
-                        } else {
-                            callback(null, rows);
-                            resolve();
-                        }
-                    });
+                            email
+                        ], (err, rows) => {
+                            if (err) {
+                                callback(err);
+                                resolve();
+                            } else if (rows.length == 0) {
+                                callback({
+                                    'message': 'entries not found'
+                                });
+                                resolve();
+                            } else {
+                                callback(null, rows);
+                                resolve();
+                            }
+                        });
 
                 }
 
@@ -698,7 +698,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -778,7 +778,7 @@ module.exports = {
                                             resolve();
 
                                         }
-                                    })
+                                    });
 
                                 }
                             });
@@ -807,7 +807,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -848,14 +848,14 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth;`, [], (err, rows) => {
-                        if (err) {
-                            callback(err);
-                            resolve();
-                        } else {
-                            callback(null, rows);
-                            resolve();
-                        }
-                    });
+                            if (err) {
+                                callback(err);
+                                resolve();
+                            } else {
+                                callback(null, rows);
+                                resolve();
+                            }
+                        });
                 }
             } catch (err) {
                 try {
@@ -876,7 +876,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -956,7 +956,7 @@ module.exports = {
                             });
 
                         }
-                    })
+                    });
                 }
 
             } catch (err) {
@@ -986,7 +986,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1129,7 +1129,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1207,7 +1207,7 @@ module.exports = {
                             resolve();
 
                         }
-                    })
+                    });
                 }
 
             } catch (err) {
@@ -1229,7 +1229,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
                     // session validation
@@ -1290,31 +1290,31 @@ module.exports = {
         try {
 
             if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.redirect('/auth/login?msg=invalid-session')
-                return false
+                res.redirect('/auth/login?msg=invalid-session');
+                return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
-                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
-                return false
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
             } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`)
-                return false
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
             } else {
 
                 if (session.valid != true) {
-                    res.redirect('/auth/login?msg=invalid-session')
-                    return false
+                    res.redirect('/auth/login?msg=invalid-session');
+                    return false;
                 } else {
-                    return true
+                    return true;
                 }
 
             }
         } catch (err) {
             try {
-                res.redirect('/auth/login?msg=invalid-session')
-                return false
+                res.redirect('/auth/login?msg=invalid-session');
+                return false;
             } catch (err) {
-                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.redirect}`)
-                return false
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.redirect}`);
+                return false;
             }
         }
 
@@ -1326,32 +1326,32 @@ module.exports = {
         try {
 
             if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.redirect('/auth/login?msg=invalid-session')
-                return false
+                res.redirect('/auth/login?msg=invalid-session');
+                return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
-                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`)
-                return false
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
             } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`)
-                return false
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
             } else {
 
                 if (session.valid != true) {
-                    res.redirect('/auth/login?msg=invalid-session')
-                    return false
+                    res.redirect('/auth/login?msg=invalid-session');
+                    return false;
                 } else {
 
                     if (perm === undefined || perm === null || typeof perm != 'string') {
-                        console.error(`invalid perm | perm must be string, received '${perm} ${typeof perm}'`)
-                        res.redirect(`${login_redirect}?msg=permission-denied`)
-                        return false
+                        console.error(`invalid perm | perm must be string, received '${perm} ${typeof perm}'`);
+                        res.redirect(`${login_redirect}?msg=permission-denied`);
+                        return false;
                     } else {
 
                         if (session.perms[perm] != true) {
-                            res.redirect(`${login_redirect}?msg=permission-denied`)
-                            return false
+                            res.redirect(`${login_redirect}?msg=permission-denied`);
+                            return false;
                         } else {
-                            return true
+                            return true;
                         }
 
                     }
@@ -1360,11 +1360,11 @@ module.exports = {
             }
         } catch (err) {
             try {
-                res.redirect(`${login_redirect}?msg=permission-denied`)
-                return false
+                res.redirect(`${login_redirect}?msg=permission-denied`);
+                return false;
             } catch (err) {
-                console.error(err.message)
-                return false
+                console.error(err.message);
+                return false;
             }
         }
     },
@@ -1385,7 +1385,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1460,7 +1460,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1535,7 +1535,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1602,9 +1602,9 @@ module.exports = {
                         } else {
 
                             try {
-                                perms = JSON.parse(rows[0].perms)
+                                perms = JSON.parse(rows[0].perms);
                             } catch (err) {
-                                perms = {}
+                                perms = {};
                             }
 
                             perms[args.permission] = true;
@@ -1630,7 +1630,7 @@ module.exports = {
                             });
 
                         }
-                    })
+                    });
                 }
             } catch (err) {
                 try {
@@ -1651,7 +1651,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1718,9 +1718,9 @@ module.exports = {
                         } else {
 
                             try {
-                                perms = JSON.parse(rows[0].perms)
+                                perms = JSON.parse(rows[0].perms);
                             } catch (err) {
-                                perms = {}
+                                perms = {};
                             }
 
                             perms[args.permission] = false;
@@ -1746,7 +1746,7 @@ module.exports = {
                             });
 
                         }
-                    })
+                    });
                 }
             } catch (err) {
                 try {
@@ -1775,7 +1775,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -1914,7 +1914,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -2010,7 +2010,7 @@ module.exports = {
 
                 // callback validation
                 if (callback == undefined || callback == null || typeof callback != 'function') {
-                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`)
+                    console.log(`invalid callback | callback must be function, received '${callback} ${typeof callback}'`);
                     resolve();
 
 
@@ -2096,7 +2096,7 @@ module.exports = {
                             });
 
                         }
-                    })
+                    });
                 }
             } catch (err) {
                 try {
@@ -2117,4 +2117,4 @@ module.exports = {
 
 
 
-}
+};

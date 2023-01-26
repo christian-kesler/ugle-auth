@@ -30,7 +30,7 @@ AUTH_SALT = "A cool and hard to guess salt"
 WEBAPP_DOMAIN = "https://myawesomecompany.com"
 ```
 
-Then use the following code in your main.js or index.js file.  It will connect to a .db file at the path provided and setup all the routes needed to handle server authentication.
+Then use the following code in your `main.js` or `index.js` file.  It will connect to a `.db` file at the path provided and setup all the routes needed to handle server authentication.
 ```javascript
 const dotenv = require('dotenv');
 dotenv.config();
@@ -193,7 +193,7 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
         })
 
 
-        // activating preset routing - this is what the test is for
+        // activating preset routing
         ugle_auth.routes(app, dtb);
 
 

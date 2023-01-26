@@ -1,5 +1,5 @@
 const auth = require(`${__dirname}/auth.js`);
-const log = require(`${__dirname}/log.js`)
+const log = require(`${__dirname}/log.js`);
 
 
 module.exports = function (app, dtb) {
@@ -33,7 +33,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/signup', (req, res) => {
-        action = 'signup'
+        action = 'signup';
 
         try {
 
@@ -53,7 +53,7 @@ module.exports = function (app, dtb) {
                         'recipient': 0,
                         'data': '',
                         'performed_by': (req.session.user_id || 0),
-                    })
+                    });
 
                     res.redirect(`/auth/login?msg=${action}-successful`);
 
@@ -82,7 +82,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/login', (req, res) => {
-        action = 'login'
+        action = 'login';
 
         try {
 
@@ -105,7 +105,7 @@ module.exports = function (app, dtb) {
                         'recipient': req.session.user_id,
                         'data': '',
                         'performed_by': req.session.user_id,
-                    })
+                    });
 
                     res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
@@ -131,7 +131,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/logout', (req, res) => {
-        action = 'logout'
+        action = 'logout';
 
         try {
 
@@ -145,7 +145,7 @@ module.exports = function (app, dtb) {
                         'recipient': req.session.user_id,
                         'data': '',
                         'performed_by': req.session.user_id,
-                    })
+                    });
                     Object.assign(req.session, session);
 
                     // req.session = session;
@@ -175,7 +175,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/forgot-password', (req, res) => {
-        action = 'forgot-password'
+        action = 'forgot-password';
 
         try {
 
@@ -194,16 +194,16 @@ module.exports = function (app, dtb) {
 
                     auth.readUser(dtb, req.body.email, (err, user) => {
                         if (err) {
-                            console.error(err.message)
+                            console.error(err.message);
                         } else {
                             log(dtb, {
                                 'action': action,
                                 'recipient': user.id,
                                 'data': '',
                                 'performed_by': (req.session.user_id || 0),
-                            })
+                            });
                         }
-                    })
+                    });
 
                     res.redirect(`/auth/login?msg=${action}-successful`);
                 }
@@ -230,7 +230,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/reset-password', (req, res) => {
-        action = 'reset-password'
+        action = 'reset-password';
 
         try {
 
@@ -248,16 +248,16 @@ module.exports = function (app, dtb) {
 
                     auth.readUser(dtb, req.query.email, (err, user) => {
                         if (err) {
-                            console.error(err.message)
+                            console.error(err.message);
                         } else {
                             log(dtb, {
                                 'action': action,
                                 'recipient': user.id,
                                 'data': '',
                                 'performed_by': (req.session.user_id || 0),
-                            })
+                            });
                         }
-                    })
+                    });
 
                     res.redirect(`/auth/login?msg=${action}-successful`);
                 }
@@ -274,7 +274,7 @@ module.exports = function (app, dtb) {
 
     // refresh session, logged in users only
     app.get('/auth/refresh-session', (req, res) => {
-        action = 'refresh-session'
+        action = 'refresh-session';
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -289,7 +289,7 @@ module.exports = function (app, dtb) {
                         // req.session = session
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
-                })
+                });
 
             }
         } catch (err) {
@@ -318,7 +318,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/change-password', (req, res) => {
-        action = 'change-password'
+        action = 'change-password';
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -339,7 +339,7 @@ module.exports = function (app, dtb) {
                             'recipient': req.session.user_id,
                             'data': '',
                             'performed_by': req.session.user_id,
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
@@ -372,7 +372,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/request-verification', (req, res) => {
-        action = 'request-verification'
+        action = 'request-verification';
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -395,7 +395,7 @@ module.exports = function (app, dtb) {
                             'recipient': req.session.user_id,
                             'data': '',
                             'performed_by': req.session.user_id,
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
@@ -409,7 +409,7 @@ module.exports = function (app, dtb) {
 
     });
     app.get('/auth/confirm-verification', (req, res) => {
-        action = 'confirm-verification'
+        action = 'confirm-verification';
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -435,7 +435,7 @@ module.exports = function (app, dtb) {
                                 // req.session = session
                                 res.redirect(`${login_redirect}?msg=${action}-successful`);
                             }
-                        })
+                        });
 
                     }
                 });
@@ -468,7 +468,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/delete-account', (req, res) => {
-        action = 'delete-account'
+        action = 'delete-account';
 
         try {
             if (auth.isLoggedIn(req.session, res)) {
@@ -490,14 +490,14 @@ module.exports = function (app, dtb) {
                                     'recipient': req.session.user_id,
                                     'data': '',
                                     'performed_by': req.session.user_id,
-                                })
+                                });
                                 Object.assign(req.session, session);
 
                                 // req.session = session
                                 res.redirect(`${login_redirect}?msg=${action}-successful`);
 
                             }
-                        })
+                        });
 
                     }
                 });
@@ -529,7 +529,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/lock-account', (req, res) => {
-        action = 'lock-account'
+        action = 'lock-account';
 
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
@@ -542,16 +542,16 @@ module.exports = function (app, dtb) {
 
                         auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.error(err.message)
+                                console.error(err.message);
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': '',
                                     'performed_by': req.session.user_id,
-                                })
+                                });
                             }
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
 
@@ -583,7 +583,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/unlock-account', (req, res) => {
-        action = 'unlock-account'
+        action = 'unlock-account';
 
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
@@ -597,16 +597,16 @@ module.exports = function (app, dtb) {
 
                         auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.error(err.message)
+                                console.error(err.message);
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': '',
                                     'performed_by': req.session.user_id,
-                                })
+                                });
                             }
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
 
@@ -640,7 +640,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/add-permission', (req, res) => {
-        action = 'add-permission'
+        action = 'add-permission';
 
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
@@ -648,7 +648,7 @@ module.exports = function (app, dtb) {
                 args = {
                     'email': req.body.email,
                     'permission': req.body.permission.toLowerCase()
-                }
+                };
 
                 auth.addPermission(dtb, args, (err) => {
                     if (err) {
@@ -658,16 +658,16 @@ module.exports = function (app, dtb) {
 
                         auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.error(err.message)
+                                console.error(err.message);
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': req.body.permission.toLowerCase(),
                                     'performed_by': req.session.user_id,
-                                })
+                                });
                             }
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
 
@@ -699,7 +699,7 @@ module.exports = function (app, dtb) {
         }
     });
     app.post('/auth/remove-permission', (req, res) => {
-        action = 'remove-permission'
+        action = 'remove-permission';
 
         try {
             if (auth.hasPermission(req.session, res, 'admin')) {
@@ -707,7 +707,7 @@ module.exports = function (app, dtb) {
                 args = {
                     'email': req.body.email,
                     'permission': req.body.permission.toLowerCase()
-                }
+                };
 
                 auth.removePermission(dtb, args, (err) => {
                     if (err) {
@@ -717,16 +717,16 @@ module.exports = function (app, dtb) {
 
                         auth.readUser(dtb, req.body.email, (err, user) => {
                             if (err) {
-                                console.error(err.message)
+                                console.error(err.message);
                             } else {
                                 log(dtb, {
                                     'action': action,
                                     'recipient': user.id,
                                     'data': req.body.permission.toLowerCase(),
                                     'performed_by': req.session.user_id,
-                                })
+                                });
                             }
-                        })
+                        });
 
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
 

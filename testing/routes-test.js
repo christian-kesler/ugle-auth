@@ -50,12 +50,12 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
         // formatting database
         ugle_auth.formatDatabase(dtb, (err) => {
             if (err) {
-                console.error(err.message)
+                console.error(err.message);
             } else {
-                console.info('database formatted')
+                console.info('database formatted');
             }
 
-        })
+        });
 
 
         // creating default admin account
@@ -63,14 +63,14 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
             'email': process.env.ADMIN_EMAIL,
             'password': process.env.ADMIN_PASSWORD,
             'created_by': 0
-        }
+        };
         ugle_auth.createAdmin(dtb, args, (err) => {
             if (err) {
                 console.error(err.message);
             } else {
-                console.info('default admin created')
+                console.info('default admin created');
             }
-        })
+        });
 
 
         // activating preset routing - this is what the test is for
@@ -133,7 +133,7 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
 
         // listening on development port
         app.listen(3000);
-        console.log('listening on port 3000');
+        console.log('listening on port 3000, begin manual testing here -> http://localhost:3000');
 
     }
 });
