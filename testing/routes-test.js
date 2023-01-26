@@ -4,6 +4,42 @@ dotenv.config();
 
 
 
+// app initialization
+const express = require('express');
+const app = express();
+
+
+// session configuration
+const session = require('express-session');
+app.use(
+    session({
+        cookie: {
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: true,
+            maxAge: 500 * 60 * 1000,
+            // expires: 5 * 60 * 1000,
+        },
+        resave: true,
+        saveUninitialized: true,
+        secret: 'secret',
+        secure: true,
+    })
+);
+
+// body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ejs view engine
+const path = require('path');
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/../views'));
+
+
+
+
+// ugle-auth functions
 const ugle_auth = require(`${__dirname}/../index.js`);
 ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
@@ -37,41 +73,7 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
         })
 
 
-        // initialization
-        const express = require('express');
-        const app = express();
-
-
-        // configuration
-        const session = require('express-session');
-        app.use(
-            session({
-                cookie: {
-                    // httpOnly: true,
-                    // secure: true,
-                    // sameSite: true,
-                    maxAge: 500 * 60 * 1000,
-                    // expires: 5 * 60 * 1000,
-                },
-                resave: true,
-                saveUninitialized: true,
-                secret: 'secret',
-                secure: true,
-            })
-        );
-
-
-        app.use(express.json());
-        app.use(express.urlencoded({ extended: true }));
-
-
-        const path = require('path');
-        app.set('view engine', 'ejs');
-        app.set('views', path.join(__dirname, '/../views'));
-
-
-
-        // preset routing - this is what the test is for
+        // activating preset routing - this is what the test is for
         ugle_auth.routes(app, dtb);
 
 
@@ -132,7 +134,6 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
         // listening on development port
         app.listen(3000);
         console.log('listening on port 3000');
-
 
     }
 });

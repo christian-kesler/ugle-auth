@@ -178,7 +178,7 @@ module.exports = {
                     );`
                 );
 
-                callback(null, dtb);
+                callback(null);
                 resolve();
 
             } catch (err) {
@@ -415,6 +415,7 @@ module.exports = {
     },
 
 
+    // 2.0 conventions
     createUser: (dtb, args, callback) => {
         return new Promise((resolve) => {
             try {
@@ -756,11 +757,6 @@ module.exports = {
                                 if (err) {
                                     callback(err);
                                     resolve();
-                                } else if (this.changes == 0) {
-                                    callback({
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    });
-                                    resolve();
                                 } else {
 
                                     dtb.run('DELETE FROM auth WHERE email = ?;', [
@@ -770,9 +766,11 @@ module.exports = {
                                             callback(err);
                                             resolve();
                                         } else if (this.changes == 0) {
-                                            callback({
-                                                'message': `Row(s) affected: ${this.changes}`
-                                            });
+                                            callback(
+                                                {
+                                                    'message': `${email} not found | Row(s) affected: ${this.changes}`
+                                                }
+                                            );
                                             resolve();
                                         } else {
 
@@ -945,9 +943,11 @@ module.exports = {
                                     callback(err);
                                     resolve();
                                 } else if (this.changes == 0) {
-                                    callback({
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    });
+                                    callback(
+                                        {
+                                            'message': `${args.email} not found | Row(s) affected: ${this.changes}`
+                                        }
+                                    );
                                     resolve();
                                 } else {
                                     callback(null);
@@ -1427,9 +1427,11 @@ module.exports = {
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-                            callback({
-                                'message': `Row(s) affected: ${this.changes}`
-                            });
+                            callback(
+                                {
+                                    'message': `${email} not found | Row(s) affected: ${this.changes}`
+                                }
+                            );
                             resolve();
                         } else {
                             callback(null);
@@ -1500,9 +1502,11 @@ module.exports = {
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-                            callback({
-                                'message': `Row(s) affected: ${this.changes}`
-                            });
+                            callback(
+                                {
+                                    'message': `${email} not found | Row(s) affected: ${this.changes}`
+                                }
+                            );
                             resolve();
                         } else {
                             callback(null);
@@ -1613,9 +1617,11 @@ module.exports = {
                                     callback(err);
                                     resolve();
                                 } else if (this.changes == 0) {
-                                    callback({
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    });
+                                    callback(
+                                        {
+                                            'message': `${args.email} not found | Row(s) affected: ${this.changes}`
+                                        }
+                                    );
                                     resolve();
                                 } else {
                                     callback(null);
@@ -1727,9 +1733,11 @@ module.exports = {
                                     callback(err);
                                     resolve();
                                 } else if (this.changes == 0) {
-                                    callback({
-                                        'message': `Row(s) affected: ${this.changes}`
-                                    });
+                                    callback(
+                                        {
+                                            'message': `${args.email} not found | Row(s) affected: ${this.changes}`
+                                        }
+                                    );
                                     resolve();
                                 } else {
                                     callback(null);
@@ -1840,7 +1848,7 @@ module.exports = {
                         } else if (this.changes == 0) {
                             callback(
                                 {
-                                    'message': `Credentials failed for ${args.recipient} | Row(s) affected: ${this.changes}`
+                                    'message': `${args.recipient} not found | Row(s) affected: ${this.changes}`
                                 }
                             );
                             resolve();
@@ -1968,10 +1976,9 @@ module.exports = {
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
-
                             callback(
                                 {
-                                    'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                    'message': `Credentials failed for ${args.email} | Row(s) affected: ${this.changes}`
                                 }
                             );
                             resolve();
@@ -2078,7 +2085,7 @@ module.exports = {
                                 } else if (this.changes == 0) {
                                     callback(
                                         {
-                                            'message': `Credentials failed | Row(s) affected: ${this.changes}`
+                                            'message': `Credentials failed for ${args.email} | Row(s) affected: ${this.changes}`
                                         }
                                     );
                                     resolve();

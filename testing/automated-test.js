@@ -88,13 +88,13 @@ single_args = [
     single_args[1] = '';
     testing = ugle_auth.formatDatabase;
     for (let i = single_args.length - 1; i >= 0; i--) {
-        await testing(single_args[i], (err, dtb) => {
+        await testing(single_args[i], (err, data) => {
             if (i == 0) {
                 if (err) {
                     console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
                     err_count++;
                 } else {
-                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_log;');
@@ -108,7 +108,7 @@ single_args = [
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_log;');
                     global.dtb = dtb;
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(dtb)}`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
                     err_count++;
                 }
             }
@@ -251,7 +251,7 @@ single_args = [
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft.admin@gmail.com'
+                args.email = 'admin.uglesoft@gmail.com'
             } else if (key == 'password') {
                 args.email = 'chrisjkesler.admin@gmail.com'
             } else if (key == 'created_by') {
@@ -342,7 +342,7 @@ single_args = [
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft.user@gmail.com'
+                args.email = 'user.uglesoft@gmail.com'
             } else if (key == 'password') {
                 args.email = 'chrisjkesler.user@gmail.com'
             } else if (key == 'created_by') {
@@ -400,7 +400,7 @@ single_args = [
 
     // ================================================================
     // readUser
-    single_args[0] = 'uglesoft.user@gmail.com';
+    single_args[0] = 'user.uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.readUser;
     for (let i = 0; i < single_args.length; i++) {
@@ -448,7 +448,7 @@ single_args = [
 
     // ================================================================
     // readUsers
-    single_args[0] = 'uglesoft.user@gmail.com';
+    single_args[0] = 'user.uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.readUsers;
     for (let i = 0; i < single_args.length; i++) {
@@ -496,7 +496,7 @@ single_args = [
 
     // ================================================================
     // deleteUser
-    single_args[0] = 'uglesoft.user@gmail.com';
+    single_args[0] = 'user.uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.deleteUser;
     for (let i = 0; i < single_args.length; i++) {
@@ -599,22 +599,22 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft.admin@gmail.com',
+            'email': 'admin.uglesoft@gmail.com',
             'password': 'aBetterpassword0!',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft.admin@gmail.com',
+                'email': 'admin.uglesoft@gmail.com',
                 'password': 'abadpassword',
             }
 
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft.admin@gmail.com'
+                args.email = 'admin.uglesoft@gmail.com'
                 args.password = 'aBetterpassword0!'
             } else if (key == 'password') {
-                args.email = 'uglesoft.admin@gmail.com'
+                args.email = 'admin.uglesoft@gmail.com'
                 args.password = 'aMuchBetterpassword0!'
             }
 
@@ -696,12 +696,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft.admin@gmail.com',
+            'email': 'admin.uglesoft@gmail.com',
             'password': 'aBetterpassword0!',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft.admin@gmail.com',
+                'email': 'admin.uglesoft@gmail.com',
                 'password': 'aBetterpassword0!',
             }
 
@@ -779,11 +779,11 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft.admin@gmail.com',
+            'email': 'admin.uglesoft@gmail.com',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft.admin@gmail.com',
+                'email': 'admin.uglesoft@gmail.com',
             }
 
             if (i > 0) {
@@ -1087,12 +1087,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft.admin@gmail.com',
+            'email': 'admin.uglesoft@gmail.com',
             'permission': 'developer',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft.admin@gmail.com',
+                'email': 'admin.uglesoft@gmail.com',
                 'permission': 'developer',
             }
 
@@ -1170,12 +1170,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft.admin@gmail.com',
+            'email': 'admin.uglesoft@gmail.com',
             'permission': 'developer',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft.admin@gmail.com',
+                'email': 'admin.uglesoft@gmail.com',
                 'permission': 'developer',
             }
 
@@ -1242,7 +1242,7 @@ single_args = [
     /* BEGIN ADMIN METHODS */
     // ================================================================
     // lockAccount
-    single_args[0] = 'uglesoft.admin@gmail.com';
+    single_args[0] = 'admin.uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.lockAccount;
     for (let i = 0; i < single_args.length; i++) {
@@ -1289,7 +1289,7 @@ single_args = [
 
     // ================================================================
     // unlockAccount
-    single_args[0] = 'uglesoft.admin@gmail.com';
+    single_args[0] = 'admin.uglesoft@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.unlockAccount;
     for (let i = 0; i < single_args.length; i++) {

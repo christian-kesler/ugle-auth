@@ -116,14 +116,94 @@ If you are using custom routing and just want the authentication functions:
 const ugle_auth = require('ugle-auth');
 ```
 
-### Function Examples
+### Preset Routing
 
-```javascript
+```javascript 
+// env variables
+const dotenv = require('dotenv');
+dotenv.config();
 
+
+// app initialization
+const express = require('express');
+const app = express();
+
+
+// session configuration
+const session = require('express-session');
+app.use(
+    session({
+        cookie: {
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: true,
+            maxAge: 500 * 60 * 1000,
+            // expires: 5 * 60 * 1000,
+        },
+        resave: true,
+        saveUninitialized: true,
+        secret: 'secret',
+        secure: true,
+    })
+);
+
+// body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ejs view engine
+const path = require('path');
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/../views'));
+
+
+
+
+// ugle-auth functions
+const ugle_auth = require('ugle-auth');
+ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+
+
+        // formatting database
+        ugle_auth.formatDatabase(dtb, (err) => {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.info('database formatted')
+            }
+
+        })
+
+
+        // creating default admin account
+        args = {
+            'email': process.env.ADMIN_EMAIL,
+            'password': process.env.ADMIN_PASSWORD,
+            'created_by': 0
+        }
+        ugle_auth.createAdmin(dtb, args, (err) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                console.info('default admin created')
+            }
+        })
+
+
+        // activating preset routing - this is what the test is for
+        ugle_auth.routes(app, dtb);
+
+
+        // listening on development port
+        app.listen(3000);
+        console.log('listening on port 3000');
+
+    }
+});
 ```
-
-
-### Preset Routes
 
 If you use the preset routing function, these are the endpoints that will be available on your server:
 
@@ -167,6 +247,330 @@ auth/
     reset-password.ejs
     signup.ejs
     verify-request.ejs
+```
+
+
+
+
+### Function Examples
+
+```javascript
+path = `${__dirname}/database.db`;
+await ugle_auth.connectToDatabase(path, async (err, dtb) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('connectToDatabase successful')
+        global.dtb = dtb
+    }
+});
+
+
+
+
+await ugle_auth.formatDatabase(dtb, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('formatDatabase successful')
+    }
+});
+
+
+
+
+perms = {
+    'admin': false,
+    'user': true
+}
+await ugle_auth.defaultPerms(perms, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('defaultPerms successful')
+    }
+});
+
+
+
+
+attempts = 8
+await ugle_auth.lockoutPolicy(attempts, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('lockoutPolicy successful')
+    }
+});
+
+
+
+
+url = '/auth/login'
+await ugle_auth.loginRedirect(url, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('loginRedirect successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'admin.uglesoft@gmail.com',
+    'password': 'P@ssw0rd',
+    'created_by': 0
+}
+await ugle_auth.createAdmin(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('createAdmin successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'P@ssw0rd',
+    'created_by': 0
+}
+await ugle_auth.createUser(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('createUser successful')
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.readUser(dtb, email, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('readUser successful')
+        console.log(data)
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.readUsers(dtb, email, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('readUsers successful')
+        console.log(data)
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.deleteUser(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('deleteUser successful')
+    }
+});
+
+
+
+
+await ugle_auth.allUsers(dtb, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('allUsers successful')
+        console.log(data)
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'NewP@ssw0rd',
+}
+await ugle_auth.changePassword(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('changePassword successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'NewP@ssw0rd',
+}
+await ugle_auth.login(dtb, args, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('login successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+await ugle_auth.refreshSession(dtb, req.session, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('refreshSession successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+await ugle_auth.logout(req.session, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('logout successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+if (ugle_auth.isLoggedIn(req.session, res)) {
+    console.log('isLoggedIn successful')
+}
+
+
+
+
+if (ugle_auth.hasPermission(req.session, res, 'user')) {
+    console.log('hasPermission successful')
+}
+
+
+
+
+email = 'user.uglesoft@gmail.com'
+await ugle_auth.lockAccount(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('lockAccount successful')
+    }
+});
+
+
+
+
+email = 'user.uglesoft@gmail.com'
+await ugle_auth.unlockAccount(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('unlockAccount successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'permission': 'developer',
+}
+await ugle_auth.addPermission(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('addPermission successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'permission': 'developer',
+}
+await ugle_auth.removePermission(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('removePermission successful')
+    }
+});
+
+
+
+
+args = {
+    'recipient': 'example@gmail.com',
+    'subject': 'Requested Account Verification Link',
+    'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
+    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
+}
+await ugle_auth.sendTempkeyEmail(dtb, args, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('sendTempkeyEmail successful')
+        console.log(data)
+    }
+});
+
+
+
+
+var args = {
+    'email': 'user.uglesoft@gmail.com',
+    'tempkey': req.query.tempkey,
+};
+await ugle_auth.verifyUser(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('verifyUser successful')
+    }
+});
+
+
+
+
+args = {
+    'email': req.query.email,
+    'tempkey': req.query.tempkey,
+    'password': req.body.password
+}
+await ugle_auth.resetPassword(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('resetPassword successful')
+    }
+});
 ```
 
 
