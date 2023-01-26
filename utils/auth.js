@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 
 
 
+
 function isValidEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
@@ -16,6 +17,7 @@ function isValidPassword(password) {
     var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,32})/;
     return re.test(password);
 }
+
 
 module.exports = {
 
@@ -378,10 +380,11 @@ module.exports = {
 
                             perms['admin'] = true
 
-                            dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
+                            dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
                                 args.email,
                                 hash,
                                 JSON.stringify(perms),
+                                0,
                                 `${new Date}`,
                                 Number(args.created_by),
                                 'unverified'
@@ -481,10 +484,11 @@ module.exports = {
                             callback(err);
                             resolve();
                         } else {
-                            dtb.run('INSERT INTO auth(email, hash, perms, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?);', [
+                            dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
                                 args.email,
                                 hash,
                                 JSON.stringify(default_perms),
+                                0,
                                 `${new Date}`,
                                 Number(args.created_by),
                                 'unverified'
@@ -1045,63 +1049,67 @@ module.exports = {
                                 'message': 'Credentials failed'
                             });
                             resolve();
+                        } else if (rows[0].failed_login_attempts >= lockout_policy) {
+                            callback({
+                                'message': 'too many failed login attempts, contact your administrator to unlock your account'
+                            });
+                            resolve();
+                        } else if (rows[0].locked != 0) {
+                            callback({
+                                'message': 'your account is locked, contact your administrator to unlock your account'
+                            });
+                            resolve();
                         } else {
-                            if (rows[0].failed_login_attempts >= lockout_policy) {
-                                callback({
-                                    'message': 'too many failed login attempts, contact your administrator to unlock your account'
-                                });
-                                resolve();
-                            } else {
-                                // Compare the hashed password from the database with the hashed password from the user input
-                                bcrypt.compare(args.password, rows[0].hash, (err, result) => {
-                                    if (err) {
-                                        callback({
-                                            'message': `Credentials failed | ${err.message}`
-                                        });
-                                        resolve();
-                                    }
-                                    if (!result) {
-                                        dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
-                                            (rows[0].failed_login_attempts + 1),
-                                            args.email
-                                        ], (err) => {
-                                            if (err) {
-                                                callback({
-                                                    'message': `Credentials failed | ${err.message}`
-                                                });
-                                                resolve();
-                                            } else {
-                                                callback({
-                                                    'message': 'Credentials failed | login attempts incremented'
-                                                });
-                                                resolve();
-                                            }
-                                        });
-                                    } else {
-                                        // reset the failed login attempts
-                                        dtb.run('UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;', [
-                                            args.email
-                                        ], (err) => {
-                                            if (err) {
-                                                callback({
-                                                    'message': `Credentials success | failed to reset login attempts | ${err.message}`
-                                                });
-                                                resolve();
-                                            } else {
-                                                callback(null, {
-                                                    email: rows[0].email,
-                                                    user_id: rows[0].id,
-                                                    perms: JSON.parse(rows[0].perms),
-                                                    valid: true,
-                                                    status: rows[0].status,
-                                                });
-                                                resolve();
-                                            }
-                                        });
-                                    }
-                                });
-                            }
+                            // Compare the hashed password from the database with the hashed password from the user input
+                            bcrypt.compare(args.password, rows[0].hash, (err, result) => {
+                                if (err) {
+                                    callback({
+                                        'message': `Credentials failed | ${err.message}`
+                                    });
+                                    resolve();
+                                }
+                                if (!result) {
+                                    dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
+                                        (rows[0].failed_login_attempts + 1),
+                                        args.email
+                                    ], (err) => {
+                                        if (err) {
+                                            callback({
+                                                'message': `Credentials failed | ${err.message}`
+                                            });
+                                            resolve();
+                                        } else {
+                                            callback({
+                                                'message': 'Credentials failed | login attempts incremented'
+                                            });
+                                            resolve();
+                                        }
+                                    });
+                                } else {
+                                    // reset the failed login attempts
+                                    dtb.run('UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;', [
+                                        args.email
+                                    ], (err) => {
+                                        if (err) {
+                                            callback({
+                                                'message': `Credentials success | failed to reset login attempts | ${err.message}`
+                                            });
+                                            resolve();
+                                        } else {
+                                            callback(null, {
+                                                email: rows[0].email,
+                                                user_id: rows[0].id,
+                                                perms: JSON.parse(rows[0].perms),
+                                                valid: true,
+                                                status: rows[0].status,
+                                            });
+                                            resolve();
+                                        }
+                                    });
+                                }
+                            });
                         }
+
                     });
                 }
             } catch (err) {
@@ -1590,7 +1598,7 @@ module.exports = {
                         } else {
 
                             try {
-                                perms = JSON.decode(rows[0].perms)
+                                perms = JSON.parse(rows[0].perms)
                             } catch (err) {
                                 perms = {}
                             }
@@ -1599,7 +1607,7 @@ module.exports = {
 
                             dtb.run('UPDATE auth SET perms = ? WHERE email = ?;', [
                                 JSON.stringify(perms),
-                                args.email
+                                args.email,
                             ], function (err) {
                                 if (err) {
                                     callback(err);
@@ -1704,7 +1712,7 @@ module.exports = {
                         } else {
 
                             try {
-                                perms = JSON.decode(rows[0].perms)
+                                perms = JSON.parse(rows[0].perms)
                             } catch (err) {
                                 perms = {}
                             }
