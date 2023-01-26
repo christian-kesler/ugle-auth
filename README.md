@@ -7,7 +7,19 @@ An authentication system for NodeJS web apps using sqlite
 
 ## Quickstart
 
-Create a .env file in the following format and substitute with your information:
+Install using this command:
+
+```bash
+npm install ugle-auth
+```
+
+Create two files using the command below:
+```bash
+touch .env
+touch database.db
+```
+
+Use the following format to substitue your information in the `.env` file:
 ```javascript
 EMAIL_SENDER = "myawesomecompany@gmail.com"
 EMAIL_DOMAIN = "gmail"
@@ -20,8 +32,10 @@ WEBAPP_DOMAIN = "https://myawesomecompany.com"
 
 Then use the following code in your main.js or index.js file.  It will connect to a .db file at the path provided and setup all the routes needed to handle server authentication.
 ```javascript
-const ugle_auth = require('ugle-auth');
+const dotenv = require('dotenv');
+dotenv.config();
 
+const ugle_auth = require('ugle-auth');
 ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
         console.error(err.message);
@@ -43,25 +57,18 @@ There are two ways to use ugle-auth:
 
 ### Security
 
-I've taken steps to make this package secure, including account lcokout protocols, sensitive data hashing, and more. 
+I've taken steps to make this package secure, including account lockout protocols for failed login attempts, sensitive data hashing, manual lockout procedurres, account verification, and more. 
 
 
 #### Password and Tempkey Hashing
 
-The hashing algorithm used is below, and relies on the built-in crypto package for NodeJS:
+`bcrypt` is used for both hashing passwords and comparing password hashes.  
 
-```javascript
-pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
-```
-
-As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 999,999 times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
-
-The Tempkeys are handled the same way, but using totally randomized input and salt each time.  There is no known reliable way to guess what a Tempkey will be before it is created, and they are only created when they are about to be used for a specific purpose.
 
 
 #### Login Attempts
 
-If a login attempt makes it through all input validation AND finds a valid email but the password hashes do not match, then a failed_login_attempts integer is incremented.  If the failed_login_attempts for a given email is equal to 4 or greater, login attempts are denied until the password is reset.  
+If a login attempt makes it through all input validation AND finds a valid email but the password hashes do not match, then a failed_login_attempts integer is incremented.  If the failed_login_attempts for a given email is equal to the `lockout_policy` variable (which is set to 4 by default), login attempts are denied until the password is reset.  
 
 
 
@@ -70,7 +77,7 @@ If a login attempt makes it through all input validation AND finds a valid email
 
 ### Installation
 
-```javascript
+```bash
 npm install ugle-auth
 ```
 
@@ -82,10 +89,9 @@ If you are using the preset routing function:
 
 ```javascript
 "dependencies": {
+    "bcrypt": "^5.1.0",
     "nodemailer": "^6.8.0",
     "sqlite3": "^5.1.2"
-    "dotenv": "^16.0.3",
-    "ejs": "^3.1.8",
     "express": "^4.18.2",
 }
 ```
@@ -94,8 +100,9 @@ If you are using custom routing and just want the authentication functions:
 
 ```javascript
 "dependencies": {
-    "nodemailer": "6.8.0",
-    "sqlite3": "5.1.2"
+    "bcrypt": "^5.1.0",
+    "nodemailer": "^6.8.0",
+    "sqlite3": "^5.1.2"
 }
 ```
 
@@ -103,7 +110,7 @@ If you are using custom routing and just want the authentication functions:
 
 ## Usage
 
-IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
+<!-- IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one. -->
 
 ```javascript
 const ugle_auth = require('ugle-auth');
