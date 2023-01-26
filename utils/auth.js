@@ -368,7 +368,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 16, (err, hash) => {
+                    bcrypt.hash(args.password, 14, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -480,7 +480,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 16, (err, hash) => {
+                    bcrypt.hash(args.password, 14, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -575,21 +575,21 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth WHERE email = ?;`, [
-                            email
-                        ], (err, rows) => {
-                            if (err) {
-                                callback(err);
-                                resolve();
-                            } else if (rows.length == 0) {
-                                callback({
-                                    'message': 'entry not found'
-                                });
-                                resolve();
-                            } else {
-                                callback(null, rows[0]);
-                                resolve();
-                            }
-                        });
+                        email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
+                            callback({
+                                'message': 'entry not found'
+                            });
+                            resolve();
+                        } else {
+                            callback(null, rows[0]);
+                            resolve();
+                        }
+                    });
 
                 }
 
@@ -661,21 +661,21 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth WHERE email = ?;`, [
-                            email
-                        ], (err, rows) => {
-                            if (err) {
-                                callback(err);
-                                resolve();
-                            } else if (rows.length == 0) {
-                                callback({
-                                    'message': 'entries not found'
-                                });
-                                resolve();
-                            } else {
-                                callback(null, rows);
-                                resolve();
-                            }
-                        });
+                        email
+                    ], (err, rows) => {
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else if (rows.length == 0) {
+                            callback({
+                                'message': 'entries not found'
+                            });
+                            resolve();
+                        } else {
+                            callback(null, rows);
+                            resolve();
+                        }
+                    });
 
                 }
 
@@ -848,14 +848,14 @@ module.exports = {
                             created_at,
                             created_by
                         FROM auth;`, [], (err, rows) => {
-                            if (err) {
-                                callback(err);
-                                resolve();
-                            } else {
-                                callback(null, rows);
-                                resolve();
-                            }
-                        });
+                        if (err) {
+                            callback(err);
+                            resolve();
+                        } else {
+                            callback(null, rows);
+                            resolve();
+                        }
+                    });
                 }
             } catch (err) {
                 try {
@@ -929,7 +929,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 16, (err, hash) => {
+                    bcrypt.hash(args.password, 14, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -2068,7 +2068,7 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 16, (err, hash) => {
+                    bcrypt.hash(args.password, 14, (err, hash) => {
                         if (err) {
                             callback(err);
                             resolve();
