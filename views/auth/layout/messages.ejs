@@ -1,3 +1,86 @@
+<% try{
+    if(query.msg == 'server-error'){
+        msg_danger = 'Something went wrong, please try again later.'
+
+    } else if(query.msg == 'invalid-session'){
+        msg_success = 'Your session is invalid, please login again to continue.'
+    } else if(query.msg == 'permission-denied'){
+        msg_warning = 'You do not have permission to perform that action.  If your permissions changed recently, please refresh your session and try again.'
+
+    } else if(query.msg == 'signup-successful'){
+        msg_success = 'Signup successful, please login to your new account.'
+    } else if(query.msg == 'signup-failed'){
+        msg_warning = 'Signup failed, please try again.'
+
+    } else if(query.msg == 'login-successful'){
+        msg_success = 'Login successful.'
+    } else if(query.msg == 'login-failed'){
+        msg_warning = 'Login failed, please try again.'
+
+    } else if(query.msg == 'logout-successful'){
+        msg_success = 'Logout successful.'
+    } else if(query.msg == 'logout-failed'){
+        msg_warning = 'Logout failed, please try again.'
+
+    } else if(query.msg == 'forgot-password-successful'){
+        msg_success = 'An email has been sent to you, please check your inbox and spam folders.'
+    } else if(query.msg == 'forgot-password-failed'){
+        msg_warning = 'We weren\'t able to send an email at this time, please try again later.'
+
+    } else if(query.msg == 'reset-password-successful'){
+        msg_success = 'Reset password successful, please login to your account.'
+    } else if(query.msg == 'reset-password-failed'){
+        msg_warning = 'Reset password failed, please try again.'
+
+    } else if(query.msg == 'refresh-session-successful'){
+        msg_success = 'Refresh session successful.'
+    } else if(query.msg == 'refresh-session-failed'){
+        msg_warning = 'Refresh session failed, please try again.'
+
+    } else if(query.msg == 'change-password-successful'){
+        msg_success = 'Change password successful.'
+    } else if(query.msg == 'change-password-failed'){
+        msg_warning = 'Change password failed, please try again.'
+
+    } else if(query.msg == 'request-verification-successful'){
+        msg_success = 'An email has been sent to you, please check your inbox and spam folders.'
+    } else if(query.msg == 'request-verification-failed'){
+        msg_warning = 'We weren\'t able to send an email at this time, please try again later.'
+
+    } else if(query.msg == 'confirm-verification-successful'){
+        msg_success = 'Account verification successful.'
+    } else if(query.msg == 'confirm-verification-failed'){
+        msg_warning = 'Account verification failed, please try again.'
+
+    } else if(query.msg == 'delete-account-successful'){
+        msg_success = 'Delete account successful.'
+    } else if(query.msg == 'delete-account-failed'){
+        msg_warning = 'Delete account failed, please try again.'
+
+    } else if(query.msg == 'lock-account-successful'){
+        msg_success = 'Lock account successful.'
+    } else if(query.msg == 'lock-account-failed'){
+        msg_warning = 'Lock account failed, please try again.'
+
+    } else if(query.msg == 'unlock-account-successful'){
+        msg_success = 'Unlock account successful.'
+    } else if(query.msg == 'unlock-account-failed'){
+        msg_warning = 'Unlock account failed, please try again.'
+
+    } else if(query.msg == 'add-permission-successful'){
+        msg_success = 'Add permission successful.'
+    } else if(query.msg == 'add-permission-failed'){
+        msg_warning = 'Add permission failed, please try again.'
+
+    } else if(query.msg == 'remove-permission-successful'){
+        msg_success = 'Remove permission successful.'
+    } else if(query.msg == 'remove-permission-failed'){
+        msg_warning = 'Remove permission failed, please try again.'
+    }
+} catch(err){}
+%>
+
+
 <% try { if (msg_primary != undefined) { %>
 <%- '<div class="alert alert-primary" role="alert">' + msg_primary + '</div>' %>
 <% } } catch {} %>
@@ -24,11 +107,13 @@
 <% } } catch {} %>
 
 
-
 <%
-if(query.msg){
-%>
-<div class="alert alert-info"><%= query.msg %></div>
-<%
-}
+delete msg_primary
+delete msg_secondary
+delete msg_success
+delete msg_danger
+delete msg_warning
+delete msg_info
+delete msg_light
+delete msg_dark
 %>

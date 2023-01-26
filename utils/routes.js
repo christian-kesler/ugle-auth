@@ -1,35 +1,18 @@
-const ugle_auth = require(`${__dirname}/handlers.js`);
-
-
-function validSession(session, res) {
-    try {
-        if (
-            session.email == null ||
-            session.id == null ||
-            session.perms == null
-        ) {
-            res.redirect('/auth/login?msg=invalid-session');
-            return false;
-        } else {
-            return true;
-        }
-    } catch (err) {
-        console.log(err.message);
-        return false;
-    }
-
-}
+const auth = require(`${__dirname}/auth.js`);
+const log = require(`${__dirname}/log.js`);
 
 
 module.exports = function (app, dtb) {
 
+
+    // directory redirect
     app.get('/auth', (req, res) => {
         try {
-            if (validSession(req.session, res)) {
-                res.redirect('/account/home');
+            if (auth.isLoggedIn(req.session, res)) {
+                res.redirect(login_redirect);
             }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -45,37 +28,40 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/signup', (req, res) => {
+        action = 'signup';
+
         try {
 
             var args = {
-                'create_params': {
-                    'email': req.body.email,
-                    'password': req.body.password,
-                    'salt': process.env.AUTH_SALT,
-                    'perms': {
-                        'user': true,
-                    },
-                    'created_at': `${new Date}`,
-                    'created_by': 'Self Signup',
-                }
+                'email': req.body.email,
+                'password': req.body.password,
+                'created_by': 0,
             };
 
-            ugle_auth.createUser(dtb, args, (err) => {
+            auth.createUser(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=signup-failed');
+                    console.error(err.message);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
-                    res.redirect('/auth/login');
+                    log(dtb, {
+                        'action': action,
+                        'recipient': 0,
+                        'data': '',
+                        'performed_by': (req.session.user_id || 0),
+                    });
+
+                    res.redirect(`/auth/login?msg=${action}-successful`);
+
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -91,34 +77,42 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/login', (req, res) => {
+        action = 'login';
+
         try {
 
             var args = {
-                'login_params': {
-                    'email': req.body.email,
-                    'password': req.body.password,
-                    'salt': process.env.AUTH_SALT,
-                },
-                'session': req.session
+                'email': req.body.email,
+                'password': req.body.password,
             };
 
-            ugle_auth.loginUser(dtb, args, (err, session) => {
+            auth.login(dtb, args, (err, session) => {
                 if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=login-failed');
+                    console.error(err.message);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
-                    req.session = session;
-                    res.redirect('/account/home');
+                    Object.assign(req.session, session);
+
+                    // req.session = { ...req.session, ...session };
+
+                    log(dtb, {
+                        'action': action,
+                        'recipient': req.session.user_id,
+                        'data': '',
+                        'performed_by': req.session.user_id,
+                    });
+
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -132,28 +126,35 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/logout', (req, res) => {
-        try {
-            var args = {
-                'session': req.session
-            };
+        action = 'logout';
 
-            ugle_auth.logoutUser(args, (err, session) => {
+        try {
+
+            auth.logout(req.session, (err, session) => {
                 if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=logout-failed');
+                    console.error(err.message);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
-                    req.session = session;
-                    res.redirect('/auth/login?msg=logout-successful');
+                    log(dtb, {
+                        'action': action,
+                        'recipient': req.session.user_id,
+                        'data': '',
+                        'performed_by': req.session.user_id,
+                    });
+                    Object.assign(req.session, session);
+
+                    // req.session = session;
+                    res.redirect(`${login_redirect}?msg=${action}-successful`);
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -169,71 +170,184 @@ module.exports = function (app, dtb) {
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/forgot-password', (req, res) => {
+        action = 'forgot-password';
+
         try {
 
             var args = {
                 'recipient': req.body.email,
-                'sender': process.env.EMAIL_SENDER,
-                'domain': process.env.EMAIL_DOMAIN,
-                'token': process.env.EMAIL_TOKEN,
-                'text': 'Requested Password Reset Link',
-                'html': `<h4>Reset Password Link</h4><p>Please click the link below to change your password.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/change-password?email=${req.body.email}&tempkey=">Change my Password</a>`
+                'subject': 'Requested Password Reset Link',
+                'text': `=== Reset Password Link === Please copy and paste this link into your browser to reset your password: ${process.env.WEBAPP_DOMAIN}/auth/reset-password?email=${req.body.email}&tempkey=`,
+                'html': `<h4>Reset Password Link</h4><p>Please click the link below to reset your password.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/reset-password?email=${req.body.email}&tempkey=">Change my Password</a>`
             };
 
-            ugle_auth.sendTempkeyEmail(dtb, args, (err) => {
+            auth.sendTempkeyEmail(dtb, args, (err) => {
                 if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=email-failed');
+                    console.error(err.message);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
                 } else {
-                    res.redirect('/auth/login?msg=email-sent');
+
+                    auth.readUser(dtb, req.body.email, (err, user) => {
+                        if (err) {
+                            console.error(err.message);
+                        } else {
+                            log(dtb, {
+                                'action': action,
+                                'recipient': user.id,
+                                'data': '',
+                                'performed_by': (req.session.user_id || 0),
+                            });
+                        }
+                    });
+
+                    res.redirect(`/auth/login?msg=${action}-successful`);
                 }
             });
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
 
     });
 
-    // change password
-    app.get('/auth/change-password', (req, res) => {
+
+    // reset password
+    app.get('/auth/reset-password', (req, res) => {
         try {
-            res.render('auth/change-password', {
+            res.render('auth/reset-password', {
                 query: req.query,
                 session: req.session
             });
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/reset-password', (req, res) => {
+        action = 'reset-password';
+
+        try {
+
+            var args = {
+                'email': req.query.email,
+                'tempkey': req.query.tempkey,
+                'password': req.body.password
+            };
+
+            auth.resetPassword(dtb, args, (err) => {
+                if (err) {
+                    console.error(err.message);
+                    res.redirect(`/auth/login?msg=${action}-failed`);
+                } else {
+
+                    auth.readUser(dtb, req.query.email, (err, user) => {
+                        if (err) {
+                            console.error(err.message);
+                        } else {
+                            log(dtb, {
+                                'action': action,
+                                'recipient': user.id,
+                                'data': '',
+                                'performed_by': (req.session.user_id || 0),
+                            });
+                        }
+                    });
+
+                    res.redirect(`/auth/login?msg=${action}-successful`);
+                }
+            });
+
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+
+
+    // refresh session, logged in users only
+    app.get('/auth/refresh-session', (req, res) => {
+        action = 'refresh-session';
+
+        try {
+            if (auth.isLoggedIn(req.session, res)) {
+
+                auth.refreshSession(dtb, req.session, (err, session) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+                        Object.assign(req.session, session);
+
+                        // req.session = session
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+
+
+    // change password, logged in users only
+    app.get('/auth/change-password', (req, res) => {
+        try {
+            if (auth.isLoggedIn(req.session, res)) {
+
+                res.render('auth/change-password', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
     app.post('/auth/change-password', (req, res) => {
+        action = 'change-password';
+
         try {
+            if (auth.isLoggedIn(req.session, res)) {
 
-            var args = {
-                'email': req.query.email,
-                'tempkey': req.query.tempkey,
-                'password': req.body.password,
-                'salt': process.env.AUTH_SALT
-            };
+                var args = {
+                    'email': req.session.email,
+                    'password': req.body.password
+                };
 
-            ugle_auth.changePassword(dtb, args, (err) => {
-                if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=change-password-failed');
-                } else {
-                    res.redirect('/auth/login?msg=change-password-successful');
-                }
-            });
+                auth.changePassword(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
+                    } else {
 
+                        log(dtb, {
+                            'action': action,
+                            'recipient': req.session.user_id,
+                            'data': '',
+                            'performed_by': req.session.user_id,
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
+                });
+
+            }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
@@ -241,71 +355,389 @@ module.exports = function (app, dtb) {
 
 
 
-    // verify account
-    app.get('/auth/verify', (req, res) => {
-        res.redirect('/auth/verify-request');
-    });
-    app.get('/auth/verify-request', (req, res) => {
+    // verify account, logged in users only
+    app.get('/auth/request-verification', (req, res) => {
         try {
-            res.render('auth/verify-request', {
-                query: req.query,
-                session: req.session
-            });
+            if (auth.isLoggedIn(req.session, res)) {
+
+                res.render('auth/request-verification', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
     });
-    app.post('/auth/verify-request', (req, res) => {
+    app.post('/auth/request-verification', (req, res) => {
+        action = 'request-verification';
+
         try {
+            if (auth.isLoggedIn(req.session, res)) {
 
-            var args = {
-                'recipient': req.session.email,
-                'sender': process.env.EMAIL_SENDER,
-                'domain': process.env.EMAIL_DOMAIN,
-                'token': process.env.EMAIL_TOKEN,
-                'text': 'Requested Account Verification Link',
-                'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify-confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
-            };
+                var args = {
+                    'recipient': req.session.email,
+                    'subject': 'Requested Account Verification Link',
+                    'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
+                    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
+                };
 
-            ugle_auth.sendTempkeyEmail(dtb, args, (err) => {
-                if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=email-failed');
-                } else {
-                    res.redirect('/auth/login?msg=email-sent');
-                }
-            });
+                auth.sendTempkeyEmail(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
 
+                        log(dtb, {
+                            'action': action,
+                            'recipient': req.session.user_id,
+                            'data': '',
+                            'performed_by': req.session.user_id,
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
+                });
+
+            }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+
+    });
+    app.get('/auth/confirm-verification', (req, res) => {
+        action = 'confirm-verification';
+
+        try {
+            if (auth.isLoggedIn(req.session, res)) {
+
+                var args = {
+                    'email': req.session.email,
+                    'tempkey': req.query.tempkey,
+                };
+
+                auth.verifyUser(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+
+                        auth.refreshSession(dtb, req.session, (err, session) => {
+                            if (err) {
+                                console.error(err.message);
+                                res.redirect(`${login_redirect}?msg=${action}-failed`);
+                            } else {
+                                Object.assign(req.session, session);
+
+                                // req.session = session
+                                res.redirect(`${login_redirect}?msg=${action}-successful`);
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
 
     });
 
-    app.get('/auth/verify-confirm', (req, res) => {
+
+
+
+    // delete account, logged in users only
+    app.get('/auth/delete-account', (req, res) => {
         try {
+            if (auth.isLoggedIn(req.session, res)) {
 
-            var args = {
-                'email': req.query.email,
-                'tempkey': req.query.tempkey,
-            };
+                res.render('auth/delete-account', {
+                    query: req.query,
+                    session: req.session
+                });
 
-            ugle_auth.verifyUser(dtb, args, (err) => {
-                if (err) {
-                    console.log(err.message);
-                    res.redirect('/auth/login?msg=verification-failed');
-                } else {
-                    res.redirect('/auth/login?msg=verification-successful');
-                }
-            });
-
+            }
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             res.redirect('/?msg=server-error');
         }
+    });
+    app.post('/auth/delete-account', (req, res) => {
+        action = 'delete-account';
 
+        try {
+            if (auth.isLoggedIn(req.session, res)) {
+
+                auth.deleteUser(dtb, req.session.email, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`${login_redirect}?msg=${action}-failed`);
+                    } else {
+
+                        auth.logout(req.session, (err, session) => {
+                            if (err) {
+                                console.error(err.message);
+                                res.redirect(`${login_redirect}?msg=${action}-failed`);
+                            } else {
+
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': req.session.user_id,
+                                    'data': '',
+                                    'performed_by': req.session.user_id,
+                                });
+                                Object.assign(req.session, session);
+
+                                // req.session = session
+                                res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+
+
+    // lock account, admins only
+    app.get('/auth/lock-account', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/admin/lock-account', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/lock-account', (req, res) => {
+        action = 'lock-account';
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                auth.lockAccount(dtb, req.body.email, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
+                    } else {
+
+                        auth.readUser(dtb, req.body.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message);
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': '',
+                                    'performed_by': req.session.user_id,
+                                });
+                            }
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+    // unlock account, admins only
+    app.get('/auth/unlock-account', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/admin/unlock-account', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/unlock-account', (req, res) => {
+        action = 'unlock-account';
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                auth.unlockAccount(dtb, req.body.email, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
+                    } else {
+
+
+                        auth.readUser(dtb, req.body.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message);
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': '',
+                                    'performed_by': req.session.user_id,
+                                });
+                            }
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+
+
+    // add permission, admins only
+    app.get('/auth/add-permission', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/admin/add-permission', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/add-permission', (req, res) => {
+        action = 'add-permission';
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                args = {
+                    'email': req.body.email,
+                    'permission': req.body.permission.toLowerCase()
+                };
+
+                auth.addPermission(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
+                    } else {
+
+                        auth.readUser(dtb, req.body.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message);
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': req.body.permission.toLowerCase(),
+                                    'performed_by': req.session.user_id,
+                                });
+                            }
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+
+
+    // remove permission, admins only
+    app.get('/auth/remove-permission', (req, res) => {
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                res.render('auth/admin/remove-permission', {
+                    query: req.query,
+                    session: req.session
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
+    });
+    app.post('/auth/remove-permission', (req, res) => {
+        action = 'remove-permission';
+
+        try {
+            if (auth.hasPermission(req.session, res, 'admin')) {
+
+                args = {
+                    'email': req.body.email,
+                    'permission': req.body.permission.toLowerCase()
+                };
+
+                auth.removePermission(dtb, args, (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        res.redirect(`/auth/login?msg=${action}-failed`);
+                    } else {
+
+                        auth.readUser(dtb, req.body.email, (err, user) => {
+                            if (err) {
+                                console.error(err.message);
+                            } else {
+                                log(dtb, {
+                                    'action': action,
+                                    'recipient': user.id,
+                                    'data': req.body.permission.toLowerCase(),
+                                    'performed_by': req.session.user_id,
+                                });
+                            }
+                        });
+
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+
+                    }
+                });
+
+            }
+        } catch (err) {
+            console.error(err.message);
+            res.redirect('/?msg=server-error');
+        }
     });
 
 

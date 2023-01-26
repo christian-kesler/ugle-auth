@@ -1,6 +1,3 @@
-TODO: Add sendTempkeyEmail, verifyUser, and changePassword example functions
-
-
 # ugle-auth
 
 An authentication system for NodeJS web apps using sqlite
@@ -10,8 +7,20 @@ An authentication system for NodeJS web apps using sqlite
 
 ## Quickstart
 
-Create a .env file in the following format and substitute with your information:
+Install using this command:
+
+```bash
+npm install ugle-auth
 ```
+
+Create two files using the command below:
+```bash
+touch .env
+touch database.db
+```
+
+Use the following format to substitue your information in the `.env` file:
+```javascript
 EMAIL_SENDER = "myawesomecompany@gmail.com"
 EMAIL_DOMAIN = "gmail"
 EMAIL_TOKEN = "abcdefghijklmnop"
@@ -21,10 +30,12 @@ AUTH_SALT = "A cool and hard to guess salt"
 WEBAPP_DOMAIN = "https://myawesomecompany.com"
 ```
 
-Then use the following code in your main.js or index.js file.  It will connect to a .db file at the path provided and setup all the routes needed to handle server authentication.
-```
-const ugle_auth = require('ugle-auth');
+Then use the following code in your `main.js` or `index.js` file.  It will connect to a `.db` file at the path provided and setup all the routes needed to handle server authentication.
+```javascript
+const dotenv = require('dotenv');
+dotenv.config();
 
+const ugle_auth = require('ugle-auth');
 ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
         console.error(err.message);
@@ -46,25 +57,18 @@ There are two ways to use ugle-auth:
 
 ### Security
 
-I've taken steps to make this package secure, including account lcokout protocols, sensitive data hashing, and more. 
+I've taken steps to make this authentication system secure by including account lockout protocols for failed login attempts, sensitive data hashing, manual lockout procedurres, account verification, and more. 
 
 
 #### Password and Tempkey Hashing
 
-The hashing algorithm used is below, and relies on the built-in crypto package for NodeJS:
+`bcrypt` is used for both hashing passwords and comparing password hashes.  
 
-```
-pbkdf2Sync(input, salt, 999999, 255, `sha512`).toString(`hex`)
-```
-
-As you can see, it hashes to a 255 character output (a convenient number for SQLite) and iterates 999,999 times with a custom salt determined by you.  As far as I can tell, this hash will be more than adequate for securing the passwords of your users.  The standard I see others recommend is 10,000 iterations with 64 characters, and I prefer a bit of overkill when it comes to cybersecurity.
-
-The Tempkeys are handled the same way, but using totally randomized input and salt each time.  There is no known reliable way to guess what a Tempkey will be before it is created, and they are only created when they are about to be used for a specific purpose.
 
 
 #### Login Attempts
 
-If a login attempt makes it through all input validation AND finds a valid email but the password hashes do not match, then a failed_login_attempts integer is incremented.  If the failed_login_attempts for a given email is equal to 4 or greater, login attempts are denied until the password is reset.  
+If a login attempt makes it through all input validation AND finds a valid email but the password hashes do not match, then a `failed_login_attempts` integer is incremented.  If the `failed_login_attempts` for a given email is equal to (or greater than) the `lockout_policy` variable (which is set to 4 by default), login attempts are denied until the password is reset.  
 
 
 
@@ -73,7 +77,7 @@ If a login attempt makes it through all input validation AND finds a valid email
 
 ### Installation
 
-```
+```bash
 npm install ugle-auth
 ```
 
@@ -83,22 +87,22 @@ You will probably be able to use this package with older or newer versions than 
 
 If you are using the preset routing function:
 
-```
+```javascript
 "dependencies": {
+    "bcrypt": "^5.1.0",
     "nodemailer": "^6.8.0",
     "sqlite3": "^5.1.2"
-    "dotenv": "^16.0.3",
-    "ejs": "^3.1.8",
     "express": "^4.18.2",
 }
 ```
 
 If you are using custom routing and just want the authentication functions:
 
-```
+```javascript
 "dependencies": {
-    "nodemailer": "6.8.0",
-    "sqlite3": "5.1.2"
+    "bcrypt": "^5.1.0",
+    "nodemailer": "^6.8.0",
+    "sqlite3": "^5.1.2"
 }
 ```
 
@@ -106,225 +110,467 @@ If you are using custom routing and just want the authentication functions:
 
 ## Usage
 
-IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one.
+<!-- IMPORTANT - your salt must not change once you enter a production environment; doing so will result in all existing accounts being locked out completely since the stored hashes will have been generated using a different salt than the currently implemented one. -->
 
-```
+```javascript
 const ugle_auth = require('ugle-auth');
 ```
 
-### Function Examples
+### Preset Routing
 
-```
-
-// CONNECT to a database file
-await ugle_auth.initDtb('./database.db', (err, dtb) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        // do something with dtb connection
-    }
-})
+```javascript 
+// env variables
+const dotenv = require('dotenv');
+dotenv.config();
 
 
-// CREATE new user account
-args = {
-    'create_params': {
-        'email': req.body.email,
-        'password': req.body.password,
-        'salt': process.env.AUTH_SALT,
-        'perms': {
-            'admin': false,
-            'user': true,
+// app initialization
+const express = require('express');
+const app = express();
+
+
+// session configuration
+const session = require('express-session');
+app.use(
+    session({
+        cookie: {
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: true,
+            maxAge: 500 * 60 * 1000,
+            // expires: 5 * 60 * 1000,
         },
-        'created_at': `${new Date}`,
-        'created_by': `${req.session.email}`,
-    }
-}
-await ugle_auth.createUser(dtb, args, (err) => {
+        resave: true,
+        saveUninitialized: true,
+        secret: 'secret',
+        secure: true,
+    })
+);
+
+// body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ejs view engine
+const path = require('path');
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/../views'));
+
+
+
+
+// ugle-auth functions
+const ugle_auth = require('ugle-auth');
+ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
-        console.log(err.message);
+        console.error(err.message);
     } else {
-        console.log(`createUser successful`);
+
+
+        // formatting database
+        ugle_auth.formatDatabase(dtb, (err) => {
+            if (err) {
+                console.error(err.message)
+            } else {
+                console.info('database formatted')
+            }
+
+        })
+
+
+        // creating default admin account
+        args = {
+            'email': process.env.ADMIN_EMAIL,
+            'password': process.env.ADMIN_PASSWORD,
+            'created_by': 0
+        }
+        ugle_auth.createAdmin(dtb, args, (err) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                console.info('default admin created')
+            }
+        })
+
+
+        // activating preset routing
+        ugle_auth.routes(app, dtb);
+
+
+        // listening on development port
+        app.listen(3000);
+        console.log('listening on port 3000');
+
     }
 });
-
-
-// READ existing user account(s)
-args = {
-    'read_fields': 'id, email, created_at, created_by',
-    'read_key': 'id',
-    'read_value': '1',
-}
-await ugle_auth.readUser(dtb, args, (err, data) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(`readUser successful | ${JSON.stringify(data)}`);
-    }
-});
-await ugle_auth.readUsers(dtb, args, (err, data) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(`readUser successful | ${JSON.stringify(data)}`);
-    }
-});
-
-
-// UPDATE existing user account
-args = {
-    'update_field': 'hash',
-    'update_params': {
-        'data': 'new_password',
-        'salt': 'exampleSalt',
-    },
-    'update_key': 'email',
-    'update_value': 'uglesoft@gmail.com'
-}
-await ugle_auth.updateUser(dtb, args, (err, changes) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(`updateUser successful | ${changes.message}`);
-    }
-});
-
-
-// DELETE existing user account
-args = {
-    'delete_key': 'id',
-    'delete_value': '1'
-}
-await ugle_auth.deleteUser(dtb, args, (err, changes) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(`deleteUser successful | ${changes.message}`);
-    }
-});
-
-
-// LOGIN to user account
-global.session = {}
-args = {
-    'login_params': {
-        'email': 'christian.j.kesler@gmail.com',
-        'password': 'personalPassword',
-        'salt': 'personalSalt',
-    },
-    'session': session
-}
-await ugle_auth.loginUser(dtb, args, (err, session) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        global.session = session;
-        console.log(`loginUser successful | ${JSON.stringify(session)}`);
-    }
-});
-
-
-// LOGOUT of user account
-global.session = { "email": "uglesoft@gmail.com", "id": 1 }
-args = {
-    'session': session
-}
-await ugle_auth.logoutUser(args, (err, session) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        global.session = session;
-        console.log(`logoutUser successful | ${JSON.stringify(session)}`);
-    }
-});
-
-
-// ALL user accounts
-await ugle_auth.allUsers(dtb, (err, data) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(JSON.stringify(data));
-    }
-});
-
-
-// SEND tempkey email
-var args = {
-    'recipient': req.session.email,
-    'sender': process.env.EMAIL_SENDER,
-    'domain': process.env.EMAIL_DOMAIN,
-    'token': process.env.EMAIL_TOKEN,
-    'text': 'Requested Account Verification Link',
-    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/verify-confirm?email=${req.session.email}&tempkey=">Verify my Account</a>`
-};
-ugle_auth.sendTempkeyEmail(dtb, args, (err, info) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(info);
-    }
-});
-
-
-// VERIFY user
-var args = {
-    'email': req.query.email,
-    'tempkey': req.query.tempkey,
-};
-ugle_auth.verifyUser(dtb, args, (err) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        // do something
-    }
-});
-
-
-// CHANGE password
-var args = {
-    'email': req.query.email,
-    'tempkey': req.query.tempkey,
-    'password': req.body.password,
-    'salt': process.env.AUTH_SALT
-};
-ugle_auth.changePassword(dtb, args, (err) => {
-    if (err) {
-        console.log(err.message);
-    } else {
-        // do something
-    }
-});
-
 ```
-
-
-### Preset Routes
 
 If you use the preset routing function, these are the endpoints that will be available on your server:
 
 ```
-/auth
-/auth/signup
-/auth/login
-/auth/logout
-/auth/forgot-password
-/auth/change-password
-/auth/verify
-/auth/verify-request
-/auth/verify-confirm
+/auth                           GET 
+/auth/signup                    GET & POST
+/auth/login                     GET & POST
+/auth/logout                    GET & POST
+/auth/forgot-password           GET & POST
+/auth/reset-password            GET & POST
+/auth/refresh-session           GET
+/auth/change-password           GET & POST
+/auth/request-verification      GET & POST
+/auth/confirm-verification      GET
+/auth/delete-account            GET & POST
+/auth/lock-account              GET & POST
+/auth/unlock-account            GET & POST
+/auth/add-permission            GET & POST
+/auth/remove-permission         GET & POST
 ```
 
 You'll also need a folder titled "auth" for the ejs files that correspond to each route.  An "auth" folder is present within this package, and can be downloaded from GitHub <a href="https://github.com/christian-kesler/ugle-auth/tree/main/views/auth/">here</a>.  If you'd rather make them yourself, these are the files you'll need within your ejs views directory:
 
 ```
 auth/
+    admin/
+        add-permission.ejs
+        lock-account.ejs
+        remove-permission.ejs
+        unlock-account.ejs
+    layout/
+        auth_begin.ejs
+        auth_end.ejs
+        messages.ejs
     change-password.ejs
+    delete-account.ejs
     forgot-password.ejs
     login.ejs
     logout.ejs
+    request-verification.ejs
+    reset-password.ejs
     signup.ejs
     verify-request.ejs
+```
+
+
+
+
+### Function Examples
+
+```javascript
+path = `${__dirname}/database.db`;
+await ugle_auth.connectToDatabase(path, async (err, dtb) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('connectToDatabase successful')
+        global.dtb = dtb
+    }
+});
+
+
+
+
+await ugle_auth.formatDatabase(dtb, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('formatDatabase successful')
+    }
+});
+
+
+
+
+perms = {
+    'admin': false,
+    'user': true
+}
+await ugle_auth.defaultPerms(perms, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('defaultPerms successful')
+    }
+});
+
+
+
+
+attempts = 8
+await ugle_auth.lockoutPolicy(attempts, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('lockoutPolicy successful')
+    }
+});
+
+
+
+
+url = '/auth/login'
+await ugle_auth.loginRedirect(url, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('loginRedirect successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'admin.uglesoft@gmail.com',
+    'password': 'P@ssw0rd',
+    'created_by': 0
+}
+await ugle_auth.createAdmin(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('createAdmin successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'P@ssw0rd',
+    'created_by': 0
+}
+await ugle_auth.createUser(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('createUser successful')
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.readUser(dtb, email, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('readUser successful')
+        console.log(data)
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.readUsers(dtb, email, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('readUsers successful')
+        console.log(data)
+    }
+});
+
+
+
+
+email = 'admin.uglesoft@gmail.com'
+await ugle_auth.deleteUser(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('deleteUser successful')
+    }
+});
+
+
+
+
+await ugle_auth.allUsers(dtb, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('allUsers successful')
+        console.log(data)
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'NewP@ssw0rd',
+}
+await ugle_auth.changePassword(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('changePassword successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'password': 'NewP@ssw0rd',
+}
+await ugle_auth.login(dtb, args, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('login successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+await ugle_auth.refreshSession(dtb, req.session, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('refreshSession successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+await ugle_auth.logout(req.session, async (err, session) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('logout successful')
+        console.log(session)
+        req.session = session
+    }
+});
+
+
+
+
+if (ugle_auth.isLoggedIn(req.session, res)) {
+    console.log('isLoggedIn successful')
+}
+
+
+
+
+if (ugle_auth.hasPermission(req.session, res, 'user')) {
+    console.log('hasPermission successful')
+}
+
+
+
+
+email = 'user.uglesoft@gmail.com'
+await ugle_auth.lockAccount(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('lockAccount successful')
+    }
+});
+
+
+
+
+email = 'user.uglesoft@gmail.com'
+await ugle_auth.unlockAccount(dtb, email, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('unlockAccount successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'permission': 'developer',
+}
+await ugle_auth.addPermission(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('addPermission successful')
+    }
+});
+
+
+
+
+args = {
+    'email': 'user.uglesoft@gmail.com',
+    'permission': 'developer',
+}
+await ugle_auth.removePermission(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('removePermission successful')
+    }
+});
+
+
+
+
+args = {
+    'recipient': 'example@gmail.com',
+    'subject': 'Requested Account Verification Link',
+    'text': `=== Account Verification Link === Please copy and paste this link into your browser to verify your account: ${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=`,
+    'html': `<h4>Account Verification Link</h4><p>Please click the link below to verify your account.</p><a href="${process.env.WEBAPP_DOMAIN}/auth/confirm-verification?tempkey=">Verify My Account</a>`
+}
+await ugle_auth.sendTempkeyEmail(dtb, args, async (err, data) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('sendTempkeyEmail successful')
+        console.log(data)
+    }
+});
+
+
+
+
+var args = {
+    'email': 'user.uglesoft@gmail.com',
+    'tempkey': req.query.tempkey,
+};
+await ugle_auth.verifyUser(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('verifyUser successful')
+    }
+});
+
+
+
+
+args = {
+    'email': req.query.email,
+    'tempkey': req.query.tempkey,
+    'password': req.body.password
+}
+await ugle_auth.resetPassword(dtb, args, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('resetPassword successful')
+    }
+});
 ```
 
 
