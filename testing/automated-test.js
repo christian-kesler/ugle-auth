@@ -237,13 +237,13 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'asuperfakeemail@yahoo.com',
+            'email': 'admin@yahoo.com',
             'password': 'aG00dPa$$word',
             'created_by': 0
         }
         for (const key in template) {
             args = {
-                'email': 'asuperfakeemail@yahoo.com',
+                'email': 'admin@yahoo.com',
                 'password': 'aG00dPa$$word',
                 'created_by': 0
             }
@@ -251,11 +251,11 @@ single_args = [
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft@gmail.com'
+                args.email = 'uglesoft.admin@gmail.com'
             } else if (key == 'password') {
-                args.email = 'christian.j.kesler@gmail.com'
+                args.email = 'chrisjkesler.admin@gmail.com'
             } else if (key == 'created_by') {
-                args.email = 'erudtionalism@gmail.com'
+                args.email = 'erudtionalism.admin@gmail.com'
             }
 
             await testing(dtb, args, async (err) => {
@@ -328,13 +328,13 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'asuperfakeemail@yahoo.com',
+            'email': 'user@yahoo.com',
             'password': 'aG00dPa$$word',
             'created_by': 0
         }
         for (const key in template) {
             args = {
-                'email': 'asuperfakeemail@yahoo.com',
+                'email': 'user@yahoo.com',
                 'password': 'aG00dPa$$word',
                 'created_by': 0
             }
@@ -342,11 +342,11 @@ single_args = [
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft@gmail.com'
+                args.email = 'uglesoft.user@gmail.com'
             } else if (key == 'password') {
-                args.email = 'christian.j.kesler@gmail.com'
+                args.email = 'chrisjkesler.user@gmail.com'
             } else if (key == 'created_by') {
-                args.email = 'erudtionalism@gmail.com'
+                args.email = 'erudtionalism.user@gmail.com'
             }
 
             await testing(dtb, args, async (err) => {
@@ -400,7 +400,7 @@ single_args = [
 
     // ================================================================
     // readUser
-    single_args[0] = 'uglesoft@gmail.com';
+    single_args[0] = 'uglesoft.user@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.readUser;
     for (let i = 0; i < single_args.length; i++) {
@@ -448,7 +448,7 @@ single_args = [
 
     // ================================================================
     // readUsers
-    single_args[0] = 'uglesoft@gmail.com';
+    single_args[0] = 'uglesoft.user@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.readUsers;
     for (let i = 0; i < single_args.length; i++) {
@@ -496,7 +496,7 @@ single_args = [
 
     // ================================================================
     // deleteUser
-    single_args[0] = 'uglesoft@gmail.com';
+    single_args[0] = 'uglesoft.user@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.deleteUser;
     for (let i = 0; i < single_args.length; i++) {
@@ -599,26 +599,27 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft@gmail.com',
+            'email': 'uglesoft.admin@gmail.com',
             'password': 'aBetterpassword0!',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft@gmail.com',
+                'email': 'uglesoft.admin@gmail.com',
                 'password': 'abadpassword',
             }
 
             if (i > 0) {
                 args[key] = single_args[i]
             } else if (key == 'email') {
-                args.email = 'uglesoft@gmail.com'
+                args.email = 'uglesoft.admin@gmail.com'
                 args.password = 'aBetterpassword0!'
             } else if (key == 'password') {
-                args.email = 'uglesoft@gmail.com'
+                args.email = 'uglesoft.admin@gmail.com'
                 args.password = 'aMuchBetterpassword0!'
             }
 
             await testing(dtb, args, async (err) => {
+                console.log(args)
                 if (i <= 0) {
                     if (err) {
                         console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
@@ -695,12 +696,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft@gmail.com',
+            'email': 'uglesoft.admin@gmail.com',
             'password': 'aBetterpassword0!',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft@gmail.com',
+                'email': 'uglesoft.admin@gmail.com',
                 'password': 'aBetterpassword0!',
             }
 
@@ -778,11 +779,11 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft@gmail.com',
+            'email': 'uglesoft.admin@gmail.com',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft@gmail.com',
+                'email': 'uglesoft.admin@gmail.com',
             }
 
             if (i > 0) {
@@ -1086,12 +1087,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft@gmail.com',
+            'email': 'uglesoft.admin@gmail.com',
             'permission': 'developer',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft@gmail.com',
+                'email': 'uglesoft.admin@gmail.com',
                 'permission': 'developer',
             }
 
@@ -1169,12 +1170,12 @@ single_args = [
 
         // subargs testing
         template = {
-            'email': 'uglesoft@gmail.com',
+            'email': 'uglesoft.admin@gmail.com',
             'permission': 'developer',
         }
         for (const key in template) {
             args = {
-                'email': 'uglesoft@gmail.com',
+                'email': 'uglesoft.admin@gmail.com',
                 'permission': 'developer',
             }
 
@@ -1241,7 +1242,7 @@ single_args = [
     /* BEGIN ADMIN METHODS */
     // ================================================================
     // lockAccount
-    single_args[0] = 'uglesoft@gmail.com';
+    single_args[0] = 'uglesoft.admin@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.lockAccount;
     for (let i = 0; i < single_args.length; i++) {
@@ -1288,7 +1289,7 @@ single_args = [
 
     // ================================================================
     // unlockAccount
-    single_args[0] = 'uglesoft@gmail.com';
+    single_args[0] = 'uglesoft.admin@gmail.com';
     single_args[1] = 'uglesoft@yahoo.com';
     testing = ugle_auth.unlockAccount;
     for (let i = 0; i < single_args.length; i++) {
