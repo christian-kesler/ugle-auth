@@ -39,7 +39,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const ugle_auth = require('ugle-auth');
-ugle_auth.initDtb(`${__dirname}/database.db`, (err, dtb) => {
+ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
     if (err) {
         console.error(err.message);
     } else {
