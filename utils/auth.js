@@ -1,6 +1,12 @@
 const { tempkey } = require(`${__dirname}/hashing.js`);
 const sqlite3 = require('sqlite3');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
+const argon_options = {
+    timeCost: 16,
+    memoryCost: 128 * 1024,
+    parallelism: 2
+}
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 // TODO verify console output on invalid callback
@@ -305,7 +311,7 @@ module.exports = {
     /* BEGIN USER MANAGEMENT METHODS */
     // 2.0 conventions
     createAdmin: (dtb, args, callback) => {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             try {
 
                 // callback validation
@@ -368,36 +374,27 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 14, (err, hash) => {
+                    perms = {};
+
+                    Object.assign(perms, default_perms);
+
+                    perms['admin'] = true;
+
+                    dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
+                        args.email,
+                        await argon2.hash(args.password, argon_options),
+                        JSON.stringify(perms),
+                        0,
+                        `${new Date}`,
+                        Number(args.created_by),
+                        'unverified'
+                    ], (err) => {
                         if (err) {
                             callback(err);
                             resolve();
                         } else {
-
-                            perms = {};
-
-                            Object.assign(perms, default_perms);
-
-                            perms['admin'] = true;
-
-                            dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
-                                args.email,
-                                hash,
-                                JSON.stringify(perms),
-                                0,
-                                `${new Date}`,
-                                Number(args.created_by),
-                                'unverified'
-                            ], (err) => {
-                                if (err) {
-                                    callback(err);
-                                    resolve();
-                                } else {
-                                    callback(null);
-                                    resolve();
-                                }
-                            });
-
+                            callback(null);
+                            resolve();
                         }
                     });
 
@@ -417,7 +414,7 @@ module.exports = {
 
     // 2.0 conventions
     createUser: (dtb, args, callback) => {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             try {
 
                 // callback validation
@@ -480,28 +477,21 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 14, (err, hash) => {
+                    dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
+                        args.email,
+                        await argon2.hash(args.password, argon_options),
+                        JSON.stringify(default_perms),
+                        0,
+                        `${new Date}`,
+                        Number(args.created_by),
+                        'unverified'
+                    ], (err) => {
                         if (err) {
                             callback(err);
                             resolve();
                         } else {
-                            dtb.run('INSERT INTO auth(email, hash, perms, locked, created_at, created_by, status) VALUES(?, ?, ?, ?, ?, ?, ?);', [
-                                args.email,
-                                hash,
-                                JSON.stringify(default_perms),
-                                0,
-                                `${new Date}`,
-                                Number(args.created_by),
-                                'unverified'
-                            ], (err) => {
-                                if (err) {
-                                    callback(err);
-                                    resolve();
-                                } else {
-                                    callback(null);
-                                    resolve();
-                                }
-                            });
+                            callback(null);
+                            resolve();
                         }
                     });
 
@@ -871,7 +861,7 @@ module.exports = {
 
     // 2.0 conventions
     changePassword: (dtb, args, callback) => {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             try {
 
                 // callback validation
@@ -929,34 +919,27 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 14, (err, hash) => {
+
+                    dtb.run('UPDATE auth SET hash = ? WHERE email = ?;', [
+                        await argon2.hash(args.password, argon_options),
+                        args.email
+                    ], function (err) {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else {
-
-                            dtb.run('UPDATE auth SET hash = ? WHERE email = ?;', [
-                                hash,
-                                args.email
-                            ], function (err) {
-                                if (err) {
-                                    callback(err);
-                                    resolve();
-                                } else if (this.changes == 0) {
-                                    callback(
-                                        {
-                                            'message': `${args.email} not found | Row(s) affected: ${this.changes}`
-                                        }
-                                    );
-                                    resolve();
-                                } else {
-                                    callback(null);
-                                    resolve();
+                        } else if (this.changes == 0) {
+                            callback(
+                                {
+                                    'message': `${args.email} not found | Row(s) affected: ${this.changes}`
                                 }
-                            });
-
+                            );
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
                         }
                     });
+
                 }
 
             } catch (err) {
@@ -1040,7 +1023,7 @@ module.exports = {
                 } else {
                     dtb.all('SELECT * FROM auth WHERE email = ?;', [
                         args.email
-                    ], (err, rows) => {
+                    ], async (err, rows) => {
                         if (err) {
                             callback(err);
                             resolve();
@@ -1060,54 +1043,46 @@ module.exports = {
                             });
                             resolve();
                         } else {
-                            // Compare the hashed password from the database with the hashed password from the user input
-                            bcrypt.compare(args.password, rows[0].hash, (err, result) => {
-                                if (err) {
-                                    callback({
-                                        'message': `Credentials failed | ${err.message}`
-                                    });
-                                    resolve();
-                                }
-                                if (!result) {
-                                    dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
-                                        (rows[0].failed_login_attempts + 1),
-                                        args.email
-                                    ], (err) => {
-                                        if (err) {
-                                            callback({
-                                                'message': `Credentials failed | ${err.message}`
-                                            });
-                                            resolve();
-                                        } else {
-                                            callback({
-                                                'message': 'Credentials failed | login attempts incremented'
-                                            });
-                                            resolve();
-                                        }
-                                    });
-                                } else {
-                                    // reset the failed login attempts
-                                    dtb.run('UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;', [
-                                        args.email
-                                    ], (err) => {
-                                        if (err) {
-                                            callback({
-                                                'message': `Credentials success | failed to reset login attempts | ${err.message}`
-                                            });
-                                            resolve();
-                                        } else {
-                                            callback(null, {
-                                                email: rows[0].email,
-                                                user_id: rows[0].id,
-                                                perms: JSON.parse(rows[0].perms),
-                                                valid: true,
-                                                status: rows[0].status,
-                                            });
-                                            resolve();
-                                        }
-                                    });
-                                }
-                            });
+
+                            if (!await argon2.verify(rows[0].hash, args.password)) {
+                                dtb.run('UPDATE auth SET failed_login_attempts = ? WHERE email = ?;', [
+                                    (rows[0].failed_login_attempts + 1),
+                                    args.email
+                                ], (err) => {
+                                    if (err) {
+                                        callback({
+                                            'message': `Credentials failed | ${err.message}`
+                                        });
+                                        resolve();
+                                    } else {
+                                        callback({
+                                            'message': 'Credentials failed | login attempts incremented'
+                                        });
+                                        resolve();
+                                    }
+                                });
+                            } else {
+                                dtb.run('UPDATE auth SET failed_login_attempts = 0 WHERE email = ?;', [
+                                    args.email
+                                ], (err) => {
+                                    if (err) {
+                                        callback({
+                                            'message': `Credentials success | failed to reset login attempts | ${err.message}`
+                                        });
+                                        resolve();
+                                    } else {
+                                        callback(null, {
+                                            email: rows[0].email,
+                                            user_id: rows[0].id,
+                                            perms: JSON.parse(rows[0].perms),
+                                            valid: true,
+                                            status: rows[0].status,
+                                        });
+                                        resolve();
+                                    }
+                                });
+
+                            }
                         }
 
                     });
@@ -2005,7 +1980,7 @@ module.exports = {
     // 2.0 conventions
     resetPassword: async (dtb, args, callback) => {
 
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             try {
 
                 // callback validation
@@ -2068,35 +2043,27 @@ module.exports = {
                     resolve();
                 } else {
 
-                    bcrypt.hash(args.password, 14, (err, hash) => {
+                    dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
+                        await argon2.hash(args.password, argon_options),
+                        args.email,
+                        args.tempkey
+                    ], async function (err) {
                         if (err) {
                             callback(err);
                             resolve();
-                        } else {
-
-                            dtb.run('UPDATE auth SET hash = ?, tempkey = NULL WHERE email = ? AND tempkey = ?;', [
-                                hash,
-                                args.email,
-                                args.tempkey
-                            ], async function (err) {
-                                if (err) {
-                                    callback(err);
-                                    resolve();
-                                } else if (this.changes == 0) {
-                                    callback(
-                                        {
-                                            'message': `Credentials failed for ${args.email} | Row(s) affected: ${this.changes}`
-                                        }
-                                    );
-                                    resolve();
-                                } else {
-                                    callback(null);
-                                    resolve();
+                        } else if (this.changes == 0) {
+                            callback(
+                                {
+                                    'message': `Credentials failed for ${args.email} | Row(s) affected: ${this.changes}`
                                 }
-                            });
-
+                            );
+                            resolve();
+                        } else {
+                            callback(null);
+                            resolve();
                         }
                     });
+
                 }
             } catch (err) {
                 try {

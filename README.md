@@ -28,6 +28,9 @@ EMAIL_TOKEN = "abcdefghijklmnop"
 AUTH_SALT = "A cool and hard to guess salt"
 
 WEBAPP_DOMAIN = "https://myawesomecompany.com"
+
+ADMIN_EMAIL = "myawesomecompany@gmail.com"
+ADMIN_PASSWORD = "MyAwesomeP@ssw0rd"
 ```
 
 Then use the following code in your `main.js` or `index.js` file.  It will connect to a `.db` file at the path provided and setup all the routes needed to handle server authentication.
@@ -62,7 +65,28 @@ I've taken steps to make this authentication system secure by including account 
 
 #### Password and Tempkey Hashing
 
-`bcrypt` is used for both hashing passwords and comparing password hashes.  
+The hashing algorithm used for passwords is below, and relies on the argon2 package for NodeJS:
+
+```javascript
+hash = await argon2.hash(password, {
+    timeCost: 16,
+    memoryCost: 128 * 1024,
+    parallelism: 2
+})
+```
+
+
+These settings are intended to balance security and performance.  Tempkeys are generated using the following algorithm:
+
+```javascript
+crypto.pbkdf2(crypto.randomBytes(256).toString('hex'), crypto.randomBytes(256).toString('hex'), 999999, 255, 'sha512', (err, derivedKey) => {
+    if (err) reject(err);
+    resolve(derivedKey.toString('hex'));
+});
+```
+
+Which is meant to be long, complex, and utterly random.  While a single randomBytes function may have sufficed, even random functions have some predictability that can be exploited.  Hashing two large random strings a large number of times is meant to be the solution to that vulnerability.  
+
 
 
 
@@ -85,26 +109,17 @@ npm install ugle-auth
 
 You will probably be able to use this package with older or newer versions than these, but I know these work for sure.  
 
-If you are using the preset routing function:
-
 ```javascript
 "dependencies": {
+    "argon2": "^0.30.3",
     "bcrypt": "^5.1.0",
-    "nodemailer": "^6.8.0",
-    "sqlite3": "^5.1.2"
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-}
-```
-
-If you are using custom routing and just want the authentication functions:
-
-```javascript
-"dependencies": {
-    "bcrypt": "^5.1.0",
     "nodemailer": "^6.8.0",
     "sqlite3": "^5.1.2"
 }
 ```
+
 
 
 
