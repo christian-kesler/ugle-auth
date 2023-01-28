@@ -891,7 +891,8 @@ single_args = [
     for (let i = 0; i < single_args.length; i++) {
 
         session_template = {
-            'valid': true
+            'valid': true,
+            'status': 'verified',
         };
 
         res_template = {
@@ -903,7 +904,8 @@ single_args = [
         for (const session_key in session_template) {
 
             session_args = {
-                'valid': true
+                'valid': true,
+                'status': 'verified',
             };
 
             if (i > 1) {
@@ -969,7 +971,8 @@ single_args = [
     for (let i = 0; i < single_args.length; i++) {
 
         session_template = {
-            'valid': true
+            'valid': true,
+            'status': 'verified',
         };
 
         res_template = {
@@ -981,7 +984,8 @@ single_args = [
         for (const session_key in session_template) {
 
             session_args = {
-                'valid': true
+                'valid': true,
+                'status': 'verified',
             };
 
             if (i > 1) {
@@ -1050,6 +1054,7 @@ single_args = [
 
         session_template = {
             'valid': true,
+            'status': 'verified',
             'perms': {
                 'admin': false,
                 'user': true
@@ -1066,6 +1071,7 @@ single_args = [
 
             session_args = {
                 'valid': true,
+                'status': 'verified',
                 'perms': {
                     'admin': false,
                     'user': true
@@ -1154,6 +1160,7 @@ single_args = [
 
         session_template = {
             'valid': true,
+            'status': 'verified',
             'perms': {
                 'admin': false,
                 'user': true
@@ -1170,6 +1177,7 @@ single_args = [
 
             session_args = {
                 'valid': true,
+                'status': 'verified',
                 'perms': {
                     'admin': false,
                     'user': true
@@ -1239,7 +1247,7 @@ single_args = [
             if (i > 0) {
                 console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
             } else {
-                console.debug(`[ ] UNEXPECTED FAIL3 | ${testing.name}[${i}] | ${session_template}, ${res_template}, ${single_args[i]}`);
+                console.debug(`[ ] UNEXPECTED FAIL3 | ${testing.name}[${i}]`);
                 err_count++;
             }
         }

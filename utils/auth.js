@@ -1278,6 +1278,9 @@ module.exports = {
                 if (session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session');
                     return false;
+                } else if (session.status != 'verified') {
+                    res.redirect('/auth/request-verification?msg=unverified-account');
+                    return false;
                 } else {
                     return true;
                 }
@@ -1318,6 +1321,11 @@ module.exports = {
                         'err': 'invalid session'
                     });
                     return false;
+                } else if (session.status != 'verified') {
+                    res.send({
+                        'err': 'unverified account'
+                    });
+                    return false;
                 } else {
                     return true;
                 }
@@ -1355,6 +1363,9 @@ module.exports = {
 
                 if (session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session');
+                    return false;
+                } else if (session.status != 'verified') {
+                    res.redirect('/auth/request-verification?msg=unverified-account');
                     return false;
                 } else {
 
@@ -1407,6 +1418,11 @@ module.exports = {
                 if (session.valid != true) {
                     res.send({
                         'err': 'permission denied'
+                    });
+                    return false;
+                } else if (session.status != 'verified') {
+                    res.send({
+                        'err': 'unverified account'
                     });
                     return false;
                 } else {
@@ -2048,7 +2064,6 @@ module.exports = {
                         args.tempkey
                     ], async function (err) {
                         if (err) {
-
                             callback(err);
                             resolve();
                         } else if (this.changes == 0) {
