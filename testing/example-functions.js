@@ -13,8 +13,10 @@
 // login
 // refreshSession
 // logout
-// isLoggedIn
-// hasPermission
+// navSession
+// apiSession
+// navPermission
+// apiPermission
 // lockAccount
 // unlockAccount
 // addPermission
@@ -47,6 +49,9 @@ req = {
 res = {
     'redirect': () => {
         console.log(login_redirect);
+    },
+    'send': (data) => {
+        console.log(data);
     }
 };
 
@@ -259,15 +264,29 @@ res = {
 
 
 
-    if (ugle_auth.isLoggedIn(req.session, res)) {
-        console.log('isLoggedIn successful');
+    if (ugle_auth.navSession(req.session, res)) {
+        console.log('navSession successful');
     }
 
 
 
 
-    if (ugle_auth.hasPermission(req.session, res, 'user')) {
-        console.log('hasPermission successful');
+    if (ugle_auth.apiSession(req.session, res)) {
+        console.log('apiSession successful');
+    }
+
+
+
+
+    if (ugle_auth.navPermission(req.session, res, 'user')) {
+        console.log('navPermission successful');
+    }
+
+
+
+
+    if (ugle_auth.apiPermission(req.session, res, 'user')) {
+        console.log('apiPermission successful');
     }
 
 

@@ -8,7 +8,7 @@ module.exports = function (app, dtb) {
     // directory redirect
     app.get('/auth', (req, res) => {
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
                 res.redirect(login_redirect);
             }
         } catch (err) {
@@ -277,7 +277,7 @@ module.exports = function (app, dtb) {
         action = 'refresh-session';
 
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 auth.refreshSession(dtb, req.session, (err, session) => {
                     if (err) {
@@ -304,7 +304,7 @@ module.exports = function (app, dtb) {
     // change password, logged in users only
     app.get('/auth/change-password', (req, res) => {
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 res.render('auth/change-password', {
                     query: req.query,
@@ -321,7 +321,7 @@ module.exports = function (app, dtb) {
         action = 'change-password';
 
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 var args = {
                     'email': req.session.email,
@@ -358,7 +358,7 @@ module.exports = function (app, dtb) {
     // verify account, logged in users only
     app.get('/auth/request-verification', (req, res) => {
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 res.render('auth/request-verification', {
                     query: req.query,
@@ -375,7 +375,7 @@ module.exports = function (app, dtb) {
         action = 'request-verification';
 
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 var args = {
                     'recipient': req.session.email,
@@ -412,7 +412,7 @@ module.exports = function (app, dtb) {
         action = 'confirm-verification';
 
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 var args = {
                     'email': req.session.email,
@@ -454,7 +454,7 @@ module.exports = function (app, dtb) {
     // delete account, logged in users only
     app.get('/auth/delete-account', (req, res) => {
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 res.render('auth/delete-account', {
                     query: req.query,
@@ -471,7 +471,7 @@ module.exports = function (app, dtb) {
         action = 'delete-account';
 
         try {
-            if (auth.isLoggedIn(req.session, res)) {
+            if (auth.navSession(req.session, res)) {
 
                 auth.deleteUser(dtb, req.session.email, (err) => {
                     if (err) {
@@ -515,7 +515,7 @@ module.exports = function (app, dtb) {
     // lock account, admins only
     app.get('/auth/lock-account', (req, res) => {
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 res.render('auth/admin/lock-account', {
                     query: req.query,
@@ -532,7 +532,7 @@ module.exports = function (app, dtb) {
         action = 'lock-account';
 
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 auth.lockAccount(dtb, req.body.email, (err) => {
                     if (err) {
@@ -569,7 +569,7 @@ module.exports = function (app, dtb) {
     // unlock account, admins only
     app.get('/auth/unlock-account', (req, res) => {
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 res.render('auth/admin/unlock-account', {
                     query: req.query,
@@ -586,7 +586,7 @@ module.exports = function (app, dtb) {
         action = 'unlock-account';
 
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 auth.unlockAccount(dtb, req.body.email, (err) => {
                     if (err) {
@@ -626,7 +626,7 @@ module.exports = function (app, dtb) {
     // add permission, admins only
     app.get('/auth/add-permission', (req, res) => {
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 res.render('auth/admin/add-permission', {
                     query: req.query,
@@ -643,7 +643,7 @@ module.exports = function (app, dtb) {
         action = 'add-permission';
 
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 args = {
                     'email': req.body.email,
@@ -685,7 +685,7 @@ module.exports = function (app, dtb) {
     // remove permission, admins only
     app.get('/auth/remove-permission', (req, res) => {
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 res.render('auth/admin/remove-permission', {
                     query: req.query,
@@ -702,7 +702,7 @@ module.exports = function (app, dtb) {
         action = 'remove-permission';
 
         try {
-            if (auth.hasPermission(req.session, res, 'admin')) {
+            if (auth.navPermission(req.session, res, 'admin')) {
 
                 args = {
                     'email': req.body.email,

@@ -1261,7 +1261,7 @@ module.exports = {
 
     /* BEGIN PERMISSION METHODS */
     // 2.0 conventions
-    isLoggedIn: (session, res) => {
+    navSession: (session, res) => {
         try {
 
             if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
@@ -1297,7 +1297,49 @@ module.exports = {
 
 
     // 2.0 conventions
-    hasPermission: (session, res, perm) => {
+    apiSession: (session, res) => {
+        try {
+
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                res.send({
+                    'err': 'invalid session'
+                });
+                return false;
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.send}`);
+                return false;
+            } else {
+
+                if (session.valid != true) {
+                    res.send({
+                        'err': 'invalid session'
+                    });
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+        } catch (err) {
+            try {
+                send({
+                    'err': 'invalid session'
+                });
+                return false;
+            } catch (err) {
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.send}`);
+                return false;
+            }
+        }
+
+    },
+
+
+    // 2.0 conventions
+    navPermission: (session, res, perm) => {
         try {
 
             if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
@@ -1336,6 +1378,65 @@ module.exports = {
         } catch (err) {
             try {
                 res.redirect(`${login_redirect}?msg=permission-denied`);
+                return false;
+            } catch (err) {
+                console.error(err.message);
+                return false;
+            }
+        }
+    },
+
+
+    // 2.0 conventions
+    apiPermission: (session, res, perm) => {
+        try {
+
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                res.send({
+                    'err': 'permission denied'
+                });
+                return false;
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.send must be function, received ${typeof res.send}`);
+                return false;
+            } else {
+
+                if (session.valid != true) {
+                    res.send({
+                        'err': 'permission denied'
+                    });
+                    return false;
+                } else {
+
+                    if (perm === undefined || perm === null || typeof perm != 'string') {
+                        console.error(`invalid perm | perm must be string, received '${perm} ${typeof perm}'`);
+                        res.send({
+                            'err': 'permission denied'
+                        });
+                        return false;
+                    } else {
+
+                        if (session.perms[perm] != true) {
+                            res.send({
+                                'err': 'permission denied'
+                            });
+                            return false;
+                        } else {
+                            return true;
+                        }
+
+                    }
+                }
+
+            }
+        } catch (err) {
+            try {
+                res.send({
+                    'err': 'permission denied'
+                });
                 return false;
             } catch (err) {
                 console.error(err.message);
