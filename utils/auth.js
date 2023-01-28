@@ -1300,6 +1300,42 @@ module.exports = {
 
 
     // 2.0 conventions
+    navSessionUnverified: (session, res) => {
+        try {
+
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                res.redirect('/auth/login?msg=invalid-session');
+                return false;
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
+            } else {
+
+                if (session.valid != true) {
+                    res.redirect('/auth/login?msg=invalid-session');
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+        } catch (err) {
+            try {
+                res.redirect('/auth/login?msg=invalid-session');
+                return false;
+            } catch (err) {
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.redirect}`);
+                return false;
+            }
+        }
+
+    },
+
+
+    // 2.0 conventions
     apiSession: (session, res) => {
         try {
 
@@ -1324,6 +1360,48 @@ module.exports = {
                 } else if (session.status != 'verified') {
                     res.send({
                         'err': 'unverified account'
+                    });
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+        } catch (err) {
+            try {
+                send({
+                    'err': 'invalid session'
+                });
+                return false;
+            } catch (err) {
+                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.send}`);
+                return false;
+            }
+        }
+
+    },
+
+
+    // 2.0 conventions
+    apiSessionUnverified: (session, res) => {
+        try {
+
+            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
+                res.send({
+                    'err': 'invalid session'
+                });
+                return false;
+            } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
+                console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
+                return false;
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.send}`);
+                return false;
+            } else {
+
+                if (session.valid != true) {
+                    res.send({
+                        'err': 'invalid session'
                     });
                     return false;
                 } else {

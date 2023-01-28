@@ -966,6 +966,84 @@ single_args = [
 
 
     // ================================================================
+    // navSessionUnverified
+    testing = ugle_auth.navSessionUnverified;
+    for (let i = 0; i < single_args.length; i++) {
+
+        session_template = {
+            'valid': true,
+        };
+
+        res_template = {
+            'redirect': (url) => {
+                console.log(url);
+            }
+        };
+
+        for (const session_key in session_template) {
+
+            session_args = {
+                'valid': true,
+            };
+
+            if (i > 1) {
+                session_args[session_key] = single_args[i];
+            } else if (i == 1) {
+                session_args.valid = false;
+            }
+
+            if (await testing(session_args, res_template)) {
+                if (i > 0) {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (i > 0) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        }
+
+        for (const res_key in res_template) {
+
+            res_args = {
+                'redirect': (url) => {
+                    console.log(url);
+                }
+            };
+
+            if (i > 1) {
+                res_args[res_key] = single_args[i];
+            }
+
+            if (await testing(session_template, res_args)) {
+                if (i > 1 && i != 8) {
+                    console.log(session_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (i > 1) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        }
+    }
+    // navSessionUnverified
+    // ================================================================
+
+
+    // ================================================================
     // apiSession
     testing = ugle_auth.apiSession;
     for (let i = 0; i < single_args.length; i++) {
@@ -1042,6 +1120,84 @@ single_args = [
         }
     }
     // apiSession
+    // ================================================================
+
+
+    // ================================================================
+    // apiSessionUnverified
+    testing = ugle_auth.apiSessionUnverified;
+    for (let i = 0; i < single_args.length; i++) {
+
+        session_template = {
+            'valid': true,
+        };
+
+        res_template = {
+            'send': (url) => {
+                console.log(url);
+            }
+        };
+
+        for (const session_key in session_template) {
+
+            session_args = {
+                'valid': true,
+            };
+
+            if (i > 1) {
+                session_args[session_key] = single_args[i];
+            } else if (i == 1) {
+                session_args.valid = false;
+            }
+
+            if (await testing(session_args, res_template)) {
+                if (i > 0) {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (i > 0) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        }
+
+        for (const res_key in res_template) {
+
+            res_args = {
+                'send': (url) => {
+                    console.log(url);
+                }
+            };
+
+            if (i > 1) {
+                res_args[res_key] = single_args[i];
+            }
+
+            if (await testing(session_template, res_args)) {
+                if (i > 1 && i != 8) {
+                    console.log(session_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
+                }
+            } else {
+                if (i > 1) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    err_count++;
+                }
+            }
+        }
+    }
+    // apiSessionUnverified
     // ================================================================
 
 

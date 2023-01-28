@@ -6,6 +6,8 @@
         msg_success = 'Your session is invalid, please login again to continue.'
     } else if(query.msg == 'permission-denied'){
         msg_warning = 'You do not have permission to perform that action.  If your permissions changed recently, please refresh your session and try again.'
+    } else if(query.msg == 'unverified-account'){
+        msg_warning = 'You need to verify your account before you can do that.  Please check your inbox, or click the button below to have another verification email sent.'
 
     } else if(query.msg == 'signup-successful'){
         msg_success = 'Signup successful, please login to your new account.'
@@ -50,7 +52,7 @@
     } else if(query.msg == 'confirm-verification-successful'){
         msg_success = 'Account verification successful.'
     } else if(query.msg == 'confirm-verification-failed'){
-        msg_warning = 'Account verification failed, please try again.'
+        msg_warning = 'Account verification failed, please login and try opening the provided link again.'
 
     } else if(query.msg == 'delete-account-successful'){
         msg_success = 'Delete account successful.'
