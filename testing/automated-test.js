@@ -207,6 +207,35 @@ single_args = [
     }
     // loginRedirect
     // ================================================================
+
+
+    // ================================================================
+    // adminRedirect
+    single_args[0] = '/admin/portal';
+    single_args[1] = 'badroute';
+    testing = ugle_auth.adminRedirect;
+    for (let i = 0; i < single_args.length; i++) {
+        await testing(single_args[i], (err) => {
+            if (i <= 2) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(login_redirect)}`);
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(login_redirect)}`);
+                    err_count++;
+                }
+            }
+
+        });
+    }
+    // adminRedirect
+    // ================================================================
     /* END CONFIG METHODS */
 
 

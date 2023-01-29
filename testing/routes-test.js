@@ -92,6 +92,13 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
             });
         });
 
+        app.get('/admin/portal', (req, res) => {
+            res.render('test-views/account-home', {
+                query: req.query,
+                session: req.session
+            });
+        });
+
         app.get('/debug/session', (req, res) => {
             res.send(req.session);
             res.end();

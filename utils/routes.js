@@ -576,7 +576,7 @@ module.exports = function (app, dtb) {
                             }
                         });
 
-                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                        res.redirect(`${admin_redirect}?msg=${action}-successful`);
 
                     }
                 });
@@ -631,7 +631,7 @@ module.exports = function (app, dtb) {
                             }
                         });
 
-                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                        res.redirect(`${admin_redirect}?msg=${action}-successful`);
 
                     }
                 });
@@ -692,7 +692,7 @@ module.exports = function (app, dtb) {
                             }
                         });
 
-                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                        res.redirect(`${admin_redirect}?msg=${action}-successful`);
 
                     }
                 });
@@ -751,7 +751,7 @@ module.exports = function (app, dtb) {
                             }
                         });
 
-                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                        res.redirect(`${admin_redirect}?msg=${action}-successful`);
 
                     }
                 });

@@ -60,6 +60,7 @@ module.exports = {
                     };
                     global.lockout_policy = 4;
                     global.login_redirect = '/account/home';
+                    global.admin_redirect = '/admin/portal';
 
                     // dtb.exec('DROP TABLE IF EXISTS auth;');
                     // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
@@ -283,6 +284,37 @@ module.exports = {
                 } else {
 
                     global.login_redirect = url;
+                    callback(null);
+                    resolve();
+
+                }
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    resolve();
+                }
+            }
+
+        });
+    },
+
+
+    // 2.0 conventions
+    adminRedirect: (url, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                if (url === undefined || url === null || typeof url != 'string') {
+                    callback({
+                        'message': `invalid args | url must be string, received '${url} ${typeof url}'`
+                    });
+                    resolve();
+                } else {
+
+                    global.admin_redirect = url;
                     callback(null);
                     resolve();
 
