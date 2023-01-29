@@ -480,8 +480,22 @@ if (ugle_auth.navSession(req.session, res)) {
 
 
 
+if (ugle_auth.navSessionUnverified(req.session, res)) {
+    console.log('navSessionUnverified successful');
+}
+
+
+
+
 if (ugle_auth.apiSession(req.session, res)) {
     console.log('apiSession successful');
+}
+
+
+
+
+if (ugle_auth.apiSessionUnverified(req.session, res)) {
+    console.log('apiSessionUnverified successful');
 }
 
 
