@@ -1203,13 +1203,6 @@ module.exports = {
                                 status: rows[0].status,
                             });
 
-
-                            // session.email = rows[0].email;
-                            // session.user_id = rows[0].id;
-                            // session.perms = JSON.parse(rows[0].perms);
-                            // session.valid = true;
-                            // session.status = rows[0].status;
-
                             // callback(null, session);
                             resolve();
 
@@ -1261,12 +1254,6 @@ module.exports = {
                         status: null,
                     });
 
-                    // session.valid = false;
-                    // session.email = null;
-                    // session.user_id = null;
-                    // session.perms = null;
-                    // session.status = null;
-
                     // callback(null, session);
                     resolve();
 
@@ -1293,24 +1280,30 @@ module.exports = {
 
     /* BEGIN PERMISSION METHODS */
     // 2.0 conventions
-    navSession: (session, res) => {
+    navSession: (req, res) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.redirect('/auth/login?msg=invalid-session');
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
             } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
                 console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
                 return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
+                return false;
             } else {
 
-                if (session.valid != true) {
-                    res.redirect('/auth/login?msg=invalid-session');
+                if (req.session.valid != true) {
+                    res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
                     return false;
-                } else if (session.status != 'verified') {
+                } else if (req.session.status != 'verified') {
                     res.redirect('/auth/request-verification?msg=unverified-account');
                     return false;
                 } else {
@@ -1332,21 +1325,27 @@ module.exports = {
 
 
     // 2.0 conventions
-    navSessionUnverified: (session, res) => {
+    navSessionUnverified: (req, res) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.redirect('/auth/login?msg=invalid-session');
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
             } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
                 console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
                 return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
+                return false;
             } else {
 
-                if (session.valid != true) {
+                if (req.session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session');
                     return false;
                 } else {
@@ -1368,28 +1367,34 @@ module.exports = {
 
 
     // 2.0 conventions
-    apiSession: (session, res) => {
+    apiSession: (req, res) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.send({
-                    'err': 'invalid session'
-                });
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
-            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.send}`);
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.send({
+                    'err': 'invalid session'
+                });
                 return false;
             } else {
 
-                if (session.valid != true) {
+                if (req.session.valid != true) {
                     res.send({
                         'err': 'invalid session'
                     });
                     return false;
-                } else if (session.status != 'verified') {
+                } else if (req.session.status != 'verified') {
                     res.send({
                         'err': 'unverified account'
                     });
@@ -1415,23 +1420,29 @@ module.exports = {
 
 
     // 2.0 conventions
-    apiSessionUnverified: (session, res) => {
+    apiSessionUnverified: (req, res) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.send({
-                    'err': 'invalid session'
-                });
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
-            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.send}`);
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.send({
+                    'err': 'invalid session'
+                });
                 return false;
             } else {
 
-                if (session.valid != true) {
+                if (req.session.valid != true) {
                     res.send({
                         'err': 'invalid session'
                     });
@@ -1457,24 +1468,30 @@ module.exports = {
 
 
     // 2.0 conventions
-    navPermission: (session, res, perm) => {
+    navPermission: (req, res, perm) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.redirect('/auth/login?msg=invalid-session');
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
             } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
                 console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
                 return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
+                return false;
             } else {
 
-                if (session.valid != true) {
+                if (req.session.valid != true) {
                     res.redirect('/auth/login?msg=invalid-session');
                     return false;
-                } else if (session.status != 'verified') {
+                } else if (req.session.status != 'verified') {
                     res.redirect('/auth/request-verification?msg=unverified-account');
                     return false;
                 } else {
@@ -1485,7 +1502,7 @@ module.exports = {
                         return false;
                     } else {
 
-                        if (session.perms[perm] != true) {
+                        if (req.session.perms[perm] != true) {
                             res.redirect(`${login_redirect}?msg=permission-denied`);
                             return false;
                         } else {
@@ -1509,28 +1526,34 @@ module.exports = {
 
 
     // 2.0 conventions
-    apiPermission: (session, res, perm) => {
+    apiPermission: (req, res, perm) => {
         try {
 
-            if (session === undefined || session === null || typeof session != 'object' || Object.keys(session).length == 0) {
-                res.send({
-                    'err': 'permission denied'
-                });
+            if (req === undefined || req === null || typeof req != 'object' || Object.keys(req).length == 0) {
+                console.error(`invalid args | arg1 must be express request object, received ${typeof req}`);
                 return false;
             } else if (res === undefined || res === null || typeof res != 'object' || Object.keys(res).length == 0) {
                 console.error(`invalid args | arg2 must be express response object, received ${typeof res}`);
                 return false;
-            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
-                console.error(`invalid args | arg2.send must be function, received ${typeof res.send}`);
+            } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
+                console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
+                return false;
+            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
+                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+                return false;
+            } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
+                res.send({
+                    'err': 'invalid session'
+                });
                 return false;
             } else {
 
-                if (session.valid != true) {
+                if (req.session.valid != true) {
                     res.send({
                         'err': 'permission denied'
                     });
                     return false;
-                } else if (session.status != 'verified') {
+                } else if (req.session.status != 'verified') {
                     res.send({
                         'err': 'unverified account'
                     });
@@ -1545,7 +1568,7 @@ module.exports = {
                         return false;
                     } else {
 
-                        if (session.perms[perm] != true) {
+                        if (req.session.perms[perm] != true) {
                             res.send({
                                 'err': 'permission denied'
                             });

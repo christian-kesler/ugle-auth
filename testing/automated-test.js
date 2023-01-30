@@ -919,9 +919,12 @@ single_args = [
     testing = ugle_auth.navSession;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
-            'status': 'verified',
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+                'status': 'verified',
+            }
         };
 
         res_template = {
@@ -930,22 +933,25 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
-                'status': 'verified',
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                    'status': 'verified',
+                }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template)) {
+            if (await testing(req_args, res_template)) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(req_args)} | ${JSON.stringify(res_template)}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -954,7 +960,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${JSON.stringify(req_args)} | ${JSON.stringify(res_template)}`);
                     err_count++;
                 }
             }
@@ -972,10 +978,10 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args)) {
+            if (await testing(req_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(session_template, JSON.stringify(res_args), i);
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.log(req_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(req_template)} | ${JSON.stringify(res_args)}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -984,7 +990,7 @@ single_args = [
                 if (i > 1) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${JSON.stringify(req_template)} | ${JSON.stringify(res_args)}`);
                     err_count++;
                 }
             }
@@ -999,8 +1005,12 @@ single_args = [
     testing = ugle_auth.navSessionUnverified;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
+
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+            }
         };
 
         res_template = {
@@ -1009,21 +1019,24 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template)) {
+            if (await testing(req_args, res_template)) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1032,7 +1045,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 }
             }
@@ -1050,10 +1063,10 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args)) {
+            if (await testing(req_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(session_template, JSON.stringify(res_args), i);
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.log(req_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1062,7 +1075,7 @@ single_args = [
                 if (i > 1) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 }
             }
@@ -1077,9 +1090,12 @@ single_args = [
     testing = ugle_auth.apiSession;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
-            'status': 'verified',
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+                'status': 'verified',
+            }
         };
 
         res_template = {
@@ -1088,22 +1104,25 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
-                'status': 'verified',
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                    'status': 'verified',
+                }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template)) {
+            if (await testing(req_args, res_template)) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1112,7 +1131,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 }
             }
@@ -1130,10 +1149,10 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args)) {
+            if (await testing(req_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(session_template, JSON.stringify(res_args), i);
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.log(req_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1142,7 +1161,7 @@ single_args = [
                 if (i > 1) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 }
             }
@@ -1157,8 +1176,11 @@ single_args = [
     testing = ugle_auth.apiSessionUnverified;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+            }
         };
 
         res_template = {
@@ -1167,21 +1189,24 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template)) {
+            if (await testing(req_args, res_template)) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1190,7 +1215,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template}`);
                     err_count++;
                 }
             }
@@ -1208,10 +1233,10 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args)) {
+            if (await testing(req_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(session_template, JSON.stringify(res_args), i);
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.log(req_template, JSON.stringify(res_args), i);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1220,7 +1245,7 @@ single_args = [
                 if (i > 1) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args}`);
                     err_count++;
                 }
             }
@@ -1237,12 +1262,15 @@ single_args = [
     testing = ugle_auth.navPermission;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
-            'status': 'verified',
-            'perms': {
-                'admin': false,
-                'user': true
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+                'status': 'verified',
+                'perms': {
+                    'admin': false,
+                    'user': true
+                }
             }
         };
 
@@ -1252,26 +1280,29 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
-                'status': 'verified',
-                'perms': {
-                    'admin': false,
-                    'user': true
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                    'status': 'verified',
+                    'perms': {
+                        'admin': false,
+                        'user': true
+                    }
                 }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template, single_args[i])) {
+            if (await testing(req_args, res_template, single_args[i])) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template, single_args[i]}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1280,7 +1311,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template, single_args[i]}`);
                     err_count++;
                 }
             }
@@ -1298,9 +1329,9 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args, single_args[i])) {
+            if (await testing(req_template, res_args, single_args[i])) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args, single_args[i]}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1309,15 +1340,15 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args, single_args[i]}`);
                     err_count++;
                 }
             }
         }
 
-        if (await testing(session_template, res_template, single_args[i])) {
+        if (await testing(req_template, res_template, single_args[i])) {
             if (i > 0) {
-                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_template, single_args[i]}`);
                 err_count++;
             } else {
                 console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1326,7 +1357,7 @@ single_args = [
             if (i > 0) {
                 console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
             } else {
-                console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}]`);
+                console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_template, single_args[i]}`);
                 err_count++;
             }
         }
@@ -1343,12 +1374,15 @@ single_args = [
     testing = ugle_auth.apiPermission;
     for (let i = 0; i < single_args.length; i++) {
 
-        session_template = {
-            'valid': true,
-            'status': 'verified',
-            'perms': {
-                'admin': false,
-                'user': true
+        req_template = {
+            'originalUrl': '/secretstuff?howmuch=everything',
+            'session': {
+                'valid': true,
+                'status': 'verified',
+                'perms': {
+                    'admin': false,
+                    'user': true
+                }
             }
         };
 
@@ -1358,26 +1392,29 @@ single_args = [
             }
         };
 
-        for (const session_key in session_template) {
+        for (const req_key in req_template.session) {
 
-            session_args = {
-                'valid': true,
-                'status': 'verified',
-                'perms': {
-                    'admin': false,
-                    'user': true
+            req_args = {
+                'originalUrl': '/secretstuff?howmuch=everything',
+                'session': {
+                    'valid': true,
+                    'status': 'verified',
+                    'perms': {
+                        'admin': false,
+                        'user': true
+                    }
                 }
             };
 
             if (i > 1) {
-                session_args[session_key] = single_args[i];
+                req_args.session[req_key] = single_args[i];
             } else if (i == 1) {
-                session_args.valid = false;
+                req_args.session.valid = false;
             }
 
-            if (await testing(session_args, res_template, single_args[i])) {
+            if (await testing(req_args, res_template, single_args[i])) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template, single_args[i]}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1386,7 +1423,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL1 | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template, single_args[i]}`);
                     err_count++;
                 }
             }
@@ -1404,9 +1441,9 @@ single_args = [
                 res_args[res_key] = single_args[i];
             }
 
-            if (await testing(session_template, res_args, single_args[i])) {
+            if (await testing(req_template, res_args, single_args[i])) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args, single_args[i]}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1415,15 +1452,15 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL2 | ${testing.name}[${i}]`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args, single_args[i]}`);
                     err_count++;
                 }
             }
         }
 
-        if (await testing(session_template, res_template, single_args[i])) {
+        if (await testing(req_template, res_template, single_args[i])) {
             if (i > 0) {
-                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}]`);
+                console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_template, single_args[i]}`);
                 err_count++;
             } else {
                 console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1432,7 +1469,7 @@ single_args = [
             if (i > 0) {
                 console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
             } else {
-                console.debug(`[ ] UNEXPECTED FAIL3 | ${testing.name}[${i}]`);
+                console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_template, single_args[i]}`);
                 err_count++;
             }
         }
