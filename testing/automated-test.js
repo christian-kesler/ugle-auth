@@ -1122,7 +1122,7 @@ single_args = [
 
             if (await testing(req_args, res_template)) {
                 if (i > 0) {
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_args, res_template}`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(req_args)} | ${JSON.stringify(res_template)}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1131,7 +1131,7 @@ single_args = [
                 if (i > 0) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_args, res_template}`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${JSON.stringify(req_args)} | ${JSON.stringify(res_template)}`);
                     err_count++;
                 }
             }
@@ -1151,8 +1151,7 @@ single_args = [
 
             if (await testing(req_template, res_args)) {
                 if (i > 1 && i != 8) {
-                    console.log(req_template, JSON.stringify(res_args), i);
-                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${req_template, res_args}`);
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(req_template)} | ${JSON.stringify(res_args)}`);
                     err_count++;
                 } else {
                     console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}]`);
@@ -1161,7 +1160,7 @@ single_args = [
                 if (i > 1) {
                     console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}]`);
                 } else {
-                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${req_template, res_args}`);
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${JSON.stringify(req_template)} | ${JSON.stringify(res_args)}`);
                     err_count++;
                 }
             }

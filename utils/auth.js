@@ -1304,7 +1304,7 @@ module.exports = {
                     res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
                     return false;
                 } else if (req.session.status != 'verified') {
-                    res.redirect('/auth/request-verification?msg=unverified-account');
+                    res.redirect(`/auth/request-verification?msg=unverified-account&target=${req.originalUrl}`);
                     return false;
                 } else {
                     return true;
@@ -1312,6 +1312,7 @@ module.exports = {
 
             }
         } catch (err) {
+            console.error(err)
             try {
                 res.redirect('/auth/login?msg=invalid-session');
                 return false;
@@ -1346,7 +1347,7 @@ module.exports = {
             } else {
 
                 if (req.session.valid != true) {
-                    res.redirect('/auth/login?msg=invalid-session');
+                    res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
                     return false;
                 } else {
                     return true;
@@ -1354,6 +1355,7 @@ module.exports = {
 
             }
         } catch (err) {
+            console.error(err)
             try {
                 res.redirect('/auth/login?msg=invalid-session');
                 return false;
@@ -1379,8 +1381,8 @@ module.exports = {
             } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
                 console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
                 return false;
-            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.send must be function, received ${typeof res.send}`);
                 return false;
             } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
                 res.send({
@@ -1411,7 +1413,7 @@ module.exports = {
                 });
                 return false;
             } catch (err) {
-                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.send}`);
+                console.error(`invalid args | arg2 must be express response object with function 'send', received ${typeof res} with send attribute of ${typeof res.send}`);
                 return false;
             }
         }
@@ -1432,8 +1434,8 @@ module.exports = {
             } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
                 console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
                 return false;
-            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.send must be function, received ${typeof res.send}`);
                 return false;
             } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
                 res.send({
@@ -1459,7 +1461,7 @@ module.exports = {
                 });
                 return false;
             } catch (err) {
-                console.error(`invalid args | arg2 must be express response object with function 'redirect', received ${typeof res} with redirect attribute of ${typeof res.send}`);
+                console.error(`invalid args | arg2 must be express response object with function 'send', received ${typeof res} with send attribute of ${typeof res.send}`);
                 return false;
             }
         }
@@ -1489,10 +1491,10 @@ module.exports = {
             } else {
 
                 if (req.session.valid != true) {
-                    res.redirect('/auth/login?msg=invalid-session');
+                    res.redirect(`/auth/login?msg=invalid-session&target=${req.originalUrl}`);
                     return false;
                 } else if (req.session.status != 'verified') {
-                    res.redirect('/auth/request-verification?msg=unverified-account');
+                    res.redirect(`/auth/request-verification?msg=unverified-account&target=${req.originalUrl}`);
                     return false;
                 } else {
 
@@ -1538,8 +1540,8 @@ module.exports = {
             } else if (req.originalUrl === undefined || req.originalUrl === null || typeof req.originalUrl != 'string') {
                 console.error(`invalid args | arg1.originalUrl must be string, received ${typeof req.originalUrl} ${req.originalUrl}`);
                 return false;
-            } else if (res.redirect === undefined || res.redirect === null || typeof res.redirect != 'function') {
-                console.error(`invalid args | arg2.redirect must be function, received ${typeof res.redirect}`);
+            } else if (res.send === undefined || res.send === null || typeof res.send != 'function') {
+                console.error(`invalid args | arg2.send must be function, received ${typeof res.send}`);
                 return false;
             } else if (req.session === undefined || req.session === null || typeof req.session != 'object' || Object.keys(req.session).length == 0) {
                 res.send({

@@ -130,7 +130,11 @@ module.exports = function (app, dtb) {
                         'performed_by': req.session.user_id,
                     });
 
-                    res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    if (req.query.target) {
+                        res.redirect(`${req.query.target}?msg=${action}-successful`);
+                    } else {
+                        res.redirect(`${login_redirect}?msg=${action}-successful`);
+                    }
                 }
             });
 
