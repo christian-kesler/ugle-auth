@@ -54,7 +54,6 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
             } else {
                 console.info('database formatted');
             }
-
         });
 
 
