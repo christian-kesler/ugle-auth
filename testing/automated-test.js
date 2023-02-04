@@ -83,6 +83,43 @@ single_args = [
 
 
     // ================================================================
+    // setupDatabase
+    single_args[0] = dtb;
+    single_args[1] = '';
+    testing = ugle_auth.setupDatabase;
+    for (let i = single_args.length - 1; i >= 0; i--) {
+        await testing(single_args[i], (err, data) => {
+            if (i == 0) {
+                if (err) {
+                    console.debug(`[ ] UNEXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                    err_count++;
+                } else {
+                    console.debug(`[X]   EXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    // dtb.exec('DROP TABLE IF EXISTS auth;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_log;');
+                    global.dtb = dtb;
+                }
+            } else {
+                if (err) {
+                    console.debug(`[X]   EXPECTED FAIL | ${testing.name}[${i}] | ${err.message}`);
+                } else {
+                    // dtb.exec('DROP TABLE IF EXISTS auth;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_archive;');
+                    // dtb.exec('DROP TABLE IF EXISTS auth_log;');
+                    global.dtb = dtb;
+                    console.debug(`[ ] UNEXPECTED PASS | ${testing.name}[${i}] | ${JSON.stringify(data)}`);
+                    err_count++;
+                }
+            }
+
+        });
+    }
+    // setupDatabase
+    // ================================================================
+
+
+    // ================================================================
     // formatDatabase
     single_args[0] = dtb;
     single_args[1] = '';

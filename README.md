@@ -182,12 +182,12 @@ ugle_auth.connectToDatabase(`${__dirname}/database.db`, (err, dtb) => {
     } else {
 
 
-        // formatting database
-        ugle_auth.formatDatabase(dtb, (err) => {
+        // setting up database
+        ugle_auth.setupDatabase(dtb, (err) => {
             if (err) {
                 console.error(err.message)
             } else {
-                console.info('database formatted')
+                console.info('database setup complete')
             }
 
         })
@@ -277,6 +277,17 @@ await ugle_auth.connectToDatabase(path, async (err, dtb) => {
     } else {
         console.log('connectToDatabase successful');
         global.dtb = dtb;
+    }
+});
+
+
+
+
+await ugle_auth.setupDatabase(dtb, async (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('setupDatabase successful');
     }
 });
 

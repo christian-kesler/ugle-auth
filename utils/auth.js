@@ -130,6 +130,74 @@ module.exports = {
 
 
     // 2.0 conventions
+    setupDatabase: (dtb, callback) => {
+        return new Promise((resolve) => {
+            try {
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth(
+                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                            'email' VARCHAR(255) UNIQUE,
+                            
+                            'hash' VARCHAR(255),
+                            'status' VARCHAR(255),
+                            'perms' TEXT,
+                            'locked' INTEGER,
+                            
+                            'tempkey' VARCHAR(255),
+                            'tempkey_datetime' DATETIME,
+                            'failed_login_attempts' INTEGER,
+                            
+                            'created_at' DATETIME,
+                            'created_by' VARCHAR(255)
+                        );`
+                );
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth_archive(
+                            'id' INTEGER,
+                            'email' VARCHAR(255),
+                        
+                            'status' VARCHAR(255),
+                            'perms' TEXT,
+    
+                            'created_at' DATETIME,
+                            'created_by' VARCHAR(255),
+                            
+                            'archived_at' DATETIME
+                        );`
+                );
+
+                dtb.exec(
+                    `CREATE TABLE IF NOT EXISTS auth_log(
+                            'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+                            
+                            'action' VARCHAR(255),
+                            'recipient' VARCHAR(255),
+                            'data' TEXT,
+    
+                            'performed_at' DATETIME,
+                            'performed_by' VARCHAR(255)
+                        );`
+                );
+
+                callback(null);
+                resolve();
+
+            } catch (err) {
+                try {
+                    callback(err);
+                    resolve();
+                } catch (err) {
+                    console.log(err);
+                    resolve();
+                }
+            }
+        });
+    },
+
+
+    // 2.0 conventions
     formatDatabase: (dtb, callback) => {
         return new Promise((resolve) => {
             try {
