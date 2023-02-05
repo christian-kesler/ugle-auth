@@ -70,7 +70,7 @@ module.exports = function (app, dtb) {
 
                             log(dtb, {
                                 'action': action,
-                                'recipient': req.session.user_id,
+                                'recipient': 0,
                                 'data': '',
                                 'performed_by': req.session.user_id,
                             });
