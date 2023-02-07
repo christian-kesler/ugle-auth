@@ -240,7 +240,7 @@ If you use the preset routing function, these are the endpoints that will be ava
 /auth/remove-permission         GET & POST
 ```
 
-You'll also need a folder titled "auth" for the ejs files that correspond to each route.  An "auth" folder is present within this package, and can be downloaded from GitHub <a href="https://github.com/christian-kesler/ugle-auth/tree/main/views/auth/">here</a>.  If you'd rather make them yourself, these are the files you'll need within your ejs views directory:
+You'll also need a folder titled "auth" for the ejs files that correspond to each route.  An "auth" folder is present within this package, and can be downloaded from GitLab <a href="https://gitlab.com/uglesoft/openware/ugle-auth/-/tree/main/views/auth">here</a>.  If you'd rather make them yourself, these are the files you'll need within your ejs views directory:
 
 ```
 auth/
