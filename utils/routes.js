@@ -46,7 +46,11 @@ module.exports = function (app, dtb) {
             auth.createUser(dtb, args, (err) => {
                 if (err) {
                     console.error(err.message);
-                    res.redirect(`/auth/login?msg=${action}-failed`);
+                    if (err.reason) {
+                        res.redirect(`/auth/signup?msg=${action}-failed-${err.reason}`);
+                    } else {
+                        res.redirect(`/auth/signup?msg=${action}-failed`);
+                    }
                 } else {
                     log(dtb, {
                         'action': action,

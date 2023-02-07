@@ -567,6 +567,7 @@ module.exports = {
                     resolve();
                 } else if (args.password === undefined || args.password === null || typeof args.password != 'string' || args.password == '' || !isValidPassword(args.password)) {
                     callback({
+                        'reason': 'password',
                         'message': `invalid args.password | args.password must be 8 to 32 character string with lowercase, uppercase, number, and special chars, received '${args.password} ${typeof args.password}'`
                     });
                     resolve();
@@ -587,7 +588,10 @@ module.exports = {
                         'unverified'
                     ], (err) => {
                         if (err) {
-                            callback(err);
+                            callback({
+                                'reason': 'email',
+                                'message': err.message
+                            });
                             resolve();
                         } else {
                             callback(null);

@@ -13,6 +13,10 @@
         msg_success = 'Signup successful, please login to your new account.'
     } else if(query.msg == 'signup-failed'){
         msg_warning = 'Signup failed, please try again.'
+    } else if(query.msg == 'signup-failed-email'){
+        msg_warning = 'Signup failed, that email is already in use.'
+    } else if(query.msg == 'signup-failed-password'){
+        msg_warning = 'Signup failed, passwords must be between 8 and 32 characters and contain lowercase, uppercase, numbers, and special characters.'
 
     } else if(query.msg == 'login-successful'){
         msg_success = 'Login successful.'
