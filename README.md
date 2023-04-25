@@ -632,7 +632,7 @@ await ugle_auth.resetPassword(dtb, args, async (err) => {
 
 ## Author(s)
 
-Christian J Kesler, Uglesoft LLC &copy;
+Christian J Kesler, Uglesoft Openware &copy;
  
 ### Acknowledgements
 
