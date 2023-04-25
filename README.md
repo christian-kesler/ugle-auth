@@ -2,8 +2,7 @@
 
 An authentication system for NodeJS web apps using sqlite
 
-
-
+![ugle-auth icon](https://raw.githubusercontent.com/Uglesoft/ugle-auth/main/ICON.png)
 
 ## Quickstart
 
