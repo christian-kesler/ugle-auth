@@ -629,6 +629,10 @@ await ugle_auth.resetPassword(dtb, args, async (err) => {
 
 
 
+## Support
+
+Reach out to uglesoft at `uglesoft@gmail.com`
+
 ## Author(s)
 
 Christian J Kesler, Uglesoft Openware &copy;
