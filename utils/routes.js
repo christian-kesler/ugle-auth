@@ -134,8 +134,16 @@ module.exports = function (app, dtb) {
                         'performed_by': req.session.user_id,
                     });
 
-                    if (req.query.target) {
-                        res.redirect(`${req.query.target}?msg=${action}-successful`);
+                    if (req?.query?.target) {
+                        if (req?.query?.target.includes('?')) {
+                            if (req?.query?.target.includes('msg=login-successful')) {
+                                res.redirect(`${req.query.target}`);
+                            } else {
+                                res.redirect(`${req.query.target}&msg=${action}-successful`);
+                            }
+                        } else {
+                            res.redirect(`${req.query.target}?msg=${action}-successful`);
+                        }
                     } else {
                         res.redirect(`${login_redirect}?msg=${action}-successful`);
                     }
